@@ -16,13 +16,13 @@ class Empresa(models.Model):
 	id_usuario = models.OneToOneField(
 		User,
 		verbose_name='Usuario',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=False
 	)
 	id_catalogo = models.OneToOneField(
 		Catalogo,
 		verbose_name='Catálogo',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=False
 	)
 	nombre_empresa = models.CharField(
@@ -51,7 +51,7 @@ class Rubro(models.Model):
         blank=False,
 		null=True
 	)
-	rubro = models.ForeignKey(
+	rub_id_rubro = models.ForeignKey(
 		'self',
 		verbose_name='Rubro',
         on_delete=models.SET_NULL,
@@ -61,6 +61,7 @@ class Rubro(models.Model):
 	codigo_rubro = models.CharField(
 		verbose_name='Código del rubro', 
         blank=False,
+        max_length=2,
         help_text="Ingrese el código del rubro",
         error_messages={
             'value':'El código del rubro no debe ser menor a 1'
@@ -256,9 +257,9 @@ class Mayorizacion(models.Model):
 	)
 	
 	class Meta:
-		ordering = ["id_perido_contable","id_cuenta"]
-		verbose_name = "Saldo"
-		verbose_name_plural = "Saldos"
+		ordering = ["id_mayorizacion","id_perido_contable"]
+		verbose_name = "Mayorizacion"
+		verbose_name_plural = "Mayorizaciones"
 
 
 class Transaccion(models.Model):
