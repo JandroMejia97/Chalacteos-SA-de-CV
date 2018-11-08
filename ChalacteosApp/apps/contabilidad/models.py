@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinLengthValidator, MaxLengthValidator
+from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator
 from django.contrib.auth.models import User
 
 
@@ -85,57 +85,6 @@ class Rubro(models.Model):
 		verbose_name = "Rubro"
 		verbose_name_plural = "Rubros"
 
-						
-class EstadoFinanciero(models.Model):
-	id_estado_financiero = models.AutoField(
-		primary_key = True,
-	)
-	id_usuario = models.ForeignKey(
-		User,
-		verbose_name='Usuario',
-        on_delete=models.SET_NULL,
-        blank=False,
-        null=True
-	)
-	id_empresa = models.ForeignKey(
-		Empresa,
-		verbose_name='Empresa',
-        on_delete=models.SET_NULL,
-        blank=False,
-        null=True
-	)
-	id_perido_contable = models.ForeignKey(
-        PeriodoContable,
-        verbose_name='Período Contable',
-        on_delete=models.SET_NULL,
-        blank=False,
-        null=True
-	)
-	id_cuenta = models.ManyToManyField(
-		Cuenta,
-		help_text='Cuenta que sera saldada',
-        error_messages={
-            'select': 'Debe seleccionar uno de la lista'
-        }, 
-        blank=True
-	)
-	nombre_estado_financiero = models.CharField(
-		max_length = 45,
-		verbose_name='Estado Financiero',
-        blank=False,
-        help_text="Nombre del Estado Financiero",
-        error_messages={
-            'empty': 'Este campo no debe quedar vacío'
-        }
-	)
-	def __str__(self):
-		return self.nombre_estado_financiero
-	
-	class Meta:
-		ordering = ["id_perido_contable", "nombre_estado_financiero"]
-		verbose_name = "Estado Financiero"
-		verbose_name_plural = "Estados Financieros"
-
 
 class PeriodoContable(models.Model):
 	id_perido_contable = models.AutoField(
@@ -215,6 +164,57 @@ class Cuenta(models.Model):
 		ordering = ["id_rubro","codigo_cuenta"]
 		verbose_name = "Cuenta"
 		verbose_name_plural = "Cuentas"
+
+
+class EstadoFinanciero(models.Model):
+	id_estado_financiero = models.AutoField(
+		primary_key = True,
+	)
+	id_usuario = models.ForeignKey(
+		User,
+		verbose_name='Usuario',
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True
+	)
+	id_empresa = models.ForeignKey(
+		Empresa,
+		verbose_name='Empresa',
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True
+	)
+	id_perido_contable = models.ForeignKey(
+        PeriodoContable,
+        verbose_name='Período Contable',
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True
+	)
+	id_cuenta = models.ManyToManyField(
+		Cuenta,
+		help_text='Cuenta que sera saldada',
+        error_messages={
+            'select': 'Debe seleccionar uno de la lista'
+        }, 
+        blank=True
+	)
+	nombre_estado_financiero = models.CharField(
+		max_length = 45,
+		verbose_name='Estado Financiero',
+        blank=False,
+        help_text="Nombre del Estado Financiero",
+        error_messages={
+            'empty': 'Este campo no debe quedar vacío'
+        }
+	)
+	def __str__(self):
+		return self.nombre_estado_financiero
+	
+	class Meta:
+		ordering = ["id_perido_contable", "nombre_estado_financiero"]
+		verbose_name = "Estado Financiero"
+		verbose_name_plural = "Estados Financieros"
 
 
 class Mayorizacion(models.Model):
@@ -356,7 +356,7 @@ class Movimiento(models.Model):
         max_digits=100,
         decimal_places=2,
         blank=False,
-        null=True
+        null=True,
         validators=[
             MinValueValidator(
                 0, 
@@ -369,7 +369,7 @@ class Movimiento(models.Model):
         max_digits=100,
         decimal_places=2,
         blank=False,
-        null=True
+        null=True,
         validators=[
             MinValueValidator(
                 0, 
