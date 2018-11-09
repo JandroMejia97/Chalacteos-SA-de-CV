@@ -7,5 +7,7 @@ from . import views
 app_name ='contabilidad'
 
 urlpatterns = [
-	
+	url(r'^crearcuenta/$', auth_views.LoginView.as_view(
+            template_name= 'contabilidad/crearcuenta.html'),
+            name='crearcuenta' ),
 ]
