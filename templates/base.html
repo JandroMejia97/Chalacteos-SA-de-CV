@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" href="images/favicon.ico" type="image/ico" />
+  	<link rel="icon" href="images/favicon.ico" type="image/ico" />
 
     <title>
       {% block title %}
@@ -43,13 +43,15 @@
         {% block tables %}
         {% endblock tables %}
       {% endblock content %}
-      {% block sidebar %}
       {% block footer %}
         <footer>
-          <div class="pull-right">
-            Chalacteos S. A. de C. V.
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto pull-right">
+              <p class="h6 m-0 text-black bold">Copyright &copy; Chalacteos S. A. de C. V. | Sistema de Administración en Línea</p>
+            </div>
           </div>
-          <div class="clearfix"></div>
+          <div class="clear-fix">
+          </div>
         </footer>
       {% endblock footer %}
       <!-- jQuery -->
@@ -82,15 +84,11 @@
       <script src="{% static '/vendors/flot.curvedlines/curvedLines.js' %}"></script>
       <!-- DateJS -->
       <script src="{% static '/vendors/DateJS/build/date.js' %}"></script>
-      <!-- JQVMap -->
-      <script src="{% static '/vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
-      <script src="{% static '/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
-      <script src="{% static '/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
       <!-- bootstrap-daterangepicker -->
       <script src="{% static '/vendors/moment/min/moment.min.js' %}"></script>
       <script src="{% static '/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
 
       <!-- Custom Theme Scripts -->
-      <script src="{% static '/build/js/custom.min.js' %}"></script>
+      <script src="{% static '/js/custom.min.js' %}"></script>
     </body>
 </html>
