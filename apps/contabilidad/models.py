@@ -51,7 +51,7 @@ class Rubro(models.Model):
         blank=False,
 		null=True
 	)
-	rub_id_rubro = models.ForeignKey(
+	rubro_sup = models.ForeignKey(
 		'self',
 		verbose_name='Rubro',
         on_delete=models.SET_NULL,
@@ -82,7 +82,7 @@ class Rubro(models.Model):
 		return self.nombre_rubro
 	
 	class Meta:
-		ordering = ["rubro", "codigo_rubro"]
+		ordering = ["codigo_rubro"]
 		verbose_name = "Rubro"
 		verbose_name_plural = "Rubros"
 
