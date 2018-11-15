@@ -33,7 +33,7 @@ class CuentasListView(LoginRequiredMixin, ListView):
 
 	def get_queryset(self):
 		user = self.request.user
-		context = Cuenta.objects.all()
+		context = Cuenta.objects.all().filter(is_alta=True)
 		if context:
 			return context
 		else:
@@ -43,16 +43,76 @@ class CuentasListView(LoginRequiredMixin, ListView):
 		context = super(CuentasListView, self).get_context_data(**kwargs)
 		return context
 
-def cuentas(request):
-	cuentas = Cuenta.objects.all()
-	return render(request, 'contabilidad/gestionarCuentas.html',{})
-
 
 class CuentaCreateView(LoginRequiredMixin, CreateView):
 	model = Cuenta
 	template_name = 'editForm.html'
-	success_url = '/cuentas/'
+	success_url = reverse_lazy('contabilidad:cuentas')
 	fields = [
 		'id_rubro',
-		'nombre_cuenta'
+		'codigo_cuenta',
+		'nombre_cuenta',
+		'is_cuenta_acreedora'
 	]
+
+
+class CuentaUpdateView(LoginRequiredMixin, UpdateView):
+	model = Cuenta
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:cuentas')
+	fields = [
+		'id_rubro',
+		'codigo_cuenta',
+		'nombre_cuenta',
+		'is_cuenta_acreedora'
+	]
+
+
+class PerfilUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    template_name = 'editForm.html'
+    success_url = '/'
+    fields = [
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'date_joined'
+    ]
+
+
+class CuentaDetailView(LoginRequiredMixin, DetailView):
+	model = Cuenta
+	template_name = 'contabilidad/viewCuenta.html'
+	success_url = reverse_lazy('contabilidad:cuentas')
+	fields = [
+		'id_rubro',
+		'codigo_cuenta',
+		'nombre_cuenta',
+		'is_cuenta_acreedora'
+	]
+	context_object_name = 'cuenta'
+
+
+class PerfilDetailView(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = 'viewPerfil.html'
+    fields = [
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'date_joined',
+        'last_login'
+    ]
+    context_object_name = 'user'
+
+@login_required(login_url='/sign-in/')
+def cuentas(request, id_cuenta):   
+    if request.method == 'DELETE':
+        #id_parametro = request.POST['id']
+        parametro = Cuenta.objects.get(id_cuenta=id_cuenta)
+        parametro.is_alta = False
+        parametro.save()
+        message = "La cuenta fue borrada exitosamente"
+        return JsonResponse(data={'message': message})

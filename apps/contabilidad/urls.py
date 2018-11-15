@@ -23,8 +23,33 @@ urlpatterns = [
 		name='cuentas'
 	),
 	path(
-		'crear/cuenta',
-		views.cuentas,
+		'crear/cuenta/',
+		views.CuentaCreateView.as_view(),
 		name='cuenta-crear'
 	),
+	path(
+		'edicion/cuenta/<slug:pk>/',
+		views.CuentaUpdateView.as_view(),
+		name='cuenta-edicion'
+	),
+	path(
+		'detalle/cuenta/<slug:pk>/',
+		views.CuentaDetailView.as_view(),
+		name='cuenta-detalle'
+	),
+	re_path(
+        r'ajax/cuenta/(?P<id_cuenta>[0-9]+)/',
+        views.cuentas,
+        name='ajax-cuenta'
+    ),
+	re_path(
+        r'detalle/perfil/(?P<pk>[0-9]+)/$',
+        views.PerfilDetailView.as_view(),
+        name='perfil-detalle'
+    ),
+    re_path(
+        r'edicion/perfil/(?P<pk>[0-9]+)/$',
+        views.PerfilUpdateView.as_view(),
+        name='perfil-edicion'
+    )
 ]

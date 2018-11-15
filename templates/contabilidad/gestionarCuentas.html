@@ -3,9 +3,7 @@
 
 {% block content %}    
   {% block sidebar %}
-  {% if user.is_authenticated %}
     {% include 'sidebar.html' %}
-  {% endif %}
   {% endblock sidebar %}
   {% block tables %}
     <div id="content-wrapper">
@@ -38,6 +36,7 @@
                       <th>Rubro</th>
                       <th>Codigo Cuenta</th>
                       <th>Nombre Cuenta</th>
+                      <th>Naturaleza</th>
                       <th>Operaciones</th>
                   </tr>
                 </thead>
@@ -48,10 +47,17 @@
                             <td>{{ cuenta.id_rubro }}</td>
                             <td>{{ cuenta.codigo_cuenta }}</td>
                             <td>{{ cuenta.nombre_cuenta }}</td>
+                            <td>
+                              {% if cuenta.is_cuenta_acreedora %}
+                                Acreedora
+                              {% else %}
+                                Deudora
+                              {% endif %}
+                            </td>
                             <td class="text-center">
-                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('cuenta', {{ cuenta.id_cuenta }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('cuenta', {{ cuenta.id_cuenta }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ cuenta.id_cuenta }}, '{{cuenta.nombre_cuenta}}', 'cuenta');" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('CUENTA', {{ cuenta.id_cuenta }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('CUENTA', {{ cuenta.id_cuenta }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ cuenta.id_cuenta }}, '{{cuenta.nombre_cuenta}}', 'CUENTA');" style="color:gray !important"></a>
                             </td>                          
                         </tr>
                     {% endfor %}

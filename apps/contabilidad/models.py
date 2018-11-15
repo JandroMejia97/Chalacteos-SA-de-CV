@@ -7,6 +7,15 @@ class Catalogo(models.Model):
 	id_catalogo = models.AutoField(
 		primary_key=True
 	)
+	nombre_catalogo = models.CharField(
+		max_length = 30,
+		verbose_name='Nombre del catalogo',
+        blank=False,
+        help_text="Nombre del catalogo"
+	)
+	
+	def __str__(self):
+		return self.nombre_catalogo
 
 
 class Empresa(models.Model):
@@ -38,6 +47,7 @@ class Empresa(models.Model):
 	class Meta:
 		ordering = ["nombre_empresa"]
 		verbose_name = "Empresa"
+		verbose_name_plural = 'Empresas'
 
 
 class Rubro(models.Model):
@@ -55,7 +65,7 @@ class Rubro(models.Model):
 		'self',
 		verbose_name='Rubro',
         on_delete=models.SET_NULL,
-        blank=False,
+        blank=True,
 		null=True
 	)
 	codigo_rubro = models.CharField(
@@ -126,6 +136,7 @@ class Cuenta(models.Model):
 		Rubro,
 		verbose_name='Rubro',
         on_delete=models.SET_NULL,
+		help_text='Seleccion el rubro al que pertenece la cuenta',
         blank=False,
         null=True
 	)
@@ -156,6 +167,12 @@ class Cuenta(models.Model):
         blank=False,
         default=False,
         help_text="Defina si la cuenta es de naturaleza acreedora o deudora"
+	)
+	is_alta = models.BooleanField(
+		verbose_name='¿Está de alta?',
+        blank=False,
+        default=True,
+        help_text="Defina si la cuenta está en uso"
 	)
 
 	def __str__(self):

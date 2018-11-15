@@ -2,12 +2,12 @@ from django.contrib import admin
 
 from .models import *
 
-admin.register(Rubro)
-admin.register(Cuenta)
-admin.register(Catalogo)
+admin.site.register(Rubro)
+admin.site.register(Cuenta)
+admin.site.register(Catalogo)
 admin.register(Empresa)
-admin.register(EstadoFinanciero)
-admin.register(Mayorizacion)
-admin.register(Movimiento)
-admin.register(PeriodoContable)
-admin.register(Transaccion)
+admin.site.register(EstadoFinanciero)
+admin.site.register(Mayorizacion)
+admin.site.register(Movimiento)
+admin.site.register(PeriodoContable)
+admin.site.register(Transaccion)

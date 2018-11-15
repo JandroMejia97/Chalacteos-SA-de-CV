@@ -42,8 +42,8 @@
         <script>
             function redirectEdit(caso, id){
                 switch(caso){
-                    case 'INVERNADERO':
-                        location.href = '/edicion/invernadero/'+id;
+                    case 'CUENTA':
+                        location.href = '/edicion/cuenta/'+id;
                         break;
                     case 'SENSOR':
                         location.href = '/edicion/sensor/'+id;
@@ -64,8 +64,8 @@
             };
             function redirectView(caso, id){
                 switch(caso){
-                    case 'INVERNADERO':
-                        location.href = '/detalle/invernadero/'+id;
+                    case 'CUENTA':
+                        location.href = '/detalle/cuenta/'+id;
                         break;
                     case 'SENSOR':
                         location.href = '/detalle/sensor/'+id;
@@ -90,13 +90,12 @@
             function operacion(id, nombre, caso){       
                 console.log("OPERACION: "+caso);
                 header = "Eliminar "+caso+": ";
-                body = "<p>¿Seguro que desea eliminar el "+caso+" <strong>"+nombre+"</strong>?</p>"+
+                body = "<p>¿Seguro que desea eliminar el/la "+caso+" <strong>"+nombre+"</strong>?</p>"+
                     "<p>Seleccione 'Continuar' para confirmar la acción</p>";
                 confirmarAccion(nombre, header, body);
                 switch(caso){
-                    case 'INVERNADERO':
-                        
-                        url = '/ajax/invernadero/'+id+'/';
+                    case 'CUENTA':                 
+                        url = '/ajax/cuenta/'+id+'/';
                         break;
                     case 'SENSOR':
                         url = '/ajax/sensor/'+id+'/';
