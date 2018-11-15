@@ -1,34 +1,52 @@
-{% extends 'base.html' %}
-{% block title %}Contabilidad{% endblock title %}
-{% block body %}
-{% load static from staticfiles  %}
-<body class="login">
-    <div>
-        <div class="login_wrapper">
-            <div class="animate form login_form">
-                <section class="login_content">
-                    {% load bootstrap %}
-                    <form method="POST">
-                        <img class="img-fluid d-block mx-auto mb-4" src="{% static '/images/Logo.png' %}" alt="" width="250" style="padding-bottom: 0.3rem; margin-top: -5rem">
-                        {% csrf_token %}
-                        <div class="text-center">
-                            <label for="id_username" style="color:darkgray !important;">
-                                Nombre de usuario
-                            </label>
-                            <i>{{ form.username }}</i>
-                        </div>
-                        <div class="text-center">
-                            <label for="id_password" style="color:darkgray !important;">
-                                Contraseña
-                            </label>
-                            <i>{{ form.password }}</i>
-                        </div>
-                        <button class="btn btn-lg btn-primary btn-block" href="{% url 'contabilidad:cuentas' %}" name="submit" type="submit">Iniciar Sesión</button>
-                        <div class="clearfix"></div>
-                    </form>
-                </section>
+{% extends "header&footer.html" %}
+{% block title %}SCIeL | Iniciar Sesión{% endblock %}
+{% block content %}
+  {% block sidebar %}
+  {% endblock sidebar %}
+  {% load static from staticfiles  %}
+  <header class="py-2 mx-auto" style="background-image: url('/static/media/images/lactea.jpg'); background-size: cover !important; width: 100% !important;">
+    <div style="align-content: center !important">
+      <div class="card card-login mx-auto bg-dark view overlay" >
+        <div class="card-header text-center" style="color:whitesmoke !important;">
+          <h3 class="h5">
+            <img class="img-fluid d-block mx-auto mb-4" src="{% static 'media/images/logo2.png' %}" alt="" width="200" height="200">
+            Sistema Administrativo en Línea - SAeL<br>Chalácteos S.A. de C.V.
+          </h3>
+          {% if form.message %}
+            <div class="alert alert-danger in alert-dismissible">
+              <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              <strong>  
+                <p>{{form.message}}</p>
+              </strong>
             </div>
+          {% endif %}
         </div>
-    </div>
-</body>
-{% endblock body %}
+        <div class="card-body form-group form-label-group text-center">
+          <strong>
+            {% load bootstrap %}
+            <form method="POST" class="form-signup">
+              {% csrf_token %}
+              <div class="form-group" style="color:lightgray !important;">
+                {{ form.username | bootstrap }}
+              </div>
+              <div class="form-group" style="color:lightgray !important;">
+                {{ form.password | bootstrap }}
+              </div>
+              <hr>
+              <button class="btn btn-lg btn-primary btn-block" href="{% url 'contabilidad:cuentas' %}" name="submit" type="submit">Iniciar Sesión</button>
+            </form>
+          </strong>
+        </div>
+      </div>
+    </div>      
+  </header>
+{% endblock content %}
+{% block footer %}
+  <footer class="py-5 bg-dark">
+      <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+          <p class="h6 m-0 text-white bold">Copyright &copy; SAeL 2018 | Sistema Administrativo en Línea - Chalácteos</p>
+        </div>
+      </div>
+  </footer>
+{% endblock footer %}

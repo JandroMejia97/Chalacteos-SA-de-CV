@@ -28,7 +28,7 @@ class SignOutView(LoginRequiredMixin, LogoutView):
 
 class CuentasListView(LoginRequiredMixin, ListView):
 	model = Cuenta
-	template_name = 'contabilidad/cuentas.html'
+	template_name = 'contabilidad/gestionarCuentas.html'
 	context_object_name = 'cuentas'
 
 	def get_queryset(self):
@@ -37,7 +37,7 @@ class CuentasListView(LoginRequiredMixin, ListView):
 		if context:
 			return context
 		else:
-			return render(self.request, template_name='page_404.html')
+			return render(self.request, template_name='404.html')
 
 	def get_context_data(self, **kwargs):
 		context = super(CuentasListView, self).get_context_data(**kwargs)
@@ -45,7 +45,7 @@ class CuentasListView(LoginRequiredMixin, ListView):
 
 def cuentas(request):
 	cuentas = Cuenta.objects.all()
-	return render(request, 'contabilidad/base_contabilidad.html',{})
+	return render(request, 'contabilidad/gestionarCuentas.html',{})
 
 
 class CuentaCreateView(LoginRequiredMixin, CreateView):

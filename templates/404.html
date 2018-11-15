@@ -1,0 +1,51 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Gestión de Dispositivos{% endblock title %}
+
+{% block content %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Dispositivos</a>
+          </li>
+          <li class="breadcrumb-item active">Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Dispositivos
+          </div>
+          <div class="card-body text-center">
+            <div id="content-wrapper">
+              <div class="container-fluid">
+                <!-- Breadcrumbs-->
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    <a href="index.html">Error</a>
+                  </li>
+                  <li class="breadcrumb-item active">Error 404</li>
+                </ol>
+                <!-- Page Content -->
+                <h1 class="display-1">404</h1>
+                <p class="lead">Página no encontrada. Puedes
+                  <a href="javascript:history.back()">regresar</a>
+                  a la página anterior, o sí lo prefieres, puedes
+                  <a href="{% url 'invernaderos:invernaderos' %}">regresar a la página inicial</a>.</p>
+              </div>
+            </div>
+            <!-- /.content-wrapper -->
+          </div>
+          <!-- /#wrapper -->
+          <!-- Scroll to Top Button-->
+          <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fas fa-angle-up"></i>
+          </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}

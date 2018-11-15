@@ -18,7 +18,7 @@ urlpatterns = [
         name='sign-out'
     ),
 	path(
-		'cuentas/',
+		'',
 		views.CuentasListView.as_view(),
 		name='cuentas'
 	),

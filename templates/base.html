@@ -1,117 +1,230 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
+﻿<!DOCTYPE html>
+<html lang="es">
+    <head>
+        
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-  	<link rel="icon" href="images/favicon.ico" type="image/ico" />
-
-    <title>
-      {% block title %}
-      {% endblock title %}
-    </title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{% block title %}{% endblock %}</title>
     {% load staticfiles %}
-    <!-- Bootstrap -->
-    <link href="{% static '/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="{% static '/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="{% static '/vendors/nprogress/nprogress.css' %}" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="{% static '/vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">
-	
-    <!-- bootstrap-progressbar -->
-    <link href="{% static '/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="{% static '/vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
-    <!-- bootstrap-daterangepicker -->
-    <link href="{% static '/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
 
-    <!-- Custom Theme Style -->
-    <link href="{% static '/css/custom.min.css' %}" rel="stylesheet">
-  </head>
-  {% block body %}
-  <body class="nav-md">
-      {% block header %}
-      {% endblock header %}
-      {% block content %}
-        {% block sidebar %}
-        {% endblock sidebar %}
-          <div class="right_col" role="main" style="min-height: 1171px;">
-            <div class="">
-              <div class="page-title">
-                <div class="title_left">
-                  {% block pageTitle %}{% endblock pageTitle %}
+    <link href="{% static 'media/images/favicon.png' %}" rel="shortcut icon" type="image/png">
+    <!-- Bootstrap core CSS-->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+        
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+        
+    <!-- Page level plugin CSS-->
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet" type="text/css">
+        
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div id="page-top" style="background-color: #fbfcff !important">
+        {% block header %}
+        {% endblock header %}
+        <div id="wrapper">
+        {% block content %}
+            {% block sidebar %}
+            {% endblock sidebar %}
+            {% block tables %}
+            {% endblock tables %}
+            {% block modals %}
+            {% endblock modals %}
+        {% endblock content %}
+        </div>
+        {% block footer %}
+        {% endblock footer %}
+        <script>
+            function redirectEdit(caso, id){
+                switch(caso){
+                    case 'INVERNADERO':
+                        location.href = '/edicion/invernadero/'+id;
+                        break;
+                    case 'SENSOR':
+                        location.href = '/edicion/sensor/'+id;
+                        break;
+                    case 'ACTUADOR':
+                        location.href = '/edicion/actuador/'+id;
+                        break;
+                    case 'DISPOSITIVO':
+                        location.href = '/edicion/dispositivo/'+id;
+                        break;
+                    case 'CULTIVO':
+                        location.href = '/edicion/cultivo/'+id;
+                        break;
+                    case 'PARAMETRO':
+                        location.href = '/edicion/parametro/'+id;
+                        break;
+                }
+            };
+            function redirectView(caso, id){
+                switch(caso){
+                    case 'INVERNADERO':
+                        location.href = '/detalle/invernadero/'+id;
+                        break;
+                    case 'SENSOR':
+                        location.href = '/detalle/sensor/'+id;
+                        break;
+                    case 'ACTUADOR':
+                        location.href = '/detalle/actuador/'+id;
+                        break;
+                    case 'DISPOSITIVO':
+                        location.href = '/detalle/dispositivo/'+id;
+                        break;
+                    case 'CULTIVO':
+                        location.href = '/detalle/cultivo/'+id;
+                        break;
+                    case 'PARAMETRO':
+                        location.href = '/detalle/parametro/'+id;
+                        break;
+                }
+            };
+            function redirect(url){
+                location.href = url;
+            }
+            function operacion(id, nombre, caso){       
+                console.log("OPERACION: "+caso);
+                header = "Eliminar "+caso+": ";
+                body = "<p>¿Seguro que desea eliminar el "+caso+" <strong>"+nombre+"</strong>?</p>"+
+                    "<p>Seleccione 'Continuar' para confirmar la acción</p>";
+                confirmarAccion(nombre, header, body);
+                switch(caso){
+                    case 'INVERNADERO':
+                        
+                        url = '/ajax/invernadero/'+id+'/';
+                        break;
+                    case 'SENSOR':
+                        url = '/ajax/sensor/'+id+'/';
+                        break;
+                    case 'ACTUADOR':
+                        url = '/ajax/actuador/'+id+'/';
+                        break;
+                    case 'DISPOSITIVO':
+                        url = '/ajax/dispositivo/'+id+'/';
+                        break;
+                    case 'CULTIVO':
+                        url = '/ajax/cultivo/'+id+'/';
+                        break;
+                    case 'PARAMETRO':
+                        url = '/ajax/parametro/'+id+'/';
+                        break;
+                }
+                $('#confirmacion').attr('onclick', 'ejecutarAJAX('+id+',\''+url+'\')');
+            };
+
+            function confirmarAccion(nombre, header, body){
+                console.log("CONFIRMARACCION: "+nombre);
+                $('#modalHeader').empty();
+                $('#modalHeader').append(
+                "<strong>"+header+nombre+"</strong>"
+                );
+                $('#modalBody').empty();
+                $('#modalBody').append(
+                body
+                );
+                $('#detalleModal').modal('show');
+            };
+
+            function ejecutarAJAX(id, url){
+                console.log("EJECUTARAJAX: "+url);
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    data: {
+                        'identificador': id,
+                    },
+                    success: function(data){
+                      console.log(data);
+                      console.log("SUCCES");
+                    },
+                    dataType: 'json'
+                }).done(function(data) {
+                    alert(data.message);
+                    $('#detalleModal').modal('hide');
+                    $('#'+id).remove();
+                }).fail(function() {
+                    console.log("error");
+                    alert("El borrado no pudo ser ejecutado");
+                    $('#detalleModal').modal('hide');
+                }).always(function() {
+                    console.log("complete");
+                });
+            };
+
+            $(function () {
+                $.ajaxSetup({
+                    headers: { "X-CSRFToken": getCookie("csrftoken") }
+                });
+            });
+        
+        </script>
+        <!-- Bootstrap core JavaScript-->
+        <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+        <!-- Core plugin JavaScript-->
+        <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+        <!-- Page level plugin JavaScript-->
+        <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
+        <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+        <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+
+        <!-- Custom scripts for all pages-->
+        <script src="{% static 'js/sb-admin.min.js' %}"></script>
+        <script src="{% static 'js/invernaderos.js' %}"></script>
+        <script src="{% static 'js/csrf.js' %}"></script>
+
+        <!-- Demo scripts for this page-->
+        <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
+        <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
+    </div>
+    <!--VIEW, EDIT & DELETE MODAL-->
+    <div class="modal fade" id="detalleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title bold" id="modalHeader"></h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
                 </div>
-  
-                <div class="title_right">
-                  <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-                    <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Search for...">
-                      <span class="input-group-btn">
-                        <button class="btn btn-default" type="button">Buscar</button>
-                      </span>
-                    </div>
+                <div id="modalBody" class="modal-body">
+                  <div class="" id="detalle">
+
                   </div>
                 </div>
-              </div>
-  
-              <div class="clearfix"></div>
-              {% block tables %}
-              {% endblock tables %}
+                <div id="modalFooter" class="modal-footer">
+                    <button class='btn btn-primary' type='button' data-dismiss='modal'>Cancelar</button>
+                    <button id='confirmacion' class='btn btn-danger' href='#'>Continuar</button>
+                </div>
+            </div> 
+        </div>
+    </div>
+    <!--LOGOUT MODAL-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">¿Seguro que quieres cerrar la sesión?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Seleccione "Cerrar sesión" a continuación si está listo para finalizar su sesión actual</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                        <a class="btn btn-primary" href="{% url 'contabilidad:sign-out' %}">Cerrar Sesión</a>
+                    </div>
+                </div>
             </div>
-          </div>
-      {% endblock content %}
-      {% block footer %}
-        <footer>
-          <div class="container my-auto">
-            <div class="copyright text-center my-auto pull-right">
-              <p class="h6 m-0 text-black bold">Copyright &copy; Chalacteos S. A. de C. V. | Sistema de Administración en Línea</p>
-            </div>
-          </div>
-          <div class="clear-fix">
-          </div>
-        </footer>
-      {% endblock footer %}
-      <!-- jQuery -->
-      <script src="{% static '/vendors/jquery/dist/jquery.min.js' %}"></script>
-      <!-- Bootstrap -->
-      <script src="{% static '/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-      <!-- FastClick -->
-      <script src="{% static '/vendors/fastclick/lib/fastclick.js' %}"></script>
-      <!-- NProgress -->
-      <script src="{% static '/vendors/nprogress/nprogress.js' %}"></script>
-      <!-- Chart.js -->
-      <script src="{% static '/vendors/Chart.js/dist/Chart.min.js' %}"></script>
-      <!-- gauge.js -->
-      <script src="{% static '/vendors/gauge.js/dist/gauge.min.js' %}"></script>
-      <!-- bootstrap-progressbar -->
-      <script src="{% static '/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
-      <!-- iCheck -->
-      <script src="{% static '/vendors/iCheck/icheck.min.js' %}"></script>
-      <!-- Skycons -->
-      <script src="{% static '/vendors/skycons/skycons.js' %}"></script>
-      <!-- Flot -->
-      <script src="{% static '/vendors/Flot/jquery.flot.js' %}"></script>
-      <script src="{% static '/vendors/Flot/jquery.flot.pie.js' %}"></script>
-      <script src="{% static '/vendors/Flot/jquery.flot.time.js' %}"></script>
-      <script src="{% static '/vendors/Flot/jquery.flot.stack.js' %}"></script>
-      <script src="{% static '/vendors/Flot/jquery.flot.resize.js' %}"></script>
-      <!-- Flot plugins -->
-      <script src="{% static '/vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
-      <script src="{% static '/vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
-      <script src="{% static '/vendors/flot.curvedlines/curvedLines.js' %}"></script>
-      <!-- DateJS -->
-      <script src="{% static '/vendors/DateJS/build/date.js' %}"></script>
-      <!-- bootstrap-daterangepicker -->
-      <script src="{% static '/vendors/moment/min/moment.min.js' %}"></script>
-      <script src="{% static '/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+        </div>
+    </div>
 
-      <!-- Custom Theme Scripts -->
-      <script src="{% static '/js/custom.min.js' %}"></script>
-    </body>
-    {% endblock body %}
+</body>
 </html>
