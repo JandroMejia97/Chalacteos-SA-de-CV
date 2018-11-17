@@ -110,9 +110,13 @@ class PerfilDetailView(LoginRequiredMixin, DetailView):
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
     if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
         parametro = Cuenta.objects.get(id_cuenta=id_cuenta)
         parametro.is_alta = False
         parametro.save()
         message = "La cuenta fue borrada exitosamente"
         return JsonResponse(data={'message': message})
+
+@login_required()
+def registrar_transaccion(request):
+	if request.method == 'GET':
+		clean = None

@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator
+from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 
 
@@ -11,7 +11,7 @@ class Catalogo(models.Model):
 		max_length = 30,
 		verbose_name='Nombre del catalogo',
         blank=False,
-        help_text="Nombre del catalogo"
+        help_text="Ingrese el nombre del catalogo"
 	)
 	
 	def __str__(self):
@@ -38,7 +38,7 @@ class Empresa(models.Model):
 		max_length = 30,
 		verbose_name='Nombre de la Empresa',
         blank=False,
-        help_text="Nombre de la Empresa"
+        help_text="Ingrese el nombre de la empresa"
 	)
 
 	def __str__(self):
@@ -59,33 +59,48 @@ class Rubro(models.Model):
 		verbose_name='Catálogo',
         on_delete=models.SET_NULL,
         blank=False,
-		null=True
+		null=True,
+		help_text='Seleccione el catalogo al que pertenece este rubro'
 	)
 	rubro_sup = models.ForeignKey(
 		'self',
 		verbose_name='Rubro',
         on_delete=models.SET_NULL,
         blank=True,
-		null=True
+		null=True,
+		help_text='Seleccione el rubro al que pertenece este subrubro'
 	)
 	codigo_rubro = models.CharField(
 		verbose_name='Código del rubro', 
         blank=False,
-        max_length=2,
+        max_length=8,
         help_text="Ingrese el código del rubro",
         error_messages={
             'value':'El código del rubro no debe ser menor a 1'
         },
         validators=[
             MinLengthValidator(1),
-			MaxLengthValidator(2)
+			MaxLengthValidator(8)
         ]
 	)	
 	nombre_rubro = models.CharField(
-		max_length = 50,
+		max_length = 100,
 		verbose_name ='Nombre del rubro',
         blank=False,
         help_text="Ingrese el nombre del rubro"
+	)
+	nivel = models.IntegerField(
+		verbose_name='Nivel del rubro', 
+        blank=False,
+        help_text="Ingrese el nivel del rubro. Ejemplo: Activo -> Es Nivel 1, Efectivo -> Es Nivel 2",
+        error_messages={
+            'value':'El nivel del rubro no debe ser menor a 1, ni mayor a 3'
+        },
+        validators=[
+            MinValueValidator(1),
+			MaxValueValidator(31)
+        ],
+		null=True
 	)
 
 	def __str__(self):
@@ -98,13 +113,12 @@ class Rubro(models.Model):
 
 
 class PeriodoContable(models.Model):
-	id_perido_contable = models.AutoField(
+	id_periodo_contable = models.AutoField(
 		primary_key = True
 	)
 	fecha_inicio_periodo = models.DateTimeField(
 		verbose_name='Fecha de inicio',
-        auto_now=True,
-        help_text='Fecha de inicio de un nuevo período contable',
+        help_text='Fecha de inicio del nuevo período contable',
         error_messages={
             'empty': 'Este campo no debe quedar vacío'
         },
@@ -113,17 +127,19 @@ class PeriodoContable(models.Model):
 	)
 	fecha_final_periodo = models.DateTimeField(
 		verbose_name='Fecha de finalización',
-        auto_now=True,
         help_text='Fecha de finalización del período contable',
         error_messages={
             'empty': 'Este campo no debe quedar vacío'
         },
         null=True, 
-        blank=False
+        blank=False,
 	)
 
+	def __str__(self):
+		return str(self.fecha_inicio_periodo)+" - "+str(self.fecha_final_periodo)
+
 	class Meta:
-		ordering = ["id_perido_contable"]
+		ordering = ["id_periodo_contable"]
 		verbose_name = "Período Contable"
 		verbose_name_plural = "Períodos Contables"
 
@@ -146,7 +162,7 @@ class Cuenta(models.Model):
         null=True,
         help_text="Debe ingresar el código de la cuenta dependiendo de su ubicación en el catálogo",
         error_messages={
-            'value':'Debe ser un código mayor a 1'
+            'value':'Debe ser un código mayor o igual a 1'
         },
         validators=[
             MinValueValidator(1)
@@ -154,7 +170,7 @@ class Cuenta(models.Model):
 	)
 	nombre_cuenta = models.CharField(
 		max_length = 50,
-		verbose_name='Nombre de cuenta',
+		verbose_name='Nombre de la cuenta',
         blank=False,
         null=True,
         help_text="Ingrese el nombre de la cuenta",
@@ -166,13 +182,13 @@ class Cuenta(models.Model):
 		verbose_name='¿Es cuenta de naturaleza acreedora?',
         blank=False,
         default=False,
-        help_text="Defina si la cuenta es de naturaleza acreedora o deudora"
+        help_text="Marque este campo sí y solo sí la cuenta es de naturaleza acreedora"
 	)
 	is_alta = models.BooleanField(
 		verbose_name='¿Está de alta?',
         blank=False,
         default=True,
-        help_text="Defina si la cuenta está en uso"
+        help_text="Marque esta casilla sí y solo sí la cuenta está en uso"
 	)
 
 	def __str__(self):
@@ -207,7 +223,7 @@ class EstadoFinanciero(models.Model):
         verbose_name='Período Contable',
         on_delete=models.SET_NULL,
         blank=False,
-        null=True
+        null=True,
 	)
 	id_cuenta = models.ManyToManyField(
 		Cuenta,
@@ -273,10 +289,47 @@ class Mayorizacion(models.Model):
         help_text="Defina si el saldo de la cuenta es acreedor o deudor"
 	)
 	
+	def __str__(self):
+		return self.id_perido_contable
+
 	class Meta:
 		ordering = ["id_mayorizacion","id_perido_contable"]
 		verbose_name = "Mayorizacion"
 		verbose_name_plural = "Mayorizaciones"
+
+
+class TipoTransaccion(models.Model):
+	id_tipo = models.AutoField(
+		primary_key=True
+	)
+	nombre_tipo = models.CharField(
+		max_length = 100,
+		verbose_name='Nombre del tipo de transacción',
+        blank=False,
+        null=True,
+        help_text="Ingrese el nombre del tipo de transacción a realizar",
+        error_messages={
+            'empty': 'Este campo no debe quedar vacío'
+        }
+	)
+	descripcion_tipo = models.CharField(
+		max_length = 100,
+		verbose_name='Descripción del tipo transacción',
+        blank=False,
+        null=True,
+        help_text="Ingrese la descripción del tipo de transacción a realizar",
+        error_messages={
+            'empty': 'Este campo no debe quedar vacío'
+        }
+	)
+	
+	def __str__(self):
+		return self.nombre_tipo
+
+	class Meta:
+		ordering = ["id_tipo","nombre_tipo"]
+		verbose_name = "Tipo de Transacción"
+		verbose_name_plural = "Tipos de transacciones"
 
 
 class Transaccion(models.Model):
@@ -289,6 +342,14 @@ class Transaccion(models.Model):
         on_delete=models.SET_NULL,
         blank=False,
         null = True
+	)
+	id_tipo = models.ForeignKey(
+		TipoTransaccion,
+		verbose_name='Tipo de Transacción',
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+		help_text="Seleccione el tipo de transacción a registrar"
 	)
 	numero_transaccion = models.IntegerField(
 		verbose_name='Número de transacción', 
