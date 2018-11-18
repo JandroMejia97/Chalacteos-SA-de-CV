@@ -130,8 +130,8 @@ def import_data(request):
 			type(new[0])
 			row = new[0].split(";")
 			if row[0] != "id_rubro":
-				codigo_cuenta=int(row[1])
-				nombre_cuenta=row[2]
+				codigo_rubro=int(row[1])
+				nombre_rubro=row[2]
 				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
 				if row[4] == '':
 					rubro_sup=None
@@ -146,3 +146,4 @@ def import_data(request):
 					nivel=nivel
 				)
 	return HttpResponse('Hecho')
+
