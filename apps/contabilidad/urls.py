@@ -51,5 +51,10 @@ urlpatterns = [
         r'edicion/perfil/(?P<pk>[0-9]+)/$',
         views.PerfilUpdateView.as_view(),
         name='perfil-edicion'
-    )
+    ),
+ 	path(
+		'import/',
+		views.import_data,
+		name='import'
+	)   
 ]

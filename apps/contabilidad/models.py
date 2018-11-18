@@ -168,6 +168,15 @@ class Cuenta(models.Model):
             MinValueValidator(1)
         ]
 	)
+	codigo_cuenta_padre=models.ForeignKey(
+		'self',
+		verbose_name='Cuenta Padre',
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		help_text='Seleccione la cuenta a la que pertenece esta subcuenta'
+	)
+
 	nombre_cuenta = models.CharField(
 		max_length = 50,
 		verbose_name='Nombre de la cuenta',

@@ -17,6 +17,7 @@ from django.utils import timezone
 
 from .models import *
 
+import csv
 
 class SignInView(LoginView):
     template_name = 'iniciarSesion.html'
@@ -120,3 +121,28 @@ def cuentas(request, id_cuenta):
 def registrar_transaccion(request):
 	if request.method == 'GET':
 		clean = None
+
+def import_data(request):
+	f = 'C:\\rubros.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			type(new[0])
+			row = new[0].split(";")
+			if row[0] != "id_rubro":
+				codigo_cuenta=int(row[1])
+				nombre_cuenta=row[2]
+				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
+				if row[4] == '':
+					rubro_sup=None
+				else:
+					rubro_sup=Rubro.objects.get(id_rubro=row[4])
+				nivel=int(row[5])
+				created = Rubro.objects.create(
+					codigo_rubro=codigo_rubro,
+					nombre_rubro=nombre_rubro,
+					id_catalogo=id_catalogo,
+					rubro_sup=rubro_sup,
+					nivel=nivel
+				)
+	return HttpResponse('Hecho')
