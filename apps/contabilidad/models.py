@@ -168,8 +168,16 @@ class Cuenta(models.Model):
             MinValueValidator(1)
         ]
 	)
+	codigo_cuenta_padre = models.ForeignKey(
+		'self',
+		verbose_name='Cuenta Padre',
+        on_delete=models.SET_NULL,
+        blank=True,
+		null=True,
+		help_text='Seleccione la cuenta a la que pertenece esta subcuenta'
+	)
 	nombre_cuenta = models.CharField(
-		max_length = 50,
+		max_length = 100,
 		verbose_name='Nombre de la cuenta',
         blank=False,
         null=True,
@@ -362,7 +370,7 @@ class Transaccion(models.Model):
         validators=[
             MinValueValidator(1)
         ]
-	)	
+	)
 	fecha_transaccion = models.DateTimeField(
 		verbose_name='Fecha de transacción',
         auto_now=True,
@@ -389,9 +397,10 @@ class Transaccion(models.Model):
         decimal_places=2,
         blank=False,
         null= True,
+		help_text="Ingrese el monto en doláres estadounidenses de la transacción a registrar",
         validators=[
             MinValueValidator(
-                0, 
+                0.01, 
                 message="La cantidad debe ser positiva"
             )
         ],
@@ -421,7 +430,8 @@ class Movimiento(models.Model):
 		verbose_name='Cuenta',
         on_delete=models.SET_NULL,
         blank=False,
-        null=True
+        null=True,
+		help_text='Seleccione una de las cuentas a afectar'
 	)
 	id_mayorizacion = models.ForeignKey(
 		Mayorizacion,
@@ -436,12 +446,14 @@ class Movimiento(models.Model):
         decimal_places=2,
         blank=False,
         null=True,
+		help_text='Ingrese el monto a cargar (en doláres estadounidenses) en la cuenta seleccionada.'+
+			'<strong><br>NOTA: El monto de cumplir partida doble y ser congruente con la transacción registrada</strong>',
         validators=[
             MinValueValidator(
-                0, 
+                0.01, 
                 message="La cantidad debe ser positiva"
             )
-        ],
+        ]
 	)
 	monto_abono = models.DecimalField(
 		verbose_name='Monto abono',
@@ -449,12 +461,14 @@ class Movimiento(models.Model):
         decimal_places=2,
         blank=False,
         null=True,
+        help_text='Ingrese el monto a abonar (en doláres estadounidenses) a la cuenta seleccionada. '+
+			'<strong><br>NOTA: El monto de cumplir partida doble y ser congruente con la transacción registrada</strong>',
         validators=[
             MinValueValidator(
-                0, 
+                0.01, 
                 message="La cantidad debe ser positiva"
             )
-        ],
+        ]
 	)
 	
 	class Meta:

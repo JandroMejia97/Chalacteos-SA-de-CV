@@ -9,6 +9,7 @@ admin.site.register(EstadoFinanciero)
 admin.site.register(Mayorizacion)
 admin.site.register(Movimiento)
 admin.site.register(Transaccion)
+admin.site.register(TipoTransaccion)
 
 @admin.register(PeriodoContable)
 class PeriodoContableAdmin(admin.ModelAdmin):

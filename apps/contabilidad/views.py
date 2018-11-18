@@ -16,7 +16,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.utils import timezone
 
 from .models import *
+from .forms import *
 
+import csv
 
 class SignInView(LoginView):
     template_name = 'iniciarSesion.html'
@@ -44,6 +46,22 @@ class CuentasListView(LoginRequiredMixin, ListView):
 		return context
 
 
+class TransaccionesListView(LoginRequiredMixin, ListView):
+	model = Transaccion
+	template_name = 'contabilidad/gestionarTransacciones.html'
+	context_object_name = 'transacciones'
+
+	def get_context_data(self, *args, **kwargs):
+		context = super(TransaccionesListView, self).get_context_data(*args, **kwargs)
+		return context
+
+
+class MovimientosListView(LoginRequiredMixin, ListView):
+	model = Movimiento
+	template_name = 'contabilidad/gestionarMovimientos.html'
+	context_object_name = 'movimientos'
+
+
 class CuentaCreateView(LoginRequiredMixin, CreateView):
 	model = Cuenta
 	template_name = 'editForm.html'
@@ -53,6 +71,29 @@ class CuentaCreateView(LoginRequiredMixin, CreateView):
 		'codigo_cuenta',
 		'nombre_cuenta',
 		'is_cuenta_acreedora'
+	]
+
+
+class TransaccionCreateView(LoginRequiredMixin, CreateView):
+	model = Transaccion
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:transacciones')
+	fields = [
+		'numero_transaccion',
+		'id_tipo',
+		'descripcion_transaccion',
+		'monto_transaccion'
+	]
+
+
+class MovimientoCreateView(LoginRequiredMixin, CreateView):
+	model = Movimiento
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:transacciones')
+	fields = [
+		'id_cuenta',
+		'monto_cargo',
+        'monto_abono'
 	]
 
 
@@ -67,6 +108,27 @@ class CuentaUpdateView(LoginRequiredMixin, UpdateView):
 		'is_cuenta_acreedora'
 	]
 
+
+class TransaccionUpdateView(LoginRequiredMixin, UpdateView):
+	model = Transaccion
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:transacciones')
+	fields = [
+		'id_rubro',
+		'codigo_cuenta',
+		'nombre_cuenta',
+		'is_cuenta_acreedora'
+	]
+
+
+class MovimientoUpdateView(LoginRequiredMixin, UpdateView):
+	model = Movimiento
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:transacciones')
+	fields = [
+		'monto_cargo',
+        'monto_abono'
+	]
 
 class PerfilUpdateView(LoginRequiredMixin, UpdateView):
     model = User
@@ -119,4 +181,64 @@ def cuentas(request, id_cuenta):
 @login_required()
 def registrar_transaccion(request):
 	if request.method == 'GET':
-		clean = None
+		tipo_transaccion = TipoTransaccion.objects.all()
+		periodo = PeriodoContable.objects.latest('id_periodo')
+		numero_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count() + 1
+		form_transaccion = TransaccionForm
+		form_movimiento = MovimientoForm
+
+def import_data_rubro(request):
+	catalogo = Catalogo.objects.create(nombre_catalogo="Catalogo")
+	f = 'C:\\rubros.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			type(new[0])
+			row = new[0].split(";")
+			if row[0] != "id_rubro":
+				codigo_rubro=int(row[1])
+				nombre_rubro=row[2]
+				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
+				if row[4] == '':
+					rubro_sup=None
+				else:
+					rubro_sup=Rubro.objects.get(id_rubro=row[4])
+				nivel=int(row[5])
+				created = Rubro.objects.create(
+					codigo_rubro=codigo_rubro,
+					nombre_rubro=nombre_rubro,
+					id_catalogo=id_catalogo,
+					rubro_sup=rubro_sup,
+					nivel=nivel
+				)
+	return HttpResponse('Hecho')
+
+def import_data_cuenta(request):
+	f = 'C:\\cuentas.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_cuenta":
+				codigo_cuenta=int(row[1])
+				nombre_cuenta=row[2]
+				is_cuenta_acreedora=bool(row[3])
+				is_alta = bool(row[4])
+				if row[5] == '' or row[5] == None:
+					id_rubro = None
+				else:
+					id_rubro = Rubro.objects.get(id_rubro=int(row[5]))
+				if row[6] == '' or row[6] == None:
+					codigo_cuenta_padre = None
+				else:
+					codigo_cuenta_padre = Cuenta.objects.get(id_cuenta=int(row[6]))
+				created = Cuenta.objects.create(
+					codigo_cuenta=codigo_cuenta,
+					nombre_cuenta=nombre_cuenta,
+					is_cuenta_acreedora=is_cuenta_acreedora,
+					is_alta=is_alta,
+					id_rubro=id_rubro,
+					codigo_cuenta_padre=codigo_cuenta_padre
+				)
+	return HttpResponse('Hecho')
+
