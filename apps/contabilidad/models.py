@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator
+from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 
 
@@ -87,6 +87,19 @@ class Rubro(models.Model):
         blank=False,
         help_text="Ingrese el nombre del rubro"
 	)
+	nivel = models.IntegerField(
+		verbose_name='Nivel del rubro', 
+        blank=False,
+        help_text="Ingrese el nivel del rubro. Ejemplo: Activo -> Es Nivel 1, Efectivo -> Es Nivel 2",
+        error_messages={
+            'value':'El nivel del rubro no debe ser menor a 1, ni mayor a 3'
+        },
+        validators=[
+            MinValueValidator(1),
+			MaxValueValidator(31)
+        ],
+		null=True
+	)
 
 	def __str__(self):
 		return self.nombre_rubro
@@ -152,8 +165,16 @@ class Cuenta(models.Model):
             MinValueValidator(1)
         ]
 	)
+	codigo_cuenta_padre=models.ForeignKey(
+		'self',
+		verbose_name='Cuenta Padre',
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		help_text='Seleccione la cuenta a la que pertenece esta subcuenta'
+	)
 	nombre_cuenta = models.CharField(
-		max_length = 50,
+		max_length = 100,
 		verbose_name='Nombre de cuenta',
         blank=False,
         null=True,

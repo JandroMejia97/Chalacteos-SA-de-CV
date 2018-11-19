@@ -1,3 +1,4 @@
+import csv
 from django.views.generic import CreateView, TemplateView 
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
@@ -116,3 +117,59 @@ def cuentas(request, id_cuenta):
         parametro.save()
         message = "La cuenta fue borrada exitosamente"
         return JsonResponse(data={'message': message})
+
+def import_data_rubro(request):
+	catalogo = Catalogo.objects.create(nombre_catalogo="Catalogo")
+	f = 'C:\\rubros.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			type(new[0])
+			row = new[0].split(";")
+			if row[0] != "id_rubro":
+				codigo_rubro=int(row[1])
+				nombre_rubro=row[2]
+				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
+				if row[4] == '':
+					rubro_sup=None
+				else:
+					rubro_sup=Rubro.objects.get(id_rubro=row[4])
+				nivel=int(row[5])
+				created = Rubro.objects.create(
+					codigo_rubro=codigo_rubro,
+					nombre_rubro=nombre_rubro,
+					id_catalogo=id_catalogo,
+					rubro_sup=rubro_sup,
+					nivel=nivel
+				)
+	return HttpResponse('Hecho')
+
+def import_data_cuenta(request):
+	f = 'C:\\cuentas.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_cuenta":
+				id_cuenta=int(row[0])
+				codigo_cuenta=int(row[1])
+				nombre_cuenta=row[2]
+				is_cuenta_acreedora=bool(row[3])
+				is_alta = bool(row[4])
+				if row[5] == '' or row[5] == None:
+					id_rubro = None
+				else:
+					id_rubro = Rubro.objects.get(id_rubro=int(row[5]))
+				if row[6] == '' or row[6] == None:
+					codigo_cuenta_padre = None
+				else:
+					codigo_cuenta_padre = Cuenta.objects.get(id_cuenta=int(row[6]))
+				created = Cuenta.objects.update_or_create(
+					codigo_cuenta=codigo_cuenta,
+					nombre_cuenta=nombre_cuenta,
+					is_cuenta_acreedora=is_cuenta_acreedora,
+					is_alta=is_alta,
+					id_rubro=id_rubro,
+					codigo_cuenta_padre=codigo_cuenta_padre
+				)
+	return HttpResponse('Hecho')

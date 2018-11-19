@@ -19,6 +19,8 @@ class Recurso(models.Model):
         max_length=250,
         help_text="Una breve descripción del recurso"
     )
+    def __str__(self):
+        return self.nombre_recurso
 
     class Meta:
         verbose_name = 'Recurso'
@@ -34,8 +36,12 @@ class Kardex(models.Model):
         Recurso,
         verbose_name='Recurso',
         on_delete=models.DO_NOTHING,
-        blank=False
+        blank=False,
+        help_text='Seleccion el recurso del que esta compuesto el kardex'
     )
+
+    def __str__(self):
+        return self.id_kardex
 
     class Meta:
         verbose_name = 'Kardex'
@@ -51,12 +57,14 @@ class Movimiento(models.Model):
         Kardex,
         verbose_name='Kardex',
         on_delete=models.DO_NOTHING,
-        blank=False
+        blank=False,
+        help_text='Seleccion el kardex que posee el movimiento'
     )
     fecha_movimiento = models.DateTimeField(
         verbose_name='Fecha',
         auto_now=True,
-        blank=False
+        blank=False,
+        help_text='Ingrese en que se realizo fecha del movimiento'
     )
     cantidad_movimiento = models.DecimalField(
         verbose_name='Cantidad',
@@ -124,7 +132,8 @@ class Saldo(models.Model):
     id_movimiento =models.OneToOneField(
         Movimiento,
         on_delete=models.DO_NOTHING,
-        blank=False
+        blank=False,
+        help_text='Seleccion el movimiento al que le corresponde el saldo'
     )
     cantidad_saldo = models.DecimalField(
         verbose_name='Cantidad',
@@ -166,6 +175,9 @@ class Saldo(models.Model):
         help_text="Este campo es auto generado"
     )
 
+    def __str__(self):
+        return self.id_saldor
+
     class Meta:
         verbose_name = 'Saldo'
         verbose_name_plural = 'Saldos'
@@ -180,8 +192,11 @@ class Producto(models.Model):
         Recurso,
         verbose_name='Recurso',
         on_delete=models.CASCADE,
-        blank=False
+        blank=False,
+        help_text='Seleccion el recurso del producto'
     )
+    def __str__(self):
+        return self.id_producto
 
     class Meta:
         verbose_name = 'Producto'
@@ -197,14 +212,19 @@ class MateriaPrima(models.Model):
         Producto,
         verbose_name='Producto',
         on_delete=models.DO_NOTHING,
-        blank=False
+        blank=False,
+        help_text='Seleccion el producto que esta conformado por materia prima'
     )
     id_recurso = models.OneToOneField(
         Recurso,
         verbose_name='Recurso',
         on_delete=models.CASCADE,
-        blank=False
+        blank=False,
+        help_text='Seleccion el recurso para la kardex',
     )
+
+    def __str__(self):
+        return self.id_materia_prima
 
     class Meta:
         verbose_name = 'Materia Prima'
@@ -229,6 +249,9 @@ class Cliente(models.Model):
         help_text='Nombre del titular del cliente'
     )
 
+    def __str__(self):
+        return self.nombre_cliente
+
     class Meta:
         verbose_name = 'Cliente'
         verbose_name_plural = 'Clientes'
@@ -252,6 +275,9 @@ class Proveedor(models.Model):
         help_text='Nombre del titular del proveedor'
     )
 
+    def __str__(self):
+        return self.nombre_proveedor
+
     class Meta:
         verbose_name = 'Proveedor'
         verbose_name_plural = 'Proveedores'
@@ -266,8 +292,12 @@ class Venta(models.Model):
         Cliente,
         verbose_name='Cliente',
         on_delete=models.DO_NOTHING,
-        blank=False
+        blank=False,
+        help_text='Seleccion el cliente al que le pertenece la venta'
     )
+
+    def __str__(self):
+        return self.id_venta
 
     class Meta:
         verbose_name = 'Venta'
@@ -283,8 +313,12 @@ class Compra(models.Model):
         Proveedor,
         verbose_name='Proveedor',
         on_delete=models.DO_NOTHING,
-        blank=False
+        blank=False,
+        help_text='Seleccion el proveedor al que le pertenece la compra'
     )
+
+    def __str__(self):
+        return self.id_compra
 
     class Meta:
         verbose_name = 'Compra'
@@ -300,13 +334,15 @@ class Factura(models.Model):
         Venta,
         verbose_name='Venta',
         on_delete=models.DO_NOTHING,
-        null=True
+        null=True,
+        help_text='Seleccion la venta que compone a la factura'
     )
     id_compra = models.OneToOneField(
         Compra,
         verbose_name='Compra',
         on_delete=models.DO_NOTHING,
-        null=True
+        null=True,
+        help_text='Seleccion la compra que compone a la factura'
     )
     sub_total_factura = models.DecimalField(
         verbose_name='Sub Total',
@@ -340,6 +376,9 @@ class Factura(models.Model):
         help_text="Estado de la fatura: Despachada, Pendiente de pago, Pendiente de entrada, Entregada"
     )
 
+    def __str__(self):
+        return self.id_factura
+
     class Meta:
         verbose_name = 'Factura'
         verbose_name_plural = 'Facturas'
@@ -354,19 +393,22 @@ class Detalle(models.Model):
         MateriaPrima,
         on_delete=models.DO_NOTHING,
         verbose_name='Materia Prima',
-        null=True
+        null=True,
+        help_text='Seleccion la materia prima que contiene el detalle'
     )
     id_producto = models.ForeignKey(
         Producto,
         on_delete=models.DO_NOTHING,
         verbose_name='Producto',
-        null=True
+        null=True,
+        help_text='Seleccion el producto que contiene el detalle'
     )
     id_factura = models.ForeignKey(
         Factura,
         on_delete=models.DO_NOTHING,
         verbose_name='Factura',
-        null=True
+        null=True,
+        help_text="Ingrese el total de la compra o venta (impuestos incluídos)"
     )
     cantidad_detalle = models.DecimalField(
         verbose_name='Cantidad',
@@ -381,6 +423,10 @@ class Detalle(models.Model):
         ],
         help_text="Ingrese el total de la compra o venta (impuestos incluídos)"
     )
+
+
+    def __str__(self):
+        return self.id_detalle
 
     class Meta:
         verbose_name = 'Detalle de Factura'
@@ -422,6 +468,9 @@ class Impuesto(models.Model):
         help_text="Ingrese la tasa que se le aplica al total de la transacción"
     )
 
+    def __str__(self):
+        return self.nombre_impuesto
+
     class Meta:
         verbose_name = "Impuesto"
         verbose_name_plural = "Impuestos"
@@ -435,13 +484,15 @@ class FacturaImpuesto(models.Model):
         Factura,
         on_delete=models.DO_NOTHING,
         verbose_name='Factura',
-        null=True
+        null=True,
+        help_text='Seleccion la factura que se aplicara en la factura con impuesto'
     )
     id_impuesto = models.ForeignKey(
         Impuesto,
         on_delete=models.DO_NOTHING,
         verbose_name='Impuesto',
-        null=True
+        null=True,
+        help_text='Seleccion el impuesto que se aplicara a la factura con impuesto'
     )
     monto_aplicacion = models.DecimalField(
         verbose_name='Monto Aplicado',

@@ -1,10 +1,134 @@
-from django.conf.urls import url,include
-from django.urls import reverse_lazy
+from django.conf.urls import include
+from django.urls import reverse_lazy, path, re_path
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from . import views
 
-app_name = 'inventario'
+app_name = 'infacturario'
 urlpatterns = [
-    
+	path(
+		'proveedores/',
+		views.ProveedoresListView.as_view(),
+		name='proveedores'
+	),
+	path(
+		'clientes/',
+		views.ClientesListView.as_view(),
+		name='clientes'
+	),
+	path(
+		'facturas/',
+		views.FacturasListView.as_view(),
+		name='facturas'
+	),
+	path(
+		'detalles/',
+		views.DetallesListView.as_view(),
+		name='detalles'
+	),
+	path(
+		'ventas/',
+		views.VentasListView.as_view(),
+		name='ventas'
+	),
+	path(
+		'crear/proveedor/',
+		views.ProveedorCreateView.as_view(),
+		name='proveedor-crear'
+	),
+	path(
+		'crear/cliente/',
+		views.ClienteCreateView.as_view(),
+		name='cliente-crear'
+	),
+	path(
+		'crear/factura/',
+		views.FacturaCreateView.as_view(),
+		name='factura-crear'
+	),
+	path(
+		'crear/detalle/',
+		views.DetalleCreateView.as_view(),
+		name='detalle-crear'
+	),
+	path(
+		'crear/venta/',
+		views.VentaCreateView.as_view(),
+		name='venta-crear'
+	),
+	path(
+		'edicion/proveedor/<slug:pk>/',
+		views.ProveedorUpdateView.as_view(),
+		name='proveedor-edicion'
+	),
+	path(
+		'edicion/cliente/<slug:pk>/',
+		views.ClienteUpdateView.as_view(),
+		name='cliente-edicion'
+	),
+	path(
+		'edicion/factura/<slug:pk>/',
+		views.FacturaUpdateView.as_view(),
+		name='factura-edicion'
+	),
+	path(
+		'edicion/detalle/<slug:pk>/',
+		views.DetalleUpdateView.as_view(),
+		name='detalle-edicion'
+	),
+	path(
+		'edicion/venta/<slug:pk>/',
+		views.VentaUpdateView.as_view(),
+		name='venta-edicion'
+	),
+	path(
+		'detalle/proveedor/<slug:pk>/',
+		views.ProveedorDetailView.as_view(),
+		name='proveedor-detalle'
+	),
+	path(
+		'detalle/cliente/<slug:pk>/',
+		views.ClienteDetailView.as_view(),
+		name='cliente-detalle'
+	),
+	path(
+		'detalle/factura/<slug:pk>/',
+		views.FacturaDetailView.as_view(),
+		name='factura-detalle'
+	),
+	path(
+		'detalle/detalle/<slug:pk>/',
+		views.DetalleDetailView.as_view(),
+		name='detalle-detalle'
+	),
+	path(
+		'detalle/venta/<slug:pk>/',
+		views.VentaDetailView.as_view(),
+		name='detalle-venta'
+	),
+	re_path(
+        r'ajax/proveedor/(?P<id_proveedor>[0-9]+)/',
+        views.proveedores,
+        name='ajax-proveedor'
+    ),
+    re_path(
+        r'ajax/cliente/(?P<id_cliente>[0-9]+)/',
+        views.clientes,
+        name='ajax-cliente'
+    ),
+    re_path(
+        r'ajax/factura/(?P<id_factura>[0-9]+)/',
+        views.facturas,
+        name='ajax-factura'
+    ),
+    re_path(
+        r'ajax/detalle/(?P<id_detalle>[0-9]+)/',
+        views.detalles,
+        name='ajax-detalle'
+    ),
+    re_path(
+        r'ajax/venta/(?P<id_venta>[0-9]+)/',
+        views.ventas,
+        name='ajax-venta'
+    )
 ]

@@ -1,0 +1,71 @@
+{% extends 'header&footer.html' %}
+{% block title %}Inventario{% endblock title %}
+{% block content %}
+    {% block sidebar %}
+    {% endblock sidebar %}
+    {% block tables %}
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="#">listado de ventas</a>
+            </li>
+            <li class="breadcrumb-item active">Datos</li>
+        </ol>
+
+        <div class="alert bold alert-success">
+            <i class="fas fw fa-plus-circle"></i>
+            <a href="{% url 'inventario:detalle-crear' %}">
+            <strong>¡Click Aquí para agregar una nueva venta!</strong>
+            </a>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Listado de ventas</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li>
+                                <a href="#" class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="close-link">
+                                    <i class="fa fa-close"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Detalle N°</th>
+                                    <th>Producto</th>
+                                    <th>Factura N°</th>
+                                    <th>Cantidad</th>
+                                    <th>Operaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detalle in detalles %}
+                                    <tr id="{{ detalle.id_detalle }}">
+                                        <td class="text-center">{{ detalle.id_detalle }}</td>
+                                        <td>{{ detalle.id_producto }}</td>
+                                        <td>{{ detalle.id_factura }}</td>
+                                        <td>{{ detalle.cantidad_detalle }}</td>
+                                        <td class="text-center">
+                                            <a class="fas fa-w fa-file-pdf" name="ver" href="#"  data-toggle="modal" onclick="redirectView('detalle', {{ detalle.id_detalle }})" style="color:gray !important"></a>
+                                            <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('detalle', {{ detalle.id_detalle }})" style="color:gray !important"></a>
+                                            <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ detalle.id_detalle }}, '{{ detalle.id_detalle }}', 'detalle');" style="color:gray !important"></a>
+                                        </td>                          
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock tables %}
+{% endblock content %}
