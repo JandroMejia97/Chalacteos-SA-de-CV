@@ -178,7 +178,7 @@ class Cuenta(models.Model):
 	)
 
 	nombre_cuenta = models.CharField(
-		max_length = 50,
+		max_length = 100,
 		verbose_name='Nombre de la cuenta',
         blank=False,
         null=True,
@@ -189,8 +189,8 @@ class Cuenta(models.Model):
 	)
 	is_cuenta_acreedora = models.BooleanField(
 		verbose_name='¿Es cuenta de naturaleza acreedora?',
-        blank=False,
-        default=False,
+        #blank=False,
+        #default=False,
         help_text="Marque este campo sí y solo sí la cuenta es de naturaleza acreedora"
 	)
 	is_alta = models.BooleanField(

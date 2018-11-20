@@ -53,8 +53,13 @@ urlpatterns = [
         name='perfil-edicion'
     ),
  	path(
-		'import/',
-		views.import_data,
-		name='import'
-	)   
+		'import/rubro/',
+		views.import_data_rubro,
+		name='import-rubro'
+	),
+	path(
+		'import/cuenta/',
+		views.import_data_cuenta,
+		name='import-cuenta'
+	),  
 ]
