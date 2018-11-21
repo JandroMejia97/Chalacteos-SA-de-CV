@@ -1,0 +1,81 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición / {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarContabilidad.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-edit"></i>
+                Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="card-body" id="1">
+            <form action="" method="POST" disabled id="detalleForm">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12 border">
+                        <h4 class="mb-3 text-center header_id">TRANSACCION</h4>
+                        {{ transaccion_form|bootstrap_inline }}
+                    </div>
+                </div>
+                <br>
+                <div class="row border-bottom">
+                    <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                        <h4 class="mb-3 text-center header_id">MOVIMIENTOS</h4>
+                        {{ movimiento_form|bootstrap_inline }}
+                    </div>
+                    <div class="col-12 text-right">    
+                        <button class="btn btn-outline-primary btn-plus" onclick="addFields(2)" type="button">
+                            Registrar movimiento  
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group text-center">
+                    <br>
+                    <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+                    <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+                </div>
+            </form>
+            <script>
+                $(document).ready(
+                function(){
+                    $(".btn-plus").each(
+                    function(element){
+                        $(this).bind("click", addFields());
+                    }
+                    );
+                }
+                );
+
+                function addFields(id){
+                    var clickId = parseInt($("#div_"+id).attr("id").replace('div_',''));
+                    var newId = clickId+1;
+                    $(".btn-plus").attr("onclick","addFields("+newId+")")
+                    $newClone = $('#div_'+clickId).clone(true);
+                    $newClone.attr("id", "div_"+newId);
+                    $(".header_id").attr
+                    $newClone.insertAfter($("#div_"+clickId));
+                }
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}

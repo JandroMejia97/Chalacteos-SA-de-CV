@@ -74,21 +74,30 @@ class CuentaCreateView(LoginRequiredMixin, CreateView):
 	]
 
 
-class TransaccionCreateView(LoginRequiredMixin, CreateView):
-	model = Transaccion
-	template_name = 'editForm.html'
+class TransaccionCreateView(LoginRequiredMixin, TemplateView):
+	template_name = 'contabilidad/chainedForm.html'
 	success_url = reverse_lazy('contabilidad:transacciones')
-	fields = [
+	""" fields = [
 		'numero_transaccion',
 		'id_tipo',
 		'descripcion_transaccion',
 		'monto_transaccion'
-	]
+	] """
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		context['transaccion_form'] = TransaccionForm()
+		cuentas_padre = Cuenta.objects.filter(codigo_cuenta_padre=None)
+		cuentas_hijo = Cuenta.objects.exclude(codigo_cuenta_padre=None)
+		context['cuentas_padre'] = cuentas_padre
+		context['cuentas_hijo'] = cuentas_hijo
+		context['movimiento_form'] = MovimientoForm()
+		return self.render_to_response(context)
 
 
 class MovimientoCreateView(LoginRequiredMixin, CreateView):
 	model = Movimiento
-	template_name = 'editForm.html'
+	template_name = 'contabilidad/chainedForm.html'
 	success_url = reverse_lazy('contabilidad:transacciones')
 	fields = [
 		'id_cuenta',
@@ -204,7 +213,7 @@ def import_data_rubro(request):
 				else:
 					rubro_sup=Rubro.objects.get(id_rubro=row[4])
 				nivel=int(row[5])
-				created = Rubro.objects.create(
+				created = Rubro.objects.update_or_create(
 					codigo_rubro=codigo_rubro,
 					nombre_rubro=nombre_rubro,
 					id_catalogo=id_catalogo,
@@ -232,7 +241,7 @@ def import_data_cuenta(request):
 					codigo_cuenta_padre = None
 				else:
 					codigo_cuenta_padre = Cuenta.objects.get(id_cuenta=int(row[6]))
-				created = Cuenta.objects.create(
+				objeto, created = Cuenta.objects.update_or_create(
 					codigo_cuenta=codigo_cuenta,
 					nombre_cuenta=nombre_cuenta,
 					is_cuenta_acreedora=is_cuenta_acreedora,

@@ -3,6 +3,8 @@ from django import forms
 from .models import *
 
 class TransaccionForm(forms.ModelForm):
+    scope_prefix = 'transaccion_data'
+    form_name = 'transaccion_form'
 
     class Meta:
         model = Transaccion
@@ -13,6 +15,8 @@ class TransaccionForm(forms.ModelForm):
         ]
 
 class MovimientoForm(forms.ModelForm):
+    scope_prefix = 'movimiento_data'
+    form_name = 'movimiento_form'
 
     class Meta:
         model = Movimiento
