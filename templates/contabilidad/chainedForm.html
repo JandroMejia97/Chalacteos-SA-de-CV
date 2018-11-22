@@ -28,14 +28,11 @@
             <form action="" method="POST" disabled id="detalleForm">
                 {% csrf_token %}
                 <div class="row">
-                    <div class="col-lg-12 col-xs-12 border">
+                    <div class="col-lg-6 col-xs-12 border">
                         <h4 class="mb-3 text-center header_id">TRANSACCION</h4>
                         {{ transaccion_form|bootstrap_inline }}
                     </div>
-                </div>
-                <br>
-                <div class="row border-bottom">
-                    <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                    <div  class="col-lg-6 col-xs-12 border" id="movimiento">
                         <h4 class="mb-3 text-center header_id">MOVIMIENTOS</h4>
                         {{ movimiento_form|bootstrap_inline }}
                     </div>
@@ -46,6 +43,7 @@
                         </button>
                     </div>
                 </div>
+                <br>
                 <div class="form-group text-center">
                     <br>
                     <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
@@ -53,6 +51,41 @@
                 </div>
             </form>
             <script>
+                function getCuenta(){
+                    console.log("GETCUENTA");
+                    $("#id_id_cuenta").change(function(){
+                        var cuenta = $("#id_id_cuenta").val();
+                        console.log("AJAX: "+cuenta);
+                        $.ajax({
+                            url: '{% url "contabilidad:ajax-subcuenta" %}',
+                            type: 'GET',
+                            data: {
+                                'id_cuenta': cuenta,
+                            },
+                            success: function(data){
+                                console.log(data.message);
+                                console.log(data);
+                                console.log("SUCCESS");
+                            },
+                            dataType: 'json'
+                        }).done(function(data){
+                            $("#id_sub_cuenta").empty();
+                            $("#id_sub_cuenta").append('<option value="" selected="">---------</option>');
+                            $.each(data.cuentas, function(index, value){
+                                $("#id_sub_cuenta").append(
+                                    "<option id='"+value.id_cuenta + "' value='" +
+                                    value.id_cuenta + "'>" + value.nombre_cuenta + "</option>");
+                            });
+                            document.getElementById("id_sub_cuenta").disabled = false;
+                        }).fail(function(data) {
+                            console.log("error");
+                            console.log(data.message);
+                        }).always(function() {
+                            console.log("complete");
+                        });
+                    });
+                }
+                document.getElementById("id_sub_cuenta").disabled = true;
                 $(document).ready(
                 function(){
                     $(".btn-plus").each(

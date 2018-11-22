@@ -19,6 +19,8 @@ from .models import *
 from .forms import *
 
 import csv
+import json
+
 
 class SignInView(LoginView):
     template_name = 'iniciarSesion.html'
@@ -87,10 +89,6 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		context['transaccion_form'] = TransaccionForm()
-		cuentas_padre = Cuenta.objects.filter(codigo_cuenta_padre=None)
-		cuentas_hijo = Cuenta.objects.exclude(codigo_cuenta_padre=None)
-		context['cuentas_padre'] = cuentas_padre
-		context['cuentas_hijo'] = cuentas_hijo
 		context['movimiento_form'] = MovimientoForm()
 		return self.render_to_response(context)
 
@@ -187,14 +185,22 @@ def cuentas(request, id_cuenta):
         message = "La cuenta fue borrada exitosamente"
         return JsonResponse(data={'message': message})
 
-@login_required()
-def registrar_transaccion(request):
+@login_required(login_url='/sign-in/')
+def load_sub_cuenta(request):
 	if request.method == 'GET':
-		tipo_transaccion = TipoTransaccion.objects.all()
-		periodo = PeriodoContable.objects.latest('id_periodo')
-		numero_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count() + 1
-		form_transaccion = TransaccionForm
-		form_movimiento = MovimientoForm
+		id_cuenta = request.GET['id_cuenta']
+		cuenta = Cuenta.objects.get(id_cuenta=id_cuenta)
+		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=cuenta).values()
+		if cuentas:
+			data = {
+				'message': "Datos recuperados",
+				'cuentas': list(cuentas)
+			}
+		else:
+			data = {
+				'message': "Esta cuenta no posee subcuentas"
+			}
+		return JsonResponse(data=data)
 
 def import_data_rubro(request):
 	catalogo = Catalogo.objects.create(nombre_catalogo="Catalogo")
@@ -206,7 +212,7 @@ def import_data_rubro(request):
 			row = new[0].split(";")
 			if row[0] != "id_rubro":
 				codigo_rubro=int(row[1])
-				nombre_rubro=row[2]
+				nombre_rubro=str(row[2]).upper()
 				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
 				if row[4] == '':
 					rubro_sup=None
@@ -231,7 +237,10 @@ def import_data_cuenta(request):
 			if row[0] != "id_cuenta":
 				codigo_cuenta=int(row[1])
 				nombre_cuenta=row[2]
-				is_cuenta_acreedora=bool(row[3])
+				if row[3] == '1':
+					is_cuenta_acreedora=True
+				else:
+					is_cuenta_acreedora=False
 				is_alta = bool(row[4])
 				if row[5] == '' or row[5] == None:
 					id_rubro = None

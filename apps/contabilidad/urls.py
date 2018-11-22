@@ -111,5 +111,10 @@ urlpatterns = [
 		'import/cuenta/',
 		views.import_data_cuenta,
 		name='import-cuenta'
+	),
+	re_path(
+		'ajax/cuenta/',
+		views.load_sub_cuenta,
+		name='ajax-subcuenta'
 	)
 ]
