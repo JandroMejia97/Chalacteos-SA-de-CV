@@ -37,6 +37,26 @@ urlpatterns = [
 		views.CuentaDetailView.as_view(),
 		name='cuenta-detalle'
 	),
+	path(
+		'estados_financieros/',
+		views.EstadoFinancieroListView.as_view(),
+		name='estados_financieros'
+	),
+	path(
+		'crear/estados_financieros/',
+		views.EstadoFinancieroCreateView.as_view(),
+		name='estados_financieros-crear'
+	),
+	path(
+		'edicion/estados_financieros/<slug:pk>/',
+		views.EstadoFinancieroUpdateView.as_view(),
+		name='estados_financieros-edicion'
+	),
+	path(
+		'detalle/estados_financieros/<slug:pk>/',
+		views.EstadoFinancieroDetailView.as_view(),
+		name='estados_financieros-detalle'
+	),
 	re_path(
         r'ajax/cuenta/(?P<id_cuenta>[0-9]+)/',
         views.cuentas,
@@ -52,6 +72,11 @@ urlpatterns = [
         views.PerfilUpdateView.as_view(),
         name='perfil-edicion'
     ),
+    re_path(
+        r'ajax/estados_financieros(?P<id_estado_financiero>[0-9]+)/',
+        views.estados_financieros,
+        name='ajax-estados_financieros'
+    ),
  	path(
 		'import/rubro/',
 		views.import_data_rubro,
@@ -61,5 +86,6 @@ urlpatterns = [
 		'import/cuenta/',
 		views.import_data_cuenta,
 		name='import-cuenta'
-	),  
+	),
+	
 ]

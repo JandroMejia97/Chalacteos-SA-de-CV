@@ -45,6 +45,24 @@ class CuentasListView(LoginRequiredMixin, ListView):
 		return context
 
 
+class EstadoFinancieroListView(LoginRequiredMixin, ListView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/gestionarEstadosFinancieros.html'
+	context_object_name = 'estados_financieros'
+
+	def get_queryset(self):
+		user = self.request.user
+		context = EstadoFinanciero.objects.all()
+		if context:
+			return context
+		else:
+			return render(self.request, template_name='404.html')
+
+	def get_context_data(self, **kwargs):
+		context = super(EstadoFinancieroListView, self).get_context_data(**kwargs)
+		return context
+
+
 class CuentaCreateView(LoginRequiredMixin, CreateView):
 	model = Cuenta
 	template_name = 'editForm.html'
@@ -57,6 +75,17 @@ class CuentaCreateView(LoginRequiredMixin, CreateView):
 	]
 
 
+class EstadoFinancieroCreateView(LoginRequiredMixin, CreateView):
+	model = EstadoFinanciero
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:estados_financieros')
+	fields = [
+		'id_estado_financiero',
+		'id_periodo_contable',
+		'nombre_estado_financiero'
+	]
+
+
 class CuentaUpdateView(LoginRequiredMixin, UpdateView):
 	model = Cuenta
 	template_name = 'editForm.html'
@@ -66,6 +95,17 @@ class CuentaUpdateView(LoginRequiredMixin, UpdateView):
 		'codigo_cuenta',
 		'nombre_cuenta',
 		'is_cuenta_acreedora'
+	]
+
+
+class EstadoFinancieroUpdateView(LoginRequiredMixin, UpdateView):
+	model = EstadoFinanciero
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:estados_financieros')
+	fields = [
+		'id_estado_financiero',
+		'id_periodo_contable',
+		'nombre_estado_financiero'
 	]
 
 
@@ -95,6 +135,18 @@ class CuentaDetailView(LoginRequiredMixin, DetailView):
 	context_object_name = 'cuenta'
 
 
+class EstadoFinancieroDetailView(LoginRequiredMixin, DetailView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/viewEstadosFinancieros.html'
+	success_url = reverse_lazy('contabilidad:estados_financieros')
+	fields = [
+		'id_estado_financiero',
+		'id_periodo_contable',
+		'nombre_estado_financiero'
+	]
+	context_object_name = 'estados_financieros'
+
+
 class PerfilDetailView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'viewPerfil.html'
@@ -107,6 +159,15 @@ class PerfilDetailView(LoginRequiredMixin, DetailView):
         'last_login'
     ]
     context_object_name = 'user'
+
+
+def estados_financieros(request, id_estado_financiero):   
+    if request.method == 'DELETE':
+        #id_parametro = request.POST['id']
+        parametro = EstadoFinanciero.objects.get(id_estado_financiero=id_estado_financiero)
+        parametro.delete()
+        message = "El estado financiero fue borrado exitosamente"
+        return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
