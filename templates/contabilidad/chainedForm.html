@@ -25,86 +25,201 @@
             <i class="fas fa-plus-circle"></i>
           </div>
           <div class="card-body" id="1">
-            <form action="" method="POST" disabled id="detalleForm">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-lg-6 col-xs-12 border">
+            <div class="row">
+                <div class="col-lg-6 col-xs-12 border rounded">
+                    <form name="transaccion_form" novalidate>
+                        {% csrf_token %}
                         <h4 class="mb-3 text-center header_id">TRANSACCION</h4>
                         {{ transaccion_form|bootstrap_inline }}
-                    </div>
-                    <div  class="col-lg-6 col-xs-12 border" id="movimiento">
+                    </form>
+                </div>
+                <div  class="col-lg-6 col-xs-12 border rounded">
+                    <form name="movimiento_form" novalidate>
+                        {% csrf_token %}
                         <h4 class="mb-3 text-center header_id">MOVIMIENTOS</h4>
                         {{ movimiento_form|bootstrap_inline }}
-                    </div>
-                    <div class="col-12 text-right">    
-                        <button class="btn btn-outline-primary btn-plus" onclick="addFields(2)" type="button">
-                            Registrar movimiento  
-                            <i class="fas fa-plus-circle"></i>
-                        </button>
+                        <div class="col-12 text-right">    
+                            <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
+                                Registrar movimiento  
+                                <i class="fas fa-plus-circle"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fas fa-table"></i>
+                    Movimientos
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th class="text-center">Cuenta</th>                
+                                    <th class="text-center">Debe</th>
+                                    <th class="text-center">Haber</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbBody">
+                                
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-right">Comprobacion</th>
+                                    <th class="text-center" id="debe">$ 0.00</th>
+                                    <th class="text-center" id="haber">$ 0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
+            </div>
+            <div class="form-group text-center">
                 <br>
-                <div class="form-group text-center">
-                    <br>
-                    <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
-                    <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
-                </div>
-            </form>
+                <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+                <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+            </div>
+            </div>
             <script>
-                function getCuenta(){
+                function getCuenta(id, id_sub){
                     console.log("GETCUENTA");
-                    $("#id_id_cuenta").change(function(){
-                        var cuenta = $("#id_id_cuenta").val();
-                        console.log("AJAX: "+cuenta);
-                        $.ajax({
-                            url: '{% url "contabilidad:ajax-subcuenta" %}',
-                            type: 'GET',
-                            data: {
-                                'id_cuenta': cuenta,
-                            },
-                            success: function(data){
-                                console.log(data.message);
-                                console.log(data);
-                                console.log("SUCCESS");
-                            },
-                            dataType: 'json'
-                        }).done(function(data){
-                            $("#id_sub_cuenta").empty();
-                            $("#id_sub_cuenta").append('<option value="" selected="">---------</option>');
+                    var cuenta = $("#"+id).val();
+                    console.log("AJAX: "+cuenta);
+                    $.ajax({
+                        url: '{% url "contabilidad:ajax-subcuenta" %}',
+                        type: 'GET',
+                        data: {
+                            'id_cuenta': cuenta,
+                        },
+                        success: function(data){
+                            console.log(data.message);
+                            console.log(data);
+                            console.log("SUCCESS");
+                        },
+                        dataType: 'json'
+                    }).done(function(data){
+                        $("#"+id_sub).empty();
+                        if(data.cuentas != null){
+                            $("#"+id_sub).append('<option value="" selected="">---------</option>');
                             $.each(data.cuentas, function(index, value){
-                                $("#id_sub_cuenta").append(
+                                $("#"+id_sub).append(
                                     "<option id='"+value.id_cuenta + "' value='" +
                                     value.id_cuenta + "'>" + value.nombre_cuenta + "</option>");
                             });
-                            document.getElementById("id_sub_cuenta").disabled = false;
-                        }).fail(function(data) {
-                            console.log("error");
-                            console.log(data.message);
-                        }).always(function() {
-                            console.log("complete");
-                        });
+                            $("#"+id_sub).removeAttr('disabled');
+                        }else{
+                            alert(data.message);
+                            $("#"+id_sub).append('<option value="" selected="">---------</option>');
+                            $("#"+id_sub).disable = true;
+                        }
+                    }).fail(function(data) {
+                        console.log("error");
+                        console.log(data.message);
+                    }).always(function() {
+                        console.log("complete");
                     });
-                }
-                document.getElementById("id_sub_cuenta").disabled = true;
-                $(document).ready(
-                function(){
-                    $(".btn-plus").each(
-                    function(element){
-                        $(this).bind("click", addFields());
-                    }
-                    );
-                }
-                );
+                };
 
-                function addFields(id){
-                    var clickId = parseInt($("#div_"+id).attr("id").replace('div_',''));
-                    var newId = clickId+1;
-                    $(".btn-plus").attr("onclick","addFields("+newId+")")
-                    $newClone = $('#div_'+clickId).clone(true);
-                    $newClone.attr("id", "div_"+newId);
-                    $(".header_id").attr
-                    $newClone.insertAfter($("#div_"+clickId));
-                }
+                function abonoChange(){
+                    $("#id_monto_cargo").val("");
+                };
+
+                function cargoChange(){
+                    $("#id_monto_abono").val("");
+                };
+
+                //Declarando variable globales
+                var count = 0;
+                var codigoCuentas = [,];
+                var cargos = [];
+                var abonos = [];
+                var totalCargos = 0;
+                var totalAbonos = 0;
+                var data = {
+                    'codigo_cuentas': [],
+                    'cargos': [],
+                    'abonos': []
+                };
+                
+                function getData(){
+                    console.log("ADDROWS")
+                    count = count + 1;
+                    var codigoCuenta = $("#id_id_cuenta").val();
+                    var codigoSubCuenta = $("#id_sub_cuenta").val();
+                    var codigoSubSubCuenta = $("#id_sub_sub_cuenta").val();
+
+                    var cbCuenta = document.getElementById("id_id_cuenta");
+                    var cbSubCuenta = document.getElementById("id_sub_cuenta");
+                    var cbSubSubCuenta = document.getElementById("id_sub_sub_cuenta");
+                    
+                    var cuenta = cbCuenta.options[cbCuenta.selectedIndex].text;
+                    var subCuenta = cbSubCuenta.options[cbSubCuenta.selectedIndex].text;
+                    var subSubCuenta = cbSubSubCuenta.options[cbSubSubCuenta.selectedIndex].text;
+                    
+                    var cargo = parseInt($("#id_monto_cargo").val());
+                    var abono = parseInt($("#id_monto_abono").val());
+                    $(".dataTables_empty").remove();
+
+                    if(cuenta!='' && cuenta!='---------' && subCuenta=='---------' && cargo!=null){
+                        getData(codigoCuenta, cargo, abono);
+                    };
+                    if(cuenta!='' && cuenta!='---------' && subCuenta=='---------' && abono!=null){
+                        getData(codigoCuenta, cargo, abono);
+                    };
+                    if(subCuenta!='' && subCuenta!='---------' && subCuenta=='---------' && cargo!=null){
+                        getData(codigoSubCuenta, cargo, abono);
+                    };
+                    if(subCuenta!='' && subCuenta!='---------' && subCuenta=='---------' && abono!=null){
+                        getData(codigoSubCuenta, cargo, abono);
+                    };
+                    if(subSubCuenta!='' && subSubCuenta!='---------' && cargo!=null){
+                        getData(codigoSubSubCuenta, cargo, abono);
+                    };
+                    if(subSubCuenta!='' && subSubCuenta!='---------' && abono!=null){
+                        getData(codigoSubSubCuenta, cargo, abono);
+                    };
+                    $("#id_monto_abono").empty()
+                    $("#id_monto_cargo").empty()
+                };
+
+                function addRows(codigoSubCuenta, cargo, abono){
+                    if(isNaN(abono)){
+                        data['codigo_cuentas'].push(codigoSubCuenta);
+                        data['cargos'].push(cargo);
+                        data['abonos'].push(null);
+                        totalCargos = totalCargos + cargo;
+
+                        console.log(data);
+
+                        console.log("CARGO")
+                        $("#tbBody").append(
+                            "<tr><td class='text-center'>"+count+"</td>"+
+                            "<td>"+subCuenta+"</td>"+
+                            "<td class='text-center'>$ "+cargo+"</td><td></td></tr>"
+                        )
+                        $("#debe").empty();
+                        $("#debe").append("$ "+totalCargos);
+                    }else{
+                        data['codigo_cuentas'].push(codigoSubCuenta);
+                        data['abonos'].push(abono);
+                        data['cargos'].push(null);
+                        totalAbonos = totalAbonos + abono;
+                        
+                        console.log(data);
+
+                        console.log("ABONO")
+                        $("#tbBody").append(
+                            "<tr><td class='text-center'>"+count+"</td>"+
+                            "<td>"+subCuenta+"</td>"+
+                            "<td></td><td class='text-center'>$ "+abono+"</td></tr>"
+                        )
+                        $("#haber").empty();
+                        $("#haber").append("$ "+totalAbonos);
+                    }
+                };
             </script>
           </div>
         </div>

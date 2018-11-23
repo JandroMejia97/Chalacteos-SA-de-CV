@@ -92,6 +92,28 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 		context['movimiento_form'] = MovimientoForm()
 		return self.render_to_response(context)
 
+	def put(self, request, *args, **kwargs):
+		request_data = json.loads(request.body)
+		transaccion_form = TransaccionForm(
+			data=request_data.get(TransaccionForm.scope_prefix, {})
+		)
+		movimiento_form = MovimientoForm(
+			data=request_data.get(MovimientoForm.scope_prefix, {})
+		)
+		response_data = {}
+
+		if transaccion_form.is_valid() and movimiento_form.is_valid():
+			response_data.update({
+				'success_url': self.success_url
+			})
+			return JsonResponse(response_data)
+		
+		response_data.update({
+			transaccion_form.form_name: transaccion_form.errors,
+			movimiento_form.form_name: movimiento_form.errors,
+		})
+		return JsonResponse(response_data, status=422)
+
 
 class MovimientoCreateView(LoginRequiredMixin, CreateView):
 	model = Movimiento
@@ -198,7 +220,7 @@ def load_sub_cuenta(request):
 			}
 		else:
 			data = {
-				'message': "Esta cuenta no posee subcuentas"
+				'message': "La cuenta seleccionda no posee subcuentas"
 			}
 		return JsonResponse(data=data)
 

@@ -29,11 +29,17 @@ class MovimientoForm(forms.ModelForm):
         label='Sub Cuenta',
         help_text='Seleccione la subcuenta a afectar',
     )
+    sub_sub_cuenta = forms.ChoiceField(
+        label='Sub Sub Cuenta',
+        help_text='Seleccione la subcuenta menor a afectar',
+    )
 
     class Meta:
         model = Movimiento
         fields = [
             'id_cuenta',
+            'sub_cuenta',
+            'sub_sub_cuenta',
             'monto_cargo',
             'monto_abono'
         ]
@@ -45,11 +51,17 @@ class MovimientoForm(forms.ModelForm):
             queryset=Cuenta.objects.filter(codigo_cuenta_padre=None),
             help_text='Seleccione la cuenta mayor a afectar',
             widget=forms.Select(
-                attrs={'onclick': 'getCuenta()'}
+                attrs={
+                    'onchange': 'getCuenta("id_id_cuenta", "id_sub_cuenta")',
+                }
             )
         )
-        """self.fields['sub_cuenta'] = forms.ModelChoiceField(
-            label='Sub Cuenta',
-            queryset=Cuenta.objects.exclude(codigo_cuenta_padre=None),
-            help_text='Seleccione la subcuenta a afectar',
-        )"""
+        self.fields['monto_cargo'].widget.attrs.update({'onchange': 'cargoChange()'})
+        self.fields['monto_abono'].widget.attrs.update({'onchange': 'abonoChange()'})
+        self.fields['sub_cuenta'].widget.attrs.update({
+            'onchange': 'getCuenta("id_sub_cuenta", "id_sub_sub_cuenta")',
+            'disabled': 'true'
+        })
+        self.fields['sub_sub_cuenta'].widget.attrs.update({
+            'disabled': 'true'
+        })
