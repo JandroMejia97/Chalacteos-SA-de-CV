@@ -21,25 +21,28 @@
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa fa-eye"></i>
-            <strong><i> Detalles de venta: {{ venta }}</i></strong>
+            <strong><i> Detalles de materia prima: {{ materia_prima }}</i></strong>
           </div>
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <tbody id="bodyTable">
-                    <tr class="row">
-                      <td class="text-right col">
-                        Codigo venta
-                      </td>
-                      <td class="text-left col">{{ venta.id_venta }}</td>
-                    </tr>
-                    <tr class="row">
-                      <td class="text-right col">
-                        Codigo cliente
-                      </td>
-                      <td class="text-left col">{{ venta.id_cliente }}</a></td>
-                    </tr>
-                </tbody>
+                      
+
+<form name="myForm" action="" method="POST" disabled id="detalleForm">
+                      {% csrf_token %}
+                <div class="row">
+                  <div class="col-lg-12 col-xs-12 border">
+                    <h4 class="mb-3 text-center header_id">VENTA</h4>
+                      {{ venta_form|bootstrap_inline }}
+                  </div>
+                </div>
+                <br>
+                <div class="row border-bottom">
+                  <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                    <h4 class="mb-3 text-center header_id">PRODUCTO</h4>
+                        {{ detalle_venta_form|bootstrap_inline }}
+                    </div>
               </table>
               <div class="row">
                 <div class="col-12 form-group text-center">

@@ -1,0 +1,130 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición / {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-edit"></i>
+                Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="card-body" id="1">
+            <div class="row">
+                <div class="col-lg-6 col-xs-12 border rounded">
+                    <form name="transaccion_form" novalidate>
+                        {% csrf_token %}
+                <div class="row">
+                  <div class="col-lg-12 col-xs-12 border">
+                    <h4 class="mb-3 text-center header_id">VENTA</h4>
+                      {{ compra_form|bootstrap_inline }}
+                  </div>
+                </div>
+                <br>
+                <div class="row border-bottom">
+                  <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                    <h4 class="mb-3 text-center header_id">PRODUCTO</h4>
+                        {{ detalle_compra_form|bootstrap_inline }}
+                    </div>
+                    <div class="col-12 text-right">    
+                        <button class="btn btn-outline-primary btn-plus" onclick="return addTable();" type="button">
+                            Registrar compra 
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fas fa-table"></i>
+                    Compra
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Materia Prima</th>                
+                                    <th>Cantidad Materia prima</th>
+                                    <th>Precio unitario</th>
+                                    <th>SubTotal</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbBody">
+                                
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-right">Total</th>
+                                    <th class="text-center" id="total">$ 0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group text-center">
+                <br>
+                <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+                <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+            </div>
+            </div>
+            <script>
+              function getDetalle(id, id_materia_prima){
+                console.log("GETDETALLE")
+                var detalle = $("#"+id).val();
+                console.log("AJAX: "+detalle);
+                $$.ajax({
+                  url: '{% url "inventario:ajax-detalle" %}',
+                  type: 'GET',
+                  data: {
+                    'id_detalle' : detalle,
+                  },
+                  success: function(data){
+                    console.log(data.message);
+                    console.log(data);
+                    console.log("SUCCESS");
+                  }
+                  dataType: 'json'
+                })
+                .done(function() {
+                  console.log("success");
+                })
+                .fail(function() {
+                  console.log("error");
+                })
+                .always(function() {
+                  console.log("complete");
+                });
+                
+              }
+            </script>
+
+
+
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}

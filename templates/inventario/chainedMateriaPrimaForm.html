@@ -1,0 +1,58 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición / {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-edit"></i>
+                Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="card-body" id="1">
+            <div class="row">
+              <div class="col-lg-6 col-xs-12 border rounded">
+                <form name="transaccion_form" method="POST" novalidate id="detalleForm">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="col-lg-12 col-xs-12 border">
+                      <h4 class="mb-3 text-center header_id">PROVEEDOR</h4>
+                        {{ proveedor_form|bootstrap_inline }}
+                    </div>
+                  </div>
+                  <br>
+                  <div class="row border-bottom">
+                    <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                      <h4 class="mb-3 text-center header_id"></h4>
+                      {{ recurso_form|bootstrap_inline }}
+                    </div>
+                  </div>
+                </form>
+                <div class="form-group text-center">
+                  <br>
+                  <button ng-click="do(update()).then(reloadPage())" type="button" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+                  <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}

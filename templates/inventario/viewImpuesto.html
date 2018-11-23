@@ -21,7 +21,7 @@
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa fa-eye"></i>
-            <strong><i> Detalles de Factura de Venta: {{ factura }}</i></strong>
+            <strong><i> Detalles de impuesto: {{ impuesto }}</i></strong>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -29,33 +29,27 @@
                 <tbody id="bodyTable">
                     <tr class="row">
                       <td class="text-right col">
-                        Factura N°
+                        Codigo impuesto
                       </td>
-                      <td class="text-left col">{{ factura.id_factura }}</td>
+                      <td class="text-left col">{{ impuesto.id_impuesto }}</td>
                     </tr>
                     <tr class="row">
                       <td class="text-right col">
-                        Venta N°
+                        Nombre impuesto
                       </td>
-                      <td class="text-left col">{{ factura.id_venta }}</td>
+                      <td class="text-left col">{{ impuesto.nombre_impuesto }}</a></td>
                     </tr>
                     <tr class="row">
                       <td class="text-right col">
-                        Subtotal factura
+                        Descripcion
                       </td>
-                      <td class="text-left col">{{ factura.sub_total_factura }}</td>
+                      <td class="text-left col">{{ impuesto.descripcion_impuesto }}</a></td>
                     </tr>
                     <tr class="row">
                       <td class="text-right col">
-                        Total factura
+                        Tasa de impuesto
                       </td>
-                      <td class="text-left col">{{ factura.total_factura }}</td>
-                    </tr>
-                    <tr class="row">
-                      <td class="text-right col">
-                        Estado
-                      </td>
-                      <td class="text-left col">{{ factura.estado_factura }}</td>
+                      <td class="text-left col">{{ impuesto.tasa_impuesto }}</a></td>
                     </tr>
                 </tbody>
               </table>

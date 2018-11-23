@@ -54,11 +54,17 @@
                     case 'FACTURA':
                         location.href = '/edicion/factura/'+id;
                         break;
-                    case 'DETALLE':
-                        location.href = '/edicion/detalle/'+id;
-                        break;
                     case 'VENTA':
                         location.href = '/edicion/venta/'+id;
+                        break;
+                    case 'COMPRA':
+                        location.href = '/edicion/compra/'+id;
+                        break;
+                    case 'IMPUESTO':
+                        location.href = '/edicion/impuesto/'+id;
+                        break;
+                    case 'FACTURAIMPUESTO':
+                        location.href = '/edicion/materia_prima/'+id;
                         break;
                 }
             };
@@ -76,11 +82,17 @@
                     case 'FACTURA':
                         location.href = '/detalle/factura/'+id;
                         break;
-                    case 'DETALLE':
-                        location.href = '/detalle/detalle/'+id;
-                        break;
                     case 'VENTA':
                         location.href = '/detalle/venta/'+id;
+                        break;
+                    case 'COMPRA':
+                        location.href = '/detalle/compra/'+id;
+                        break;
+                    case 'IMPUESTO':
+                        location.href = '/detalle/impuesto/'+id;
+                        break;
+                    case 'MATERIAPRIMA':
+                        location.href = '/detalle/materia_prima/'+id;
                         break;
                 }
             };
@@ -106,11 +118,17 @@
                     case 'FACTURA':
                         url = '/ajax/factura/'+id+'/';
                         break;
-                    case 'DETALLE':
-                        url = '/ajax/detalle/'+id+'/';
-                        break;
                     case 'VENTA':
                         url = '/ajax/venta/'+id+'/';
+                        break;
+                    case 'COMPRA':
+                        url = '/ajax/compra/'+id+'/';
+                        break;
+                    case 'IMPUESTO':
+                        url = '/ajax/impuesto/'+id+'/';
+                        break;
+                    case 'MATERIAPRIMA':
+                        url = '/ajax/materia_prima/'+id;
                         break;
                 }
                 $('#confirmacion').attr('onclick', 'ejecutarAJAX('+id+',\''+url+'\')');
@@ -168,6 +186,9 @@
 
         <!-- Core plugin JavaScript-->
         <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+        <!-- Angular -->
+        <script src="{% static 'js/angular.js' %}"></script>
 
         <!-- Page level plugin JavaScript-->
         <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>

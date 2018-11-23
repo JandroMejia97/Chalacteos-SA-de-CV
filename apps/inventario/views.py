@@ -13,6 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
 from .models import *
+from .forms import *
 
 # Create your views here.
 
@@ -50,40 +51,6 @@ class ClientesListView(LoginRequiredMixin, ListView):
 		context = super(ClientesListView, self).get_context_data(**kwargs)
 		return context
 
-class FacturasListView(LoginRequiredMixin, ListView):
-	model = Factura
-	template_name = 'inventario/gestionarFacturaVentas.html'
-	context_object_name = 'facturas'
-
-	def get_queryset(self):
-		user = self.request.user
-		context = Factura.objects.all()
-		if context:
-			return context
-		else:
-			return render(self.request, template_name='404.html')
-
-	def get_context_data(self, **kwargs):
-		context = super(FacturasListView, self).get_context_data(**kwargs)
-		return context
-
-class DetallesListView(LoginRequiredMixin, ListView):
-	model = Detalle
-	template_name = 'inventario/gestionarDetalleVentas.html'
-	context_object_name = 'detalles'
-
-	def get_queryset(self):
-		user = self.request.user
-		context = Detalle.objects.all()
-		if context:
-			return context
-		else:
-			return render(self.request, template_name='404.html')
-
-	def get_context_data(self, **kwargs):
-		context = super(DetallesListView, self).get_context_data(**kwargs)
-		return context
-
 class VentasListView(LoginRequiredMixin, ListView):
 	model = Venta
 	template_name = 'inventario/gestionarVentas.html'
@@ -100,6 +67,45 @@ class VentasListView(LoginRequiredMixin, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(VentasListView, self).get_context_data(**kwargs)
 		return context
+
+class ComprasListView(LoginRequiredMixin, ListView):
+	model = Compra
+	template_name = 'inventario/gestionarCompras.html'
+	context_object_name = 'compras'
+
+	def get_queryset(self):
+		user = self.request.user
+		context = Compra.objects.all()
+		if context:
+			return context
+		else:
+			return render(self.request, template_name='404.html')
+
+	def get_context_data(self, **kwargs):
+		context = super(ComprasListView, self).get_context_data(**kwargs)
+		return context
+
+class ImpuestosListView(LoginRequiredMixin, ListView):
+	model = Impuesto
+	template_name = 'inventario/gestionarImpuestos.html'
+	context_object_name = 'impuestos'
+
+
+class MateriasPrimasListView(LoginRequiredMixin, ListView):
+	model = MateriaPrima
+	template_name = 'inventario/gestionarMateriaPrima.html'
+	context_object_name = 'materiales'
+
+	"""def get_queryset(self):
+					 = MateriaPrima.objects.all()
+					if context:
+						return context
+					else:
+						return render(self.request, template_name='404.html')
+			
+				def get_context_data(self, **kwargs):
+					context = super(MateriasPrimasListView, self).get_context_data(**kwargs)
+					return context"""
 
 
 class ProveedorCreateView(LoginRequiredMixin, CreateView):
@@ -122,38 +128,89 @@ class ClienteCreateView(LoginRequiredMixin, CreateView):
 		'nombre_titular_cliente'
 	]
 
-class FacturaCreateView(LoginRequiredMixin, CreateView):
-	model = Factura
-	template_name = 'editForm.html'
-	success_url = reverse_lazy('inventario:facturas')
-	fields = [
-		'id_factura',
-		'id_venta',
-		'sub_total_factura',
-		'total_factura',
-		'estado_factura'
-	]
 
-class DetalleCreateView(LoginRequiredMixin, CreateView):
+class DetalleVentaCreateView(LoginRequiredMixin, CreateView):
 	model = Detalle
-	template_name = 'editForm.html'
+	template_name = 'inventario/chainedVentaForm.html'
 	success_url = reverse_lazy('inventario:detalles')
 	fields = [
-		'id_detalle',
-		'id_materia_prima',
 		'id_producto',
-		'id_factura',
 		'cantidad_detalle'
 	]
 
-class VentaCreateView(LoginRequiredMixin, CreateView):
-	model = Venta
-	template_name = 'editForm.html'
-	success_url = reverse_lazy('inventario:ventas')
+class DetalleCompraCreateView(LoginRequiredMixin, CreateView):
+	model = Detalle
+	template_name = 'inventario/chainedCompraForm.html'
+	success_url = reverse_lazy('inventario:detalles')
 	fields = [
-		'id_venta',
-		'id_cliente'
+		'id_materia_prima',
+		'cantidad_detalle'
 	]
+
+class VentaCreateView(LoginRequiredMixin, TemplateView):
+	template_name = 'inventario/chainedVentaForm.html'
+	success_url = reverse_lazy('inventario:ventas')
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		context['venta_form'] = VentaForm()
+		context['detalle_venta_form'] = DetalleVentaForm()
+		return self.render_to_response(context)
+
+class CompraCreateView(LoginRequiredMixin, TemplateView):
+	template_name = 'inventario/chainedCompraForm.html'
+	success_url = reverse_lazy('inventario:compras')
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		context['proveedor_form'] = ProveedorForm()
+		context['materia_prima_form'] = MateriaPrima()
+		context['compra_form'] = CompraForm()
+		context['detalle_compra_form'] = DetalleCompraForm()
+		return self.render_to_response(context)
+
+class ImpuestoCreateView(LoginRequiredMixin, CreateView):
+	model = Impuesto
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('inventario:impuestos')
+	fields = [
+		'id_impuesto',
+		'nombre_impuesto',
+		'descripcion_impuesto',
+		'tasa_impuesto'
+	]
+
+class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
+	template_name = 'inventario/chainedMateriaPrimaForm.html'
+	success_url = reverse_lazy('inventario:materia_prima')
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		context['recurso_form'] = RecursoForm()
+		context['proveedor_form'] = ProveedorForm()
+		return self.render_to_response(context)
+
+	def put(self, request, *args, **kwargs):
+		request_data = json.loads(request.body)
+		recurso_form = MovimientoForm(
+			data=request_data.get(RecursoForm.scope_prefix, {})
+		)
+		proveedor_form = ProveedorForm(
+			data=request_data.get(ProveedorForm.scope_prefix, {})
+		)
+		response_data = {}
+
+		if recurso_form.is_valid() and proveedor_form.is_valid():
+			response_data.update({
+				'success_url': self.success_url
+			})
+			return JsonResponse(response_data)
+		
+		response_data.update({
+			recurso_form.form_name: recurso_form.errors,
+			proveedor_form.form_name: proveedor_form.errors,
+		})
+		return JsonResponse(response_data, status=422)		
 
 
 class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
@@ -176,37 +233,26 @@ class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_titular_cliente'
 	]
 
-class FacturaUpdateView(LoginRequiredMixin, UpdateView):
-	model = Factura
+class ImpuestoUpdateView(LoginRequiredMixin, UpdateView):
+	model = Impuesto
 	template_name = 'editForm.html'
-	success_url = reverse_lazy('inventario:facturas')
+	success_url = reverse_lazy('inventario:impuestos')
 	fields = [
-		'id_factura',
-		'id_venta',
-		'sub_total_factura',
-		'total_factura',
-		'estado_factura'
+		'id_impuesto',
+		'nombre_impuesto',
+		'descripcion_impuesto',
+		'tasa_impuesto'
 	]
 
-class DetalleUpdateView(LoginRequiredMixin, UpdateView):
-	model = Detalle
+class MateriaPrimaUpdateView(LoginRequiredMixin, UpdateView):
+	model = Impuesto
 	template_name = 'editForm.html'
-	success_url = reverse_lazy('inventario:detalles')
+	success_url = reverse_lazy('inventario:materia_prima')
 	fields = [
-		'id_detalle',
 		'id_materia_prima',
 		'id_producto',
-		'id_factura',
-		'cantidad_detalle'
-	]
-
-class VentaUpdateView(LoginRequiredMixin, UpdateView):
-	model = Venta
-	template_name = 'editForm.html'
-	success_url = reverse_lazy('inventario:ventas')
-	fields = [
-		'id_venta',
-		'id_cliente'
+		'id_recurso',
+		'id_proveedor'
 	]
 
 
@@ -232,41 +278,29 @@ class ClienteDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'cliente'
 
-class FacturaDetailView(LoginRequiredMixin, DetailView):
-	model = Factura
-	template_name = 'inventario/viewFacturaVenta.html'
-	success_url = reverse_lazy('inventario:facturas')
+class ImpuestoDetailView(LoginRequiredMixin, DetailView):
+	model = Impuesto
+	template_name = 'inventario/viewImpuesto.html'
+	success_url = reverse_lazy('inventario:impuestos')
 	fields = [
-		'id_factura',
-		'id_venta',
-		'sub_total_factura',
-		'total_factura',
-		'estado_factura'
+		'id_impuesto',
+		'nombre_impuesto',
+		'descripcion_impuesto',
+		'tasa_impuesto'
 	]
-	context_object_name = 'factura'
+	context_object_name = 'impuesto'
 
-class DetalleDetailView(LoginRequiredMixin, DetailView):
-	model = Detalle
-	template_name = 'inventario/viewDetalleVenta.html'
-	success_url = reverse_lazy('inventario:detalles')
+class MateriaPrimaDetailView(LoginRequiredMixin, DetailView):
+	model = Impuesto
+	template_name = 'inventario/viewMateriaPrima.html'
+	success_url = reverse_lazy('inventario:materia_prima')
 	fields = [
-		'id_detalle',
 		'id_materia_prima',
 		'id_producto',
-		'id_factura',
-		'cantidad_detalle'
+		'id_recurso',
+		'id_proveedor'
 	]
-	context_object_name = 'detalle'
-
-class VentaDetailView(LoginRequiredMixin, DetailView):
-	model = Venta
-	template_name = 'inventario/viewVenta.html'
-	success_url = reverse_lazy('inventario:ventas')
-	fields = [
-		'id_venta',
-		'id_cliente'
-	]
-	context_object_name = 'venta'
+	context_object_name = 'materia_prima'
 
 
 def proveedores(request, id_proveedor):   
@@ -285,26 +319,26 @@ def clientes(request, id_cliente):
         message = "El proveedor fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
-def facturas(request, id_factura):   
+def impuestos(request, id_impuesto):   
     if request.method == 'DELETE':
         #id_parametro = request.POST['id']
-        parametro = Factura.objects.get(id_factura=id_factura)
+        parametro = Impuesto.objects.get(id_impuesto=id_impuesto)
         parametro.delete()
         message = "El proveedor fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
-def detalles(request, id_detalle):   
-    if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
-        parametro = Detalle.objects.get(id_detalle=id_detalle)
-        parametro.delete()
-        message = "El proveedor fue borrado exitosamente"
-        return JsonResponse(data={'message': message})
-
-def ventas(request, id_venta):   
-    if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
-        parametro = Venta.objects.get(id_venta=id_venta)
-        parametro.delete()
-        message = "El proveedor fue borrado exitosamente"
-        return JsonResponse(data={'message': message})
+def load_materia_prima(request):
+	if request.method == 'GET':
+		id_cuenta = request.GET['id_cuenta']
+		cuenta = Cuenta.objects.get(id_cuenta=id_cuenta)
+		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=cuenta).values()
+		if cuentas:
+			data = {
+				'message': "Datos recuperados",
+				'cuentas': list(cuentas)
+			}
+		else:
+			data = {
+				'message': "La cuenta seleccionda no posee subcuentas"
+			}
+		return JsonResponse(data=data)

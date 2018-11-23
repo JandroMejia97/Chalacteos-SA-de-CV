@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from . import views
 
-app_name = 'infacturario'
+app_name = 'inventario'
 urlpatterns = [
 	path(
 		'proveedores/',
@@ -17,19 +17,24 @@ urlpatterns = [
 		name='clientes'
 	),
 	path(
-		'facturas/',
-		views.FacturasListView.as_view(),
-		name='facturas'
-	),
-	path(
-		'detalles/',
-		views.DetallesListView.as_view(),
-		name='detalles'
-	),
-	path(
 		'ventas/',
 		views.VentasListView.as_view(),
 		name='ventas'
+	),
+	path(
+		'compras/',
+		views.ComprasListView.as_view(),
+		name='compras'
+	),
+	path(
+		'materiales/',
+		views.MateriasPrimasListView.as_view(),
+		name='materia-prima'
+	),
+	path(
+		'impuestos/',
+		views.ImpuestosListView.as_view(),
+		name='impuestos'
 	),
 	path(
 		'crear/proveedor/',
@@ -42,19 +47,24 @@ urlpatterns = [
 		name='cliente-crear'
 	),
 	path(
-		'crear/factura/',
-		views.FacturaCreateView.as_view(),
-		name='factura-crear'
-	),
-	path(
-		'crear/detalle/',
-		views.DetalleCreateView.as_view(),
-		name='detalle-crear'
-	),
-	path(
 		'crear/venta/',
 		views.VentaCreateView.as_view(),
 		name='venta-crear'
+	),
+	path(
+		'crear/compra/',
+		views.CompraCreateView.as_view(),
+		name='compra-crear'
+	),
+	path(
+		'crear/impuesto/',
+		views.ImpuestoCreateView.as_view(),
+		name='impuesto-crear'
+	),
+	path(
+		'crear/material/',
+		views.MateriaPrimaCreateView.as_view(),
+		name='material-crear'
 	),
 	path(
 		'edicion/proveedor/<slug:pk>/',
@@ -67,19 +77,9 @@ urlpatterns = [
 		name='cliente-edicion'
 	),
 	path(
-		'edicion/factura/<slug:pk>/',
-		views.FacturaUpdateView.as_view(),
-		name='factura-edicion'
-	),
-	path(
-		'edicion/detalle/<slug:pk>/',
-		views.DetalleUpdateView.as_view(),
-		name='detalle-edicion'
-	),
-	path(
-		'edicion/venta/<slug:pk>/',
-		views.VentaUpdateView.as_view(),
-		name='venta-edicion'
+		'edicion/impuesto/<slug:pk>/',
+		views.ImpuestoUpdateView.as_view(),
+		name='impuesto-edicion'
 	),
 	path(
 		'detalle/proveedor/<slug:pk>/',
@@ -92,19 +92,14 @@ urlpatterns = [
 		name='cliente-detalle'
 	),
 	path(
-		'detalle/factura/<slug:pk>/',
-		views.FacturaDetailView.as_view(),
-		name='factura-detalle'
+		'detalle/impuesto/<slug:pk>/',
+		views.ImpuestoDetailView.as_view(),
+		name='impuesto-detalle'
 	),
 	path(
-		'detalle/detalle/<slug:pk>/',
-		views.DetalleDetailView.as_view(),
-		name='detalle-detalle'
-	),
-	path(
-		'detalle/venta/<slug:pk>/',
-		views.VentaDetailView.as_view(),
-		name='detalle-venta'
+		'detalle/impuesto/<slug:pk>/',
+		views.MateriaPrimaDetailView.as_view(),
+		name='materia-prima-detalle'
 	),
 	re_path(
         r'ajax/proveedor/(?P<id_proveedor>[0-9]+)/',
@@ -117,18 +112,18 @@ urlpatterns = [
         name='ajax-cliente'
     ),
     re_path(
-        r'ajax/factura/(?P<id_factura>[0-9]+)/',
-        views.facturas,
-        name='ajax-factura'
+        r'ajax/impuesto/(?P<id_impuesto>[0-9]+)/',
+        views.impuestos,
+        name='ajax-impuesto'
     ),
     re_path(
-        r'ajax/detalle/(?P<id_detalle>[0-9]+)/',
-        views.detalles,
-        name='ajax-detalle'
+        r'ajax/materia_prima/(?P<id_cliente>[0-9]+)/',
+        views.clientes,
+        name='ajax-materia-prima'
     ),
     re_path(
-        r'ajax/venta/(?P<id_venta>[0-9]+)/',
-        views.ventas,
-        name='ajax-venta'
-    )
+		'ajax/cuenta/',
+		views.load_materia_prima,
+		name='ajax-detalle'
+	)
 ]

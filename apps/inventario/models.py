@@ -19,6 +19,7 @@ class Recurso(models.Model):
         max_length=250,
         help_text="Una breve descripción del recurso"
     )
+
     def __str__(self):
         return self.nombre_recurso
 
@@ -41,7 +42,7 @@ class Kardex(models.Model):
     )
 
     def __str__(self):
-        return self.id_kardex
+        return str(self.id_recurso)
 
     class Meta:
         verbose_name = 'Kardex'
@@ -125,6 +126,7 @@ class Movimiento(models.Model):
         get_latest_by = 'fecha_movimiento'
         ordering = ['-fecha_movimiento']
 
+
 class Saldo(models.Model):
     id_saldor = models.AutoField(
         primary_key=True
@@ -186,49 +188,22 @@ class Saldo(models.Model):
 
 class Producto(models.Model):
     id_producto = models.AutoField(
-        primary_key='True'
+        primary_key=True
     )
     id_recurso = models.OneToOneField(
         Recurso,
         verbose_name='Recurso',
         on_delete=models.CASCADE,
         blank=False,
-        help_text='Seleccion el recurso del producto'
+        help_text='Seleccione el recurso del producto'
     )
+
     def __str__(self):
-        return self.id_producto
+        return str(self.id_recurso)
 
     class Meta:
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
-        ordering = ['id_producto', 'id_recurso']
-
-
-class MateriaPrima(models.Model):
-    id_materia_prima = models.AutoField(
-        primary_key=True
-    )
-    id_producto = models.ForeignKey(
-        Producto,
-        verbose_name='Producto',
-        on_delete=models.DO_NOTHING,
-        blank=False,
-        help_text='Seleccion el producto que esta conformado por materia prima'
-    )
-    id_recurso = models.OneToOneField(
-        Recurso,
-        verbose_name='Recurso',
-        on_delete=models.CASCADE,
-        blank=False,
-        help_text='Seleccion el recurso para la kardex',
-    )
-
-    def __str__(self):
-        return self.id_materia_prima
-
-    class Meta:
-        verbose_name = 'Materia Prima'
-        verbose_name_plural = 'Materias Primas'
         ordering = ['id_producto', 'id_recurso']
 
 
@@ -284,6 +259,99 @@ class Proveedor(models.Model):
         ordering = ['nombre_titular_proveedor', 'nombre_proveedor']
 
 
+class MateriaPrima(models.Model):
+    id_materia_prima = models.AutoField(
+        primary_key=True
+    )
+    id_producto = models.ForeignKey(
+        Producto,
+        verbose_name='Producto',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion el producto que esta conformado por materia prima'
+    )
+    id_recurso = models.OneToOneField(
+        Recurso,
+        verbose_name='Recurso',
+        on_delete=models.CASCADE,
+        blank=False,
+        help_text='Seleccion el recurso para la kardex',
+    )
+    id_proveedor = models.ForeignKey(
+        Proveedor,
+        verbose_name='Proveedor',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion el proveedor al que le pertenece la compra'
+    )
+
+    def __str__(self):
+        return str(self.id_recurso)
+
+    class Meta:
+        verbose_name = 'Materia Prima'
+        verbose_name_plural = 'Materias Primas'
+        ordering = ['id_producto', 'id_recurso']
+
+
+class Factura(models.Model):
+    id_factura = models.AutoField(
+        primary_key=True
+    )
+    sub_total_factura = models.DecimalField(
+        verbose_name='Sub Total',
+        max_digits=1000,
+        decimal_places=2,
+        blank=False,
+        validators=[
+            MinValueValidator(
+                0, 
+                message="Este campo debe ser positivo"
+            )
+        ],
+        help_text="Ingrese el sub total antes de impuestos"
+    )
+    total_factura = models.DecimalField(
+        verbose_name='Total',
+        max_digits=1000,
+        decimal_places=2,
+        blank=False,
+        validators=[
+            MinValueValidator(
+                0, 
+                message="Este campo debe ser positivo"
+            )
+        ],
+        help_text="Ingrese el total (impuestos incluídos)"
+    )
+    estado_factura = models.CharField(
+        verbose_name='Estado de la Factura',
+        max_length=20,
+        help_text="Estado de la fatura: Despachada, Pendiente de pago, Pendiente de entrada, Entregada"
+    )
+    monto_aplicacion = models.DecimalField(
+        verbose_name='Monto Aplicado',
+        max_digits=1000,
+        decimal_places=2,
+        blank=False,
+        validators=[
+            MinValueValidator(
+                0, 
+                message="Este campo debe ser positivo"
+            )
+        ],
+        help_text="Ingrese el recargo por el impuesto a la compra o venta"
+    )
+
+    def __str__(self):
+        return '{}'.format(self.id_factura)
+
+    class Meta:
+        verbose_name = 'Factura'
+        verbose_name_plural = 'Facturas'
+        ordering = ['estado_factura','total_factura']
+
+
 class Venta(models.Model):
     id_venta = models.AutoField(
         primary_key=True
@@ -295,14 +363,21 @@ class Venta(models.Model):
         blank=False,
         help_text='Seleccion el cliente al que le pertenece la venta'
     )
+    id_factura = models.ForeignKey(
+        Factura,
+        verbose_name='Factura',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion la factura al que le pertenece la venta'
+    )
 
     def __str__(self):
-        return self.id_venta
+        return '{}'.format(self.id_venta)
 
     class Meta:
         verbose_name = 'Venta'
         verbose_name_plural = 'Ventas'
-        ordering = ['id_cliente']
+        ordering = ['id_factura','id_cliente']
 
 
 class Compra(models.Model):
@@ -316,6 +391,13 @@ class Compra(models.Model):
         blank=False,
         help_text='Seleccion el proveedor al que le pertenece la compra'
     )
+    id_factura = models.ForeignKey(
+        Factura,
+        verbose_name='Factura',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion la factura al que le pertenece la venta'
+    )
 
     def __str__(self):
         return self.id_compra
@@ -323,66 +405,7 @@ class Compra(models.Model):
     class Meta:
         verbose_name = 'Compra'
         verbose_name_plural = 'Compras'
-        ordering = ['id_proveedor']
-
-
-class Factura(models.Model):
-    id_factura = models.AutoField(
-        primary_key=True
-    )
-    id_venta = models.OneToOneField(
-        Venta,
-        verbose_name='Venta',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        help_text='Seleccion la venta que compone a la factura'
-    )
-    id_compra = models.OneToOneField(
-        Compra,
-        verbose_name='Compra',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        help_text='Seleccion la compra que compone a la factura'
-    )
-    sub_total_factura = models.DecimalField(
-        verbose_name='Sub Total',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Ingrese el sub total antes de impuestos de la compra o venta"
-    )
-    total_factura = models.DecimalField(
-        verbose_name='Total',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Ingrese el total de la compra o venta (impuestos incluídos)"
-    )
-    estado_factura = models.CharField(
-        verbose_name='Estado de la Factura',
-        max_length=20,
-        help_text="Estado de la fatura: Despachada, Pendiente de pago, Pendiente de entrada, Entregada"
-    )
-
-    def __str__(self):
-        return self.id_factura
-
-    class Meta:
-        verbose_name = 'Factura'
-        verbose_name_plural = 'Facturas'
-        ordering = ['id_venta', 'id_compra', 'estado_factura','total_factura']
+        ordering = ['id_factura','id_proveedor']
 
 
 class Detalle(models.Model):
@@ -408,7 +431,7 @@ class Detalle(models.Model):
         on_delete=models.DO_NOTHING,
         verbose_name='Factura',
         null=True,
-        help_text="Ingrese el total de la compra o venta (impuestos incluídos)"
+        help_text="Seleccione la factura que pertenece el detalle"
     )
     cantidad_detalle = models.DecimalField(
         verbose_name='Cantidad',
@@ -421,7 +444,7 @@ class Detalle(models.Model):
                 message="Este campo debe ser positivo"
             )
         ],
-        help_text="Ingrese el total de la compra o venta (impuestos incluídos)"
+        help_text="Ingrese cantidad del producto o materia prima"
     )
 
 
@@ -476,6 +499,7 @@ class Impuesto(models.Model):
         verbose_name_plural = "Impuestos"
         ordering = ['nombre_impuesto', 'tasa_impuesto']
 
+
 class FacturaImpuesto(models.Model):
     id_aplicacion = models.AutoField(
         primary_key=True
@@ -485,14 +509,14 @@ class FacturaImpuesto(models.Model):
         on_delete=models.DO_NOTHING,
         verbose_name='Factura',
         null=True,
-        help_text='Seleccion la factura que se aplicara en la factura con impuesto'
+        help_text='Seleccione la factura que se aplicara en la factura con impuesto'
     )
     id_impuesto = models.ForeignKey(
         Impuesto,
         on_delete=models.DO_NOTHING,
         verbose_name='Impuesto',
         null=True,
-        help_text='Seleccion el impuesto que se aplicara a la factura con impuesto'
+        help_text='Seleccione el impuesto que se aplicara a la factura con impuesto'
     )
     monto_aplicacion = models.DecimalField(
         verbose_name='Monto Aplicado',

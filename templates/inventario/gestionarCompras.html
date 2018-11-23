@@ -1,5 +1,5 @@
 {% extends 'header&footer.html' %}
-{% block title %}SAeL - Gestión de ventaes{% endblock title %}
+{% block title %}SAeL - Gestión de compras{% endblock title %}
 
 {% block content %}    
   {% block sidebar %}
@@ -11,47 +11,43 @@
         <!-- Breadcrumbs-->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a href="#">Listado de facturas</a>
+            <a href="#">Listado de compras</a>
           </li>
-          <li class="breadcrumb-item active">facturas</li>
+          <li class="breadcrumb-item active">compras</li>
         </ol>
         <!-- DataTables Example -->
         <div class="alert bold alert-info">
           <i class="fas fw fa-plus-circle"></i>
-          <a href="{% url 'inventario:factura-crear' %}">
-            <strong>¡Click Aquí para agregar una nueva factura!</strong>
+          <a href="{% url 'inventario:compra-crear' %}">
+            <strong>¡Click Aquí para agregar una nueva compra!</strong>
           </a>
         </div>
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-table"></i>
-            ventas
+            compras
           </div>
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                   <tr>
+                      <th>Compra N°</th>
+                      <th>Proveedor</th>
                       <th>Factura N°</th>
-                      <th>Venta</th>
-                      <th>Subtotal factura</th>
-                      <th>Total factura</th>
-                      <th>Estado</th>
                       <th>Operaciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                    {% for factura in facturas %}
-                        <tr id="{{ factura.id_factura }}">
-                            <td class="text-center">{{ factura.id_factura }}</td>
-                            <td>{{ factura.id_venta }}</td>
-                            <td>{{ factura.sub_total_factura }}</td>
-                            <td>{{ factura.total_factura }}</td>
-                            <td>{{ factura.estado_factura }}</td>
+                    {% for compra in compras %}
+                        <tr id="{{ compra.id_compra }}">
+                            <td class="text-center">{{ compra.id_compra }}</td>
+                            <td>{{ compra.id_proveedor }}</td>
+                            <td>{{ compra.id_factura }}</td>
                             <td class="text-center">
-                                <a class="fas fa-w fa-file-pdf" name="ver" href="#"  data-toggle="modal" onclick="redirectView('FACTURA', {{ factura.id_factura }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('FACTURA', {{ factura.id_factura }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ factura.id_factura }}, '{{ factura.id_venta }}', 'FACTURA');" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ compra.id_compra }}, '{{ compra.id_cliente }}', 'COMPRA');" style="color:gray !important"></a>
                             </td>                          
                         </tr>
                     {% endfor %}
