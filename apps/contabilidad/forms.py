@@ -34,7 +34,7 @@ class MovimientoForm(forms.ModelForm):
         help_text='Seleccione la subcuenta menor a afectar',
     )
 
-    class Meta:
+    class Meta: 
         model = Movimiento
         fields = [
             'id_cuenta',
@@ -62,6 +62,8 @@ class MovimientoForm(forms.ModelForm):
             'onchange': 'getCuenta("id_sub_cuenta", "id_sub_sub_cuenta")',
             'disabled': 'true'
         })
+        self.fields['sub_cuenta'].choices = (('', '---------'),)
         self.fields['sub_sub_cuenta'].widget.attrs.update({
-            'disabled': 'true'
+            'disabled': 'true',
         })
+        self.fields['sub_sub_cuenta'].choices = (('', '---------'),)

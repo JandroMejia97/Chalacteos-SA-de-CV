@@ -36,7 +36,6 @@ class CuentasListView(LoginRequiredMixin, ListView):
 	context_object_name = 'cuentas'
 
 	def get_queryset(self):
-		user = self.request.user
 		context = Cuenta.objects.all().filter(is_alta=True)
 		if context:
 			return context
@@ -79,12 +78,6 @@ class CuentaCreateView(LoginRequiredMixin, CreateView):
 class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'contabilidad/chainedForm.html'
 	success_url = reverse_lazy('contabilidad:transacciones')
-	""" fields = [
-		'numero_transaccion',
-		'id_tipo',
-		'descripcion_transaccion',
-		'monto_transaccion'
-	] """
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
@@ -97,12 +90,9 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 		transaccion_form = TransaccionForm(
 			data=request_data.get(TransaccionForm.scope_prefix, {})
 		)
-		movimiento_form = MovimientoForm(
-			data=request_data.get(MovimientoForm.scope_prefix, {})
-		)
 		response_data = {}
 
-		if transaccion_form.is_valid() and movimiento_form.is_valid():
+		if transaccion_form.is_valid():
 			response_data.update({
 				'success_url': self.success_url
 			})
@@ -110,9 +100,31 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 		
 		response_data.update({
 			transaccion_form.form_name: transaccion_form.errors,
-			movimiento_form.form_name: movimiento_form.errors,
 		})
 		return JsonResponse(response_data, status=422)
+
+	def post(self, request, *args, **kwargs):
+		periodo = PeriodoContable.objects.all().last()
+		ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
+		abonos_data = self.request.POST['abonos']
+		cargos_data = request.POST['cargos']
+		codigos_cuentas_data = request.POST['codigo_cuentas']
+
+		transaccion = Transaccion.objects.create(
+			id_perido_contable=periodo,
+			id_tipo=request.POST['codigoTipo'],
+			numero_transaccion=ultima_transaccion+1,
+			descripcion_transaccion=request.POST['descripcion'],
+			monto_transaccion=request.POST['monto']
+		)
+		for i in range(len(codigos_cuentas_data)):
+			Movimiento.objects.create(
+				id_transaccion=transaccion.id_transaccion,
+				id_cuenta=codigos_cuentas_data[i],
+				monto_cargo=cargos_data[i],
+				monto_abono=abonos_data[i]
+			)
+		return JsonResponse({'message':'Transacción registrada'}, status=422)
 
 
 class MovimientoCreateView(LoginRequiredMixin, CreateView):

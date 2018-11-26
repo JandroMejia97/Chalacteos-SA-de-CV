@@ -87,6 +87,11 @@ urlpatterns = [
 		views.CuentaDetailView.as_view(),
 		name='movimiento-detalle'
 	),
+	path(
+		'ajax/transaccion/',
+		views.TransaccionCreateView.as_view(),
+		name='ajax-transaccion'
+	),
 	re_path(
         r'ajax/movimiento/(?P<id_movimiento>[0-9]+)/',
         views.cuentas,
