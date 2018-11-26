@@ -1,0 +1,68 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Detalle{% endblock title %}
+
+{% block content %}
+    
+  {% block sidebar %}
+    {% include "sidebarInventario.html" %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Visualización</a>
+          </li>
+          <li class="breadcrumb-item active">Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa fa-eye"></i>
+            <strong><i> Detalles de impuesto: {{ impuesto }}</i></strong>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <tbody id="bodyTable">
+                    <tr class="row">
+                      <td class="text-right col">
+                        Codigo impuesto
+                      </td>
+                      <td class="text-left col">{{ impuesto.id_impuesto }}</td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Nombre impuesto
+                      </td>
+                      <td class="text-left col">{{ impuesto.nombre_impuesto }}</a></td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Descripcion
+                      </td>
+                      <td class="text-left col">{{ impuesto.descripcion_impuesto }}</a></td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Tasa de impuesto
+                      </td>
+                      <td class="text-left col">{{ impuesto.tasa_impuesto }}</a></td>
+                    </tr>
+                </tbody>
+              </table>
+              <div class="row">
+                <div class="col-12 form-group text-center">
+                  <br>
+                  <button class='btn btn-primary' onclick="javascript:history.back()" style="width: 50%;" type='button'>Salir</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}

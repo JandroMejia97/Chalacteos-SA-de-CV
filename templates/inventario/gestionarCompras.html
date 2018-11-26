@@ -1,0 +1,69 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión de compras{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Listado de compras</a>
+          </li>
+          <li class="breadcrumb-item active">compras</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="alert bold alert-info">
+          <i class="fas fw fa-plus-circle"></i>
+          <a href="{% url 'inventario:compra-crear' %}">
+            <strong>¡Click Aquí para agregar una nueva compra!</strong>
+          </a>
+        </div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            compras
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                      <th>Compra N°</th>
+                      <th>Proveedor</th>
+                      <th>Factura N°</th>
+                      <th>Operaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for compra in compras %}
+                        <tr id="{{ compra.id_compra }}">
+                            <td class="text-center">{{ compra.id_compra }}</td>
+                            <td>{{ compra.id_proveedor }}</td>
+                            <td>{{ compra.id_factura }}</td>
+                            <td class="text-center">
+                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ compra.id_compra }}, '{{ compra.id_cliente }}', 'COMPRA');" style="color:gray !important"></a>
+                            </td>                          
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}

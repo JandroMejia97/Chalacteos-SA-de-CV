@@ -1,0 +1,59 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión de Clientes{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Listado de materiales</a>
+          </li>
+          <li class="breadcrumb-item active">Materiales</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="alert bold alert-info">
+          <i class="fas fw fa-plus-circle"></i>
+          <a href="{% url 'inventario:material-crear' %}">
+            <strong>¡Click Aquí para agregar un nuevo material!</strong>
+          </a>
+        </div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Clientes
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                      <th>Codigo Material</th>
+                      <th>Proveedor</th>
+                      <th>Nombre Material</th>
+                      <th>Descripción</th>
+                      <th>Operaciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbBody">
+                                
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}

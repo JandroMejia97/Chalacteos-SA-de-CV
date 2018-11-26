@@ -7,6 +7,16 @@ from . import views
 app_name ='contabilidad'
 
 urlpatterns = [
+	path(
+		'import/rubro/',
+		views.import_data_rubro,
+		name='import-rubro'
+	),
+	path(
+		'import/cuenta/',
+		views.import_data_cuenta,
+		name='import-cuenta'
+	),
 	re_path(
 		'sign-in/',
 		views.SignInView.as_view(),

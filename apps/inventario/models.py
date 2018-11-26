@@ -201,37 +201,12 @@ class Producto(models.Model):
     def __str__(self):
         return str(self.id_recurso)
 
-    class Meta:
-        verbose_name = 'Producto'
-        verbose_name_plural = 'Productos'
-        ordering = ['id_producto', 'id_recurso']
-
-
-class MateriaPrima(models.Model):
-    id_materia_prima = models.AutoField(
-        primary_key=True
-    )
-    id_producto = models.ForeignKey(
-        Producto,
-        verbose_name='Producto',
-        on_delete=models.DO_NOTHING,
-        blank=False,
-        help_text='Seleccion el producto que esta conformado por materia prima'
-    )
-    id_recurso = models.OneToOneField(
-        Recurso,
-        verbose_name='Recurso',
-        on_delete=models.CASCADE,
-        blank=False,
-        help_text='Seleccion el recurso para la kardex',
-    )
-
     def __str__(self):
         return str(self.id_recurso)
 
     class Meta:
-        verbose_name = 'Materia Prima'
-        verbose_name_plural = 'Materias Primas'
+        verbose_name = 'Producto'
+        verbose_name_plural = 'Productos'
         ordering = ['id_producto', 'id_recurso']
 
 
@@ -285,6 +260,41 @@ class Proveedor(models.Model):
         verbose_name = 'Proveedor'
         verbose_name_plural = 'Proveedores'
         ordering = ['nombre_titular_proveedor', 'nombre_proveedor']
+
+
+class MateriaPrima(models.Model):
+    id_materia_prima = models.AutoField(
+        primary_key=True
+    )
+    id_producto = models.ForeignKey(
+        Producto,
+        verbose_name='Producto',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion el producto que esta conformado por materia prima'
+    )
+    id_recurso = models.OneToOneField(
+        Recurso,
+        verbose_name='Recurso',
+        on_delete=models.CASCADE,
+        blank=False,
+        help_text='Seleccion el recurso para la kardex',
+    )
+    id_proveedor = models.ForeignKey(
+        Proveedor,
+        verbose_name='Proveedor',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion el proveedor al que le pertenece la compra'
+    )
+
+    def __str__(self):
+        return str(self.id_recurso)
+
+    class Meta:
+        verbose_name = 'Materia Prima'
+        verbose_name_plural = 'Materias Primas'
+        ordering = ['id_producto', 'id_recurso']
 
 
 class Factura(models.Model):

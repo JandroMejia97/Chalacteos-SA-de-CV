@@ -1,3 +1,4 @@
+import csv
 from django.views.generic import CreateView, TemplateView 
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
@@ -246,13 +247,16 @@ def import_data_rubro(request):
 			row = new[0].split(";")
 			if row[0] != "id_rubro":
 				codigo_rubro=int(row[1])
+
 				nombre_rubro=str(row[2]).upper()
+				
 				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
 				if row[4] == '':
 					rubro_sup=None
 				else:
 					rubro_sup=Rubro.objects.get(id_rubro=row[4])
 				nivel=int(row[5])
+
 				created = Rubro.objects.update_or_create(
 					codigo_rubro=codigo_rubro,
 					nombre_rubro=nombre_rubro,
@@ -269,6 +273,7 @@ def import_data_cuenta(request):
 		for new in reader:
 			row=new[0].split(";")
 			if row[0] != "id_cuenta":
+
 				codigo_cuenta=int(row[1])
 				nombre_cuenta=row[2]
 				if row[3] == '1':
@@ -284,6 +289,7 @@ def import_data_cuenta(request):
 					codigo_cuenta_padre = None
 				else:
 					codigo_cuenta_padre = Cuenta.objects.get(id_cuenta=int(row[6]))
+
 				objeto, created = Cuenta.objects.update_or_create(
 					codigo_cuenta=codigo_cuenta,
 					nombre_cuenta=nombre_cuenta,
@@ -293,4 +299,3 @@ def import_data_cuenta(request):
 					codigo_cuenta_padre=codigo_cuenta_padre
 				)
 	return HttpResponse('Hecho')
-
