@@ -192,7 +192,7 @@ class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 
 	def put(self, request, *args, **kwargs):
 		request_data = json.loads(request.body)
-		recurso_form = MovimientoForm(
+		recurso_form = RecursoForm(
 			data=request_data.get(RecursoForm.scope_prefix, {})
 		)
 		proveedor_form = ProveedorForm(
@@ -327,18 +327,18 @@ def impuestos(request, id_impuesto):
         message = "El proveedor fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
-def load_materia_prima(request):
+		
+def load_materia(request):
 	if request.method == 'GET':
-		id_cuenta = request.GET['id_cuenta']
-		cuenta = Cuenta.objects.get(id_cuenta=id_cuenta)
-		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=cuenta).values()
-		if cuentas:
+		id_proveedor = request.GET['id_proveedor']
+		materiales = MateriaPrima.objects.all().filter(id_proveedor=id_proveedor).values()
+		if materias:
 			data = {
 				'message': "Datos recuperados",
-				'cuentas': list(cuentas)
+				'materiales': list(materiales)
 			}
 		else:
 			data = {
-				'message': "La cuenta seleccionda no posee subcuentas"
+				'message': "La materia seleccionada no posee datos"
 			}
 		return JsonResponse(data=data)

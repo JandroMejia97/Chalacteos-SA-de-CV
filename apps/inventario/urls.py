@@ -122,8 +122,8 @@ urlpatterns = [
         name='ajax-materia-prima'
     ),
     re_path(
-		'ajax/cuenta/',
-		views.load_materia_prima,
-		name='ajax-detalle'
-	)
+		'ajax/compra/',
+		views.load_materia,
+		name='ajax-materia'
+	),
 ]

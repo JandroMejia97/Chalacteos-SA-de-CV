@@ -10,7 +10,7 @@
   {% load bootstrap %}
     <div id="content-wrapper">
       <div class="container-fluid">
-      <!-- Breadcrumbs-->
+        <!-- Breadcrumbs-->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
             <a href="#">Edición  | Creación</a>
@@ -27,8 +27,8 @@
           <div class="card-body" id="1">
             <div class="row">
               <div class="col-lg-6 col-xs-12 border rounded">
-                <form name="transaccion_form" method="POST" novalidate id="detalleForm">
-                  {% csrf_token %}
+                <form name="proveedor_form" novalidate>
+                  
                   <div class="row">
                     <div class="col-lg-12 col-xs-12 border">
                       <h4 class="mb-3 text-center header_id">PROVEEDOR</h4>
@@ -42,15 +42,121 @@
                       {{ recurso_form|bootstrap_inline }}
                     </div>
                   </div>
+
+                  <div class="col-12 text-right">    
+                    <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
+                      Registrar compra 
+                      <i class="fas fa-plus-circle"></i>
+                    </button>
+                  </div>
                 </form>
-                <div class="form-group text-center">
-                  <br>
-                  <button ng-click="do(update()).then(reloadPage())" type="button" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
-                  <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header">
+                <i class="fas fa-table"></i>
+                  Compra
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th>Proveedor</th>
+                        <th>Materia Prima</th>                
+                        <th>Cantidad Materia prima</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbBody">
+                                
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="2" class="text-right">Total</th>
+                        <th class="text-center" id="total">$ 0.00</th>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
               </div>
             </div>
+            <div class="form-group text-center">
+              <br>
+              <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+              <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+            </div>
           </div>
+          <script>
+                function getMateria(id_proveedor){
+                    console.log("GETMATERIA");
+                    var materiaPrima = $("#"+id_proveedor).val();
+                    console.log("AJAX: "+materiaPrima);
+                    $.ajax({
+                        url: '{% url "inventario:ajax-materia" %}',
+                        type: 'GET',
+                        data: {
+                            'id_proveedor': materiaPrima,
+                        },
+                        success: function(data){
+                            console.log(data.message);
+                            console.log(data);
+                            console.log("SUCCESS");
+                        },
+                        dataType: 'json'
+                    }).fail(function(data) {
+                        console.log("error");
+                        console.log(data.message);
+                    }).always(function() {
+                        console.log("complete");
+                    });
+                };
+
+                //Declarando variable globales
+                var count = 0;
+
+                var data = {
+                    'codigo_proveedores': [],
+                    'nombre_recurso': [],
+                    'descripcion_recurso': []
+                };
+                
+
+                function getData(){
+                    console.log("ADDROWS")
+                    count = count + 1;
+                    var codigoProveedor = $("#id_id_proveedor").val();
+
+                    var cbProveedor = document.getElementById("id_id_proveedor");
+                    
+                    var proveedor = cbProveedor.options[cbProveedor.selectedIndex].text;
+
+
+                    var nombreRecurso = $("#nombre_recurso").val();
+                    var descripcionRecurso = $("#descripcion_recurso").val();
+
+                    $(".dataTables_empty").remove();
+
+                    if(proveedor!='' && proveedor!='---------' && nombreRecurso!="" && descripcionRecurso!=""){
+                        addRows(codigoProveedor, nombreRecurso, descripcionRecurso);
+                    }
+                    //$("#id_cantidad_detalle").val("")
+                    //$("#id_precio_unitario").val("")
+                };
+
+                function addRows(codigoProveedor, nombreRecurso, descripcionRecurso){
+                        data['codigo_proveedores'].push(codigoProveedor);
+                        data['nombre_recurso'].push(nombreRecurso);
+                        data['descripcion_recurso'].push(descripcionRecurso);
+
+                        $("#tbBody").append(
+                            "<tr><td class='text-center'>"+count+"</td>"+
+                            "<td>"+codigoProveedor+"</td>"+
+                            "<td>"+nombreRecurso+"</td>"+
+                            "<td class='text-center'>$ "+descripcionRecurso+"</td><td></td></tr>"
+                        )
+                    
+                };
+          </script>
         </div>
       </div>
     </div>

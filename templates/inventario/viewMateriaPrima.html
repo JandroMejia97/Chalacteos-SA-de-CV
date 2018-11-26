@@ -27,22 +27,23 @@
             <div class="table-responsive">
               <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <tbody id="bodyTable">
-                      
-
-<form name="myForm" action="" method="POST" disabled id="detalleForm">
-                      {% csrf_token %}
-                <div class="row">
-                  <div class="col-lg-12 col-xs-12 border">
-                    <h4 class="mb-3 text-center header_id">VENTA</h4>
-                      {{ venta_form|bootstrap_inline }}
-                  </div>
-                </div>
-                <br>
-                <div class="row border-bottom">
-                  <div  class="col-lg-12 col-xs-12 border" id="div_1">
-                    <h4 class="mb-3 text-center header_id">PRODUCTO</h4>
-                        {{ detalle_venta_form|bootstrap_inline }}
+                  <form name="myForm" action="" method="POST" disabled id="detalleForm">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-lg-12 col-xs-12 border">
+                        <h4 class="mb-3 text-center header_id">PROVEEDOR</h4>
+                        {{ proveedor_form|bootstrap_inline }}
+                      </div>
                     </div>
+                    <br>
+                    <div class="row border-bottom">
+                      <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                        <h4 class="mb-3 text-center header_id">RECURSO</h4>
+                        {{ recurso_form|bootstrap_inline }}
+                      </div>
+                    </div>
+                  </form>
+                </tbody>
               </table>
               <div class="row">
                 <div class="col-12 form-group text-center">

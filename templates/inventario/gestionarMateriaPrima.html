@@ -33,24 +33,14 @@
                 <thead>
                   <tr>
                       <th>Codigo Material</th>
+                      <th>Proveedor</th>
                       <th>Nombre Material</th>
                       <th>Descripción</th>
                       <th>Operaciones</th>
                   </tr>
                 </thead>
-                <tbody>
-                    {% for material in materiales %}
-                        <tr id="{{ material.id_cliente }}">
-                            <td class="text-center">{{ material.id_materia_prima }}</td>
-                            <td>{{ material }}</td>
-                            <td>{{ material.id_recurso.desripcion_recurso }}</td>
-                            <td class="text-center">
-                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('MATERIAPRIMA', {{ material.id_materia_prima }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('MATERIAPRIMA', {{ material.id_materia_prima }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ material.id_materia_prima }}, '{{ material }}', 'MATERIAPRIMA');" style="color:gray !important"></a>
-                            </td>                          
-                        </tr>
-                    {% endfor %}
+                <tbody id="tbBody">
+                                
                 </tbody>
               </table>
             </div>
