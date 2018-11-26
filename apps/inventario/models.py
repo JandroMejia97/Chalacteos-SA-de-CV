@@ -197,6 +197,9 @@ class Producto(models.Model):
         blank=False,
         help_text='Seleccione el recurso del producto'
     )
+    
+    def __str__(self):
+        return str(self.id_recurso)
 
     def __str__(self):
         return str(self.id_recurso)

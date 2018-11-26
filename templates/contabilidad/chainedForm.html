@@ -1,0 +1,367 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarContabilidad.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-edit"></i>
+              Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+
+          <div class="card-body" id="1">
+            <div class="row">
+              <div class="col-lg-6 col-xs-12 border rounded">
+                <form name="transaccion_form" novalidate>
+                  {% csrf_token %}
+                  <h4 class="mb-3 text-center header_id">TRANSACCION</h4>
+                  {{ transaccion_form|bootstrap_inline }}
+                </form>
+              </div>
+              <div  class="col-lg-6 col-xs-12 border rounded">
+                <form name="movimiento_form" novalidate>
+                  {% csrf_token %}
+                  <h4 class="mb-3 text-center header_id">MOVIMIENTOS</h4>
+                  {{ movimiento_form|bootstrap_inline }}
+                  <div class="col-12 text-center" style="padding-bottom: 5%">    
+                    <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
+                      Registrar movimiento  
+                      <i class="fas fa-plus-circle"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header">
+                <i class="fas fa-table"></i>
+                Movimientos
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Cuenta</th>                
+                        <th class="text-center">Debe</th>
+                        <th class="text-center">Haber</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbBody">
+                                
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="2" class="text-right">Comprobacion</th>
+                        <th class="text-center" id="debe">$ 0.00</th>
+                        <th class="text-center" id="haber">$ 0.00</th>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="form-group text-center">
+              <br>
+              <button id='aprobar' type="submit" onclick="sendData()" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+              <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+            </div>
+          </div>
+        </div>        
+        <script>
+            function getCuenta(id, id_sub){
+                console.log("GETCUENTA");
+                var cuenta = $("#"+id).val();
+                console.log("AJAX: "+cuenta);
+                $.ajax({
+                    url: '{% url "contabilidad:ajax-subcuenta" %}',
+                    type: 'GET',
+                    data: {
+                        'id_cuenta': cuenta,
+                    },
+                    success: function(data){
+                        console.log(data.message);
+                        console.log(data);
+                        console.log("SUCCESS");
+                    },
+                    dataType: 'json'
+                }).done(function(data){
+                    $("#"+id_sub).empty();
+                    if(data.cuentas != null){
+                        $("#"+id_sub).append('<option value="" selected="">---------</option>');
+                        $.each(data.cuentas, function(index, value){
+                            $("#"+id_sub).append(
+                                "<option id='"+value.id_cuenta + "' value='" +
+                                value.id_cuenta + "'>" + value.nombre_cuenta + "</option>");
+                        });
+                        $("#"+id_sub).removeAttr('disabled');
+                    }else{
+                        alert(data.message);
+                        $("#"+id_sub).append('<option value="" selected="">---------</option>');
+                        $("#"+id_sub).attr('disabled','disabled');
+                    }
+                }).fail(function(data) {
+                    console.log("error");
+                    console.log(data.message);
+                }).always(function() {
+                    console.log("complete");
+                });
+            };
+                
+            function abonoChange(){
+                $("#id_monto_cargo").val("");
+            };
+                
+            function cargoChange(){
+                $("#id_monto_abono").val("");
+            };
+                
+            //Declarando variable globales
+            var count = 0;
+                
+            var totalCargos = 0;
+            var totalAbonos = 0;
+            var codigo_cuentas = [];
+            var cargos = [];
+            var abonos = [];
+            var codigoTipo = null;
+            var monto = null;
+            var descripcion = null
+                
+            function getData(){
+                console.log("ADDROWS")
+                count = count + 1;
+                var codigoCuenta = $("#id_id_cuenta").val();
+                var codigoSubCuenta = $("#id_sub_cuenta").val();
+                var codigoSubSubCuenta = $("#id_sub_sub_cuenta").val();
+
+                var cbCuenta = document.getElementById("id_id_cuenta");
+                var cbSubCuenta = document.getElementById("id_sub_cuenta");
+                var cbSubSubCuenta = document.getElementById("id_sub_sub_cuenta");
+                
+                var cuenta = cbCuenta.options[cbCuenta.selectedIndex].text;
+                var subCuenta = cbSubCuenta.options[cbSubCuenta.selectedIndex].text;
+                var subSubCuenta = cbSubSubCuenta.options[cbSubSubCuenta.selectedIndex].text;
+                    
+                var cargo = parseFloat($("#id_monto_cargo").val());
+                var abono = parseFloat($("#id_monto_abono").val());
+                $(".dataTables_empty").remove();
+
+                var correcto = false;
+
+                if( !isNaN(cargo) || !isNaN(abono)){
+                    if(!isNaN(cargo) && isNaN(abono)){
+                        if(cuenta!='' && cuenta!='---------' && subCuenta=='---------'){
+                            addRows(codigoCuenta, cuenta, cargo, abono);
+                            correcto = true;
+                        }else{
+                            if(subCuenta!='' && subCuenta!='---------' && subSubCuenta=='---------'){
+                                addRows(codigoSubCuenta, subCuenta, cargo, abono);
+                                correcto = true;
+                            }else{
+                                if(subSubCuenta!='' && subSubCuenta!='---------'){
+                                    addRows(codigoSubSubCuenta, subSubCuenta, cargo, abono);
+                                    correcto = true;
+                                }
+                            }
+                        }
+                    }else{
+                        if(isNaN(cargo) && !isNaN(abono)){
+                            if(cuenta!='' && cuenta!='---------' && subCuenta=='---------'){
+                               addRows(codigoCuenta, cuenta, cargo, abono);
+                                correcto = true;
+                            }else{
+                                if(subCuenta!='' && subCuenta!='---------' && subSubCuenta=='---------'){
+                                    addRows(codigoSubCuenta, subCuenta, cargo, abono);
+                                    correcto = true;
+                                }else{
+                                    if(subSubCuenta!='' && subSubCuenta!='---------'){
+                                        addRows(codigoSubSubCuenta, subSubCuenta, cargo, abono);
+                                        correcto = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if(correcto==true){
+                    $("#id_monto_abono").val("")
+                    $("#id_monto_cargo").val("")
+                }else{
+                    console.log("Correcto: "+correcto);
+                    header = 'No ha ingresado un Cargo o Abono';
+                    body = '<p class="alert bold alert-danger">Debe corroborar que ha ingresado un monto para abonar o cargar la cuenta seleccionada.'+
+                        '<br>También, debe corroborar que ha seleccionado la cuenta menor, es decir, la cuenta que se encuentra al el nivel más inferior.'+
+                        '<br>Seleccione una cuenta de los menús que pueden ser desplegados y debe llenar al menos uno de estos campos. Presione "Continuar"</p>';
+                    clase = 'btn btn-primary'
+                    showModal(header, body, clase);
+                }
+                /*if(correcto==true){
+                    $("#id_monto_abono").val("")
+                    $("#id_monto_cargo").val("")
+                }else{
+                    header = 'Seleccione la cuenta menor';
+                    body = '<p class="alert bold alert-danger">Debe corroborar que ha seleccionado la cuenta menor, es decir, la cuenta que se encuentra al el nivel más inferior.'+
+                           '<br>Seleccione una cuenta de los menús que pueden ser desplegados. Presione "Continuar"</p>';
+                    clase = 'btn btn-primary'
+                    showModal(header, body, clase);
+                }*/
+            }
+
+            function addRows(codigoSubCuenta, cuenta, cargo, abono){
+                if(isNaN(abono) && !(isNaN(cargo))){
+                    codigo_cuentas.push(codigoSubCuenta);
+                    cargos.push(cargo);
+                    abonos.push(null);
+                    totalCargos = totalCargos + cargo;
+
+                    console.log("CARGO")
+                    $("#tbBody").append(
+                        "<tr><td class='text-center'>"+count+"</td>"+
+                        "<td>"+cuenta+"</td>"+
+                        "<td class='text-center'>$ "+cargo+"</td><td></td></tr>"
+                    );
+                    $("#debe").empty();
+                    $("#debe").append("$ "+totalCargos);
+                };
+                if(isNaN(cargo) && !(isNaN(abono))){
+                    codigo_cuentas.push(codigoSubCuenta);
+                    abonos.push(abono);
+                    cargos.push(null);
+                    totalAbonos = totalAbonos + abono;                
+
+                    console.log("ABONO")
+                    $("#tbBody").append(
+                        "<tr><td class='text-center'>"+count+"</td>"+
+                        "<td>"+cuenta+"</td>"+
+                        "<td></td><td class='text-center'>$ "+abono+"</td></tr>"
+                    )
+                    $("#haber").empty();
+                    $("#haber").append("$ "+totalAbonos);
+                }
+            };
+        
+            function sendData(){
+                codigoTipo = $("#id_id_tipo").val();
+                cbTipo = document.getElementById("id_id_tipo");
+                tipo = cbTipo.options[cbTipo.selectedIndex].text;
+                monto = parseFloat($("#id_monto_transaccion").val());
+                descripcion = $("#id_descripcion_transaccion").val();
+
+                if(tipo!='' && tipo!='---------' && !isNaN(monto) && descripcion!=''){
+                    if(totalAbonos==totalCargos){
+                        if(totalAbonos==monto){
+                            $.ajax({
+                                url: "{% url 'contabilidad:ajax-transaccion' %}",
+                                type: "POST",
+                                data: {
+                                    'codigo_cuentas': codigo_cuentas,
+                                    'cargos': cargos,
+                                    'abonos': abonos,
+                                    'codigoTipo': codigoTipo,
+                                    'monto': monto,
+                                    'descripcion': descripcion
+                                },
+                                success: function(data){
+                                    console.log(data);
+                                    console.log("SUCCES");
+                                },
+                                dataType: "json"
+                            }).done(function(data){
+                                alert(data.message);
+                            }).fail(function() {
+                                console.log("error");
+                                alert("La transaccion no pudo ser realizada");
+                            }).always(function() {
+                                console.log("complete");
+                            });
+                        }else{
+                            header = '!Datos incoherentes!'
+                            body = 'El monto de la partida doble no concuerda con el monto de la transaccion. Presione "Continuar"';
+                            clase = 'btn btn-danger'
+                            showModal(header, body, clase);
+                        }
+                    }else{
+                        header = '!Error en partida doble!'
+                        body = 'Los movimientos registrados para esta transacción no cumplen partida doble. Presione "Continuar"'
+                        clase = 'btn btn-danger'
+                        showModal(header, body, clase);
+                    }
+                }else{
+                    header = '!Error! Datos incompletos'
+                    body = 'Verifique que los campos de la "Transacción" estén completos. Presione "Continuar"'
+                    clase = 'btn btn-danger'
+                    showModal(header, body, clase);
+                }
+            }
+            
+            function showModal(header, body, clase){
+                $('#headModal').empty();
+                $('#headModal').append(
+                "<strong>"+header+"</strong>"
+                );
+                $('#bodyModal').empty();
+                $('#bodyModal').append(
+                body
+                );
+                $('#btnError').attr('class', clase)
+                $('#countErrorModal').modal('show');
+            }
+        </script>
+      </div>
+      <div class="modal fade" id="countErrorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="headModal"></h5>
+              <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div class="modal-body" id="bodyModal">
+              
+            </div>
+              <div class="modal-footer" id="footModal">
+                <button class="" id="btnError" type="button" aria-hidden="true" data-dismiss="modal">Continuar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}
+{% block js %}
+    {% load static %}
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Page level plugin JavaScript-->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin.min.js' %}"></script>
+    <script src="{% static 'js/invernaderos.js' %}"></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+{% endblock js %}

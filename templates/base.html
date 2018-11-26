@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>{% block title %}{% endblock %}</title>
-    {% load staticfiles %}
+    {% load static %}
 
     <link href="{% static 'media/images/favicon.png' %}" rel="shortcut icon" type="image/png">
     <!-- Bootstrap core CSS-->
@@ -54,6 +54,9 @@
                     case 'FACTURA':
                         location.href = '/edicion/factura/'+id;
                         break;
+                    case 'TRANSACCION':
+                        location.href = '/edicion/transaccion/'+id;
+                        break;
                     case 'VENTA':
                         location.href = '/edicion/venta/'+id;
                         break;
@@ -81,6 +84,9 @@
                         break;
                     case 'FACTURA':
                         location.href = '/detalle/factura/'+id;
+                        break;
+                    case 'TRANSACCION':
+                        location.href = '/detalle/transaccion/'+id;
                         break;
                     case 'VENTA':
                         location.href = '/detalle/venta/'+id;
@@ -117,6 +123,9 @@
                         break;
                     case 'FACTURA':
                         url = '/ajax/factura/'+id+'/';
+                        break;
+                    case 'TRANSACCION':
+                        url = '/ajax/transaccion/'+id+'/';
                         break;
                     case 'VENTA':
                         url = '/ajax/venta/'+id+'/';
@@ -180,6 +189,7 @@
             });
         
         </script>
+        {% block js %}
         <!-- Bootstrap core JavaScript-->
         <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
         <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -191,7 +201,6 @@
         <script src="{% static 'js/angular.js' %}"></script>
 
         <!-- Page level plugin JavaScript-->
-        <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
         <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
         <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
 
@@ -202,7 +211,7 @@
 
         <!-- Demo scripts for this page-->
         <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
-        <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
+        {% endblock js %}
     </div>
     <!--VIEW, EDIT & DELETE MODAL-->
     <div class="modal fade" id="detalleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

@@ -61,6 +61,7 @@
                   <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                       <tr>
+                        <th class="text-center">#</th>
                         <th>Proveedor</th>
                         <th>Materia Prima</th>                
                         <th>Cantidad Materia prima</th>
@@ -73,6 +74,14 @@
                                 
                     </tbody>
                     <tfoot>
+                      <tr>
+                        <th colspan="5" class="text-right">Sub Total</th>
+                        <th class="text-center" id="subTotal">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="5" class="text-right">Total IVA</th>
+                        <th class="text-center" id="iva">$ 0.00</th>
+                      </tr>
                       <tr>
                         <th colspan="5" class="text-right">Total</th>
                         <th class="text-center" id="total">$ 0.00</th>
@@ -130,11 +139,12 @@
                 //Declarando variable globales
                 var count = 0;
 
-                var totalCompras = 0;
-                var subTotalCompra = 0;
+                var total = [];
+                var totalCompra = 0;
+                var subTotal = 0;
                 var totalImp = 0;
-                var codigo_proveedores = [];
-                var codigo_materiales = [];
+                var proveedores = [];
+                var materiales = [];
                 var cantidades = [];
 
                 function getData(){
@@ -154,27 +164,37 @@
 
                     $(".dataTables_empty").remove();
 
-                    if(proveedor!='' && proveedor!='---------' && materiaPrima=='---------' && cantidad!=null && precio!=null){
-                        addRows(codigoProveedor, codigoMateriaPrima, cantidad, precio);
+                    if(proveedor!='' && proveedor!='---------' && materiaPrima!='' && materiaPrima!='---------' && !isNaN(cantidad) && !isNaN(precio)){
+                        console.log("prueba")
+                        addRows(proveedor, materiaPrima, cantidad, precio);
                     }
                 };
 
-                function addRows(codigoProveedor, codigoMateriaPrima, cantidad, precio){
-                    if(!(isNaN(cantidad))){
-                        data['codigo_proveedores'].push(codigoProveedor);
-                        data['codigo_materiales'].push(codigoMateriaPrima);
-                        data['cantidades'].push(cantidad);
+                function addRows(proveedor, materiaPrima, cantidad, precio){
+                  console.log("registro")
+                    if(!isNaN(cantidad) && !isNaN(precio)){
+                      total.push(cantidad*precio);
+                      subTotal=subTotal+cantidad*precio;
+                      iva=subTotal*0.13;
+                      total=subTotal*1.13;
+                      proveedores.push(proveedor);
+                      materiales.push(materiaPrima);
+                      cantidades.push(cantidad);
 
-                        console.log(data);
-
-                        console.log("CANTIDAD")
-                        $("#tbBody").append(
-                            "<tr><td class='text-center'>"+count+"</td>"+
-                            "<td>"+codigoProveedor+"</td>"+
-                            "<td>"+codigoMateriaPrima+"</td>"+
-                            "<td class='text-center'>$ "+cantidad+"</td>"+
-                            "<td class='text-center'>$ "+precio+"</td><td></td></tr>"
-                        )
+                      console.log("CANTIDAD")
+                      $("#tbBody").append(
+                        "<tr><td class='text-center'>"+count+"</td>"+
+                          "<td>"+proveedor+"</td>"+
+                          "<td>"+materiaPrima+"</td>"+
+                          "<td class='text-center'>"+cantidad+"</td>"+
+                          "<td class='text-center'>$ "+precio+"</td><td></td></tr>"
+                      );
+                      $("#subTotal").empty();
+                      $("#subTotal").append("$ "+subTotal);
+                      $("#iva").empty();
+                      $("#iva").append("$ "+iva);
+                      $("#total").empty();
+                      $("#total").append("$ "+total);
                     }
                 };
           </script>
