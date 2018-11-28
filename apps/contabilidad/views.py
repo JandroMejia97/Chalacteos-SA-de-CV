@@ -23,6 +23,10 @@ import csv
 import json
 
 
+class IndexView(LoginRequiredMixin, TemplateView):
+	template_name = 'index.html'
+
+
 class SignInView(LoginView):
     template_name = 'iniciarSesion.html'
 
@@ -62,6 +66,14 @@ class MovimientosListView(LoginRequiredMixin, ListView):
 	model = Movimiento
 	template_name = 'contabilidad/gestionarMovimientos.html'
 	context_object_name = 'movimientos'
+
+	def get_queryset(self):
+		transaccion = Transaccion.objects.get(id_transaccion=self.request.GET[''])
+		context = Movimiento.objects.filter()
+
+	def get_context_data(self, *args, **kwargs):
+		context = super(MovimientosListView, self).get_context_data(*args, **kwargs)
+		return context
 
 
 class EstadoFinancieroListView(LoginRequiredMixin, ListView):
