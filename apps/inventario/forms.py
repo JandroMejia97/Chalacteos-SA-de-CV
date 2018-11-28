@@ -98,7 +98,6 @@ class ProveedorForm(forms.ModelForm):
     scope_prefix = 'proveedor_data'
     form_name = 'proveedor_form'
 
-
     class Meta:
         model = Proveedor
         fields = [
@@ -111,9 +110,4 @@ class ProveedorForm(forms.ModelForm):
             label='Proveedor',
             queryset=Proveedor.objects.all(),
             help_text='Seleccione el proveedor al que se le comprará la materia prima',
-            widget=forms.Select(
-                attrs={
-                    'onchange': 'getMateria("id_id_proveedor")'
-                }
-            )
         )

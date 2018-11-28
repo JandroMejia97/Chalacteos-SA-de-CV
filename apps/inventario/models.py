@@ -266,13 +266,6 @@ class MateriaPrima(models.Model):
     id_materia_prima = models.AutoField(
         primary_key=True
     )
-    id_producto = models.ForeignKey(
-        Producto,
-        verbose_name='Producto',
-        on_delete=models.DO_NOTHING,
-        blank=False,
-        help_text='Seleccion el producto que esta conformado por materia prima'
-    )
     id_recurso = models.OneToOneField(
         Recurso,
         verbose_name='Recurso',
@@ -294,7 +287,7 @@ class MateriaPrima(models.Model):
     class Meta:
         verbose_name = 'Materia Prima'
         verbose_name_plural = 'Materias Primas'
-        ordering = ['id_producto', 'id_recurso']
+        ordering = ['id_proveedor', 'id_recurso']
 
 
 class Factura(models.Model):

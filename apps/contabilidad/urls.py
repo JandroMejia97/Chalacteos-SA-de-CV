@@ -28,7 +28,7 @@ urlpatterns = [
         name='sign-out'
     ),
 	path(
-		'',
+		'cuentas/',
 		views.CuentasListView.as_view(),
 		name='cuentas'
 	),
@@ -117,16 +117,6 @@ urlpatterns = [
         views.PerfilUpdateView.as_view(),
         name='perfil-edicion'
     ),
-	path(
-		'import/rubro/',
-		views.import_data_rubro,
-		name='import-rubro'
-	),
-	path(
-		'import/cuenta/',
-		views.import_data_cuenta,
-		name='import-cuenta'
-	),
 	re_path(
 		'ajax/cuenta/',
 		views.load_sub_cuenta,
