@@ -15,6 +15,8 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
+import json
+
 # Create your views here.
 
 class ProveedoresListView(LoginRequiredMixin, ListView):
@@ -190,13 +192,14 @@ class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 		context['proveedor_form'] = ProveedorForm()
 		return self.render_to_response(context)
 
-	def put(self, request, *args, **kwargs):
+	def post(self, request, *args, **kwargs):
+		proveedor = request.POST.get('id_id_proveedor')
 		request_data = json.loads(request.body)
 		recurso_form = RecursoForm(
-			data=request_data.get(RecursoForm.scope_prefix, {})
+			request.POST.get('recurso_form', {})
 		)
 		proveedor_form = ProveedorForm(
-			data=request_data.get(ProveedorForm.scope_prefix, {})
+			request.POST.get('proveedor_form', {})
 		)
 		response_data = {}
 
