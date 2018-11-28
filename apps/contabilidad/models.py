@@ -198,6 +198,7 @@ class Cuenta(models.Model):
         default=True,
         help_text="Marque esta casilla sí y solo sí la cuenta está en uso"
 	)
+	
 
 	def __str__(self):
 		return self.nombre_cuenta
@@ -407,7 +408,7 @@ class Transaccion(models.Model):
 	)	
 	
 	def __str__(self):
-		return self.numero_transaccion
+		return str(self.numero_transaccion)
 
 	class Meta:
 		ordering = ["fecha_transaccion", "numero_transaccion"]
@@ -471,6 +472,12 @@ class Movimiento(models.Model):
         ]
 	)
 	
+	def __str__(self):
+		if self.monto_abono != None:
+			return 'Transaccion: '+str(self.id_transaccion.numero_transaccion)+' Movimiento: '+str(self.id_movimiento)+'\tAbono: '+str(self.monto_abono)
+		elif self.monto_cargo != None:
+			return 'Transaccion: '+str(self.id_transaccion.numero_transaccion)+' Movimiento: '+str(self.id_movimiento)+'\tCargoo: '+str(self.monto_cargo)
+
 	class Meta:
 		ordering = ["id_transaccion", "id_movimiento"]
 		verbose_name = "Movimiento"

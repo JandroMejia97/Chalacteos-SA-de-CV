@@ -1,0 +1,75 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Estados Financieros{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarContabilidad.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Historial de Estados Financieros</a>
+          </li>
+          <li class="breadcrumb-item active">Estados Financieros</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="alert bold alert-info">
+          <i class="fas fw fa-plus-circle"></i>
+          <a href="{% url 'contabilidad:cuenta-crear' %}">
+            <strong>¡Click Aquí para cerrar período contable!</strong>
+          </a>
+        </div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Estados Financieros
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                      <th>Nombre del Estado Financiero</th>
+                      <th>Período Contable</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for estado_financiero in estados_financieros %}
+                        <tr id="{{estado_financiero.id_estado_financiero}}">
+                            <!--<td class="text-center">{{estado_financiero.id_estado_financiero}}</td>-->
+                            {% ifequal estado_financiero.nombre_estado_financiero 'BALANCE GENERAL' %}
+                                <td><a href="/detalle/estado/general/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Al {{estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>
+                            {% endifequal %}
+                            {% ifequal estado_financiero.nombre_estado_financiero 'BALANCE DE COMPROBACION' %}
+                                <td><a href="/detalle/estado/comprobacion/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
+                            {% endifequal %}
+                            {% ifequal estado_financiero.nombre_estado_financiero 'ESTADO DE RESULTADOS' %}
+                                <td><a href="/detalle/estado/resultados/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
+                            {% endifequal %}
+                            {% ifequal estado_financiero.nombre_estado_financiero 'ESTADO DE CAPITAL' %}
+                                <td><a href="/detalle/estado/capital/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
+                            {% endifequal %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+{% endblock content %}

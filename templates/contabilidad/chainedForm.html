@@ -1,5 +1,5 @@
 {% extends 'header&footer.html' %}
-{% block title %}SCIeL - Edición {% endblock title %}
+{% block title %}SAeL - Edición {% endblock title %}
 
 {% block content %}
   
@@ -138,9 +138,9 @@
                 
             var totalCargos = 0;
             var totalAbonos = 0;
-            var codigo_cuentas = [];
-            var cargos = [];
-            var abonos = [];
+            var codigo_cuentas = "";
+            var cargos = "";
+            var abonos = "";
             var codigoTipo = null;
             var monto = null;
             var descripcion = null
@@ -227,9 +227,9 @@
 
             function addRows(codigoSubCuenta, cuenta, cargo, abono){
                 if(isNaN(abono) && !(isNaN(cargo))){
-                    codigo_cuentas.push(codigoSubCuenta);
-                    cargos.push(cargo);
-                    abonos.push(null);
+                    codigo_cuentas+=codigoSubCuenta+",";
+                    cargos+=cargo+",";
+                    abonos+="None,";
                     totalCargos = totalCargos + cargo;
 
                     console.log("CARGO")
@@ -242,9 +242,9 @@
                     $("#debe").append("$ "+totalCargos);
                 };
                 if(isNaN(cargo) && !(isNaN(abono))){
-                    codigo_cuentas.push(codigoSubCuenta);
-                    abonos.push(abono);
-                    cargos.push(null);
+                    codigo_cuentas+=codigoSubCuenta+",";
+                    abonos+=abono+",";
+                    cargos+="None,";
                     totalAbonos = totalAbonos + abono;                
 
                     console.log("ABONO")
@@ -264,10 +264,10 @@
                 tipo = cbTipo.options[cbTipo.selectedIndex].text;
                 monto = parseFloat($("#id_monto_transaccion").val());
                 descripcion = $("#id_descripcion_transaccion").val();
-
                 if(tipo!='' && tipo!='---------' && !isNaN(monto) && descripcion!=''){
                     if(totalAbonos==totalCargos){
                         if(totalAbonos==monto){
+                            console.log("Cuentas: "+codigo_cuentas+"\nAbonos: "+abonos+"\nCargos: "+cargos);
                             $.ajax({
                                 url: "{% url 'contabilidad:ajax-transaccion' %}",
                                 type: "POST",
@@ -285,7 +285,7 @@
                                 },
                                 dataType: "json"
                             }).done(function(data){
-                                alert(data.message);
+                                location.href = data.success_url;
                             }).fail(function() {
                                 console.log("error");
                                 alert("La transaccion no pudo ser realizada");

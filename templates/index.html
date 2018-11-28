@@ -1,0 +1,201 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Monitorear Invernaderos{% endblock title %}
+
+{% block content %}
+    
+  {% block sidebar %}
+  {% endblock sidebar %}
+  <div id="content-wrapper">
+      <div class="container-fluid col-8 content-center">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            SAeL
+          </li>
+          <li class="breadcrumb-item active">Menú</li>
+        </ol>
+        <!-- Icon Cards-->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-balance-scale"></i>
+                <strong>Contabilidad General</strong>
+            </div>
+            <div class="card-body">
+                <div class="row bold">
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'contabilidad:cuentas' %}')">
+                        <div class="card text-white bg-primary o-hidden h-100">
+                            <div class="card-body">
+                                <div class="card-body-icon">
+                                <i class="fas fa-fw fa-book"></i>
+                                </div>
+                                <div class="mr-5">Catálogo de Cuentas</div>
+                            </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'contabilidad:transacciones' %}')">
+                        <div class="card text-white bg-warning o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                            <i class="fas fa-fw fa-database"></i>
+                            </div>
+                            <div class="mr-5">Transacciones</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="#">
+                            <span class="float-left">Ver Detalles</span>
+                            <span class="float-right">
+                            <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'contabilidad:estados-financieros' %}')">
+                        <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-edit"></i>
+                            </div>
+                            <div class="mr-5">Estados Financieros</div>
+                        </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'inventario:impuestos' %}')">
+                        <div class="card text-white bg-danger o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-bank"></i>
+                            </div>
+                            <div class="mr-5">Impuestos</div>
+                        </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-check-circle"></i>
+                <strong>Contabilidad de Costos</strong>
+            </div>
+            <div class="card-body">
+                <div class="row bold">
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'inventario:proveedores' %}')">
+                        <div class="card text-white bg-primary o-hidden h-100">
+                            <div class="card-body">
+                                <div class="card-body-icon">
+                                <i class="fas fa-fw fa-address-book"></i>
+                                </div>
+                                <div class="mr-5">Proveedores</div>
+                            </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'inventario:clientes' %}')">
+                        <div class="card text-white bg-warning o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                            <i class="fas fa-fw fa-address-card"></i>
+                            </div>
+                            <div class="mr-5">Clientes</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="#">
+                            <span class="float-left">Ver Detalles</span>
+                            <span class="float-right">
+                            <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'inventario:ventas' %}')">
+                        <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-cart-arrow-down"></i>
+                            </div>
+                            <div class="mr-5">Ventas</div>
+                        </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'inventario:compras' %}')">
+                        <div class="card text-white bg-danger o-hidden h-100">
+                            <div class="card-body">
+                                <div class="card-body-icon">
+                                <i class="fas fa-fw fa-cart-plus"></i>
+                                </div>
+                                <div class="mr-5">Compras</div>
+                            </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'inventario:materia-prima' %}')">
+                        <div class="card text-white bg-info o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                            <i class="fas fa-fw fa-archive"></i>
+                            </div>
+                            <div class="mr-5">Materias Primas</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="#">
+                            <span class="float-left">Ver Detalles</span>
+                            <span class="float-right">
+                            <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+        <!-- Sticky Footer -->
+      </div>
+      <!-- /.content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+{% endblock content %}
+{% block footer %}
+  <footer class="py-5 bg-dark">
+      <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+          <p class="h6 m-0 text-white bold">Copyright &copy; SAeL 2018 | Sistema Administrativo en Línea - Chalácteos</p>
+        </div>
+      </div>
+  </footer>
+{% endblock footer %}
