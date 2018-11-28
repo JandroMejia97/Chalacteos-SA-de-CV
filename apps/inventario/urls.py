@@ -1,10 +1,129 @@
-from django.conf.urls import url,include
-from django.urls import reverse_lazy
+from django.conf.urls import include
+from django.urls import reverse_lazy, path, re_path
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = 'inventario'
 urlpatterns = [
-    
+	path(
+		'proveedores/',
+		views.ProveedoresListView.as_view(),
+		name='proveedores'
+	),
+	path(
+		'clientes/',
+		views.ClientesListView.as_view(),
+		name='clientes'
+	),
+	path(
+		'ventas/',
+		views.VentasListView.as_view(),
+		name='ventas'
+	),
+	path(
+		'compras/',
+		views.ComprasListView.as_view(),
+		name='compras'
+	),
+	path(
+		'materiales/',
+		views.MateriasPrimasListView.as_view(),
+		name='materia-prima'
+	),
+	path(
+		'impuestos/',
+		views.ImpuestosListView.as_view(),
+		name='impuestos'
+	),
+	path(
+		'crear/proveedor/',
+		views.ProveedorCreateView.as_view(),
+		name='proveedor-crear'
+	),
+	path(
+		'crear/cliente/',
+		views.ClienteCreateView.as_view(),
+		name='cliente-crear'
+	),
+	path(
+		'crear/venta/',
+		views.VentaCreateView.as_view(),
+		name='venta-crear'
+	),
+	path(
+		'crear/compra/',
+		views.CompraCreateView.as_view(),
+		name='compra-crear'
+	),
+	path(
+		'crear/impuesto/',
+		views.ImpuestoCreateView.as_view(),
+		name='impuesto-crear'
+	),
+	path(
+		'crear/material/',
+		views.MateriaPrimaCreateView.as_view(),
+		name='material-crear'
+	),
+	path(
+		'edicion/proveedor/<slug:pk>/',
+		views.ProveedorUpdateView.as_view(),
+		name='proveedor-edicion'
+	),
+	path(
+		'edicion/cliente/<slug:pk>/',
+		views.ClienteUpdateView.as_view(),
+		name='cliente-edicion'
+	),
+	path(
+		'edicion/impuesto/<slug:pk>/',
+		views.ImpuestoUpdateView.as_view(),
+		name='impuesto-edicion'
+	),
+	path(
+		'detalle/proveedor/<slug:pk>/',
+		views.ProveedorDetailView.as_view(),
+		name='proveedor-detalle'
+	),
+	path(
+		'detalle/cliente/<slug:pk>/',
+		views.ClienteDetailView.as_view(),
+		name='cliente-detalle'
+	),
+	path(
+		'detalle/impuesto/<slug:pk>/',
+		views.ImpuestoDetailView.as_view(),
+		name='impuesto-detalle'
+	),
+	path(
+		'detalle/impuesto/<slug:pk>/',
+		views.MateriaPrimaDetailView.as_view(),
+		name='materia-prima-detalle'
+	),
+	re_path(
+        r'ajax/proveedor/(?P<id_proveedor>[0-9]+)/',
+        views.proveedores,
+        name='ajax-proveedor'
+    ),
+    re_path(
+        r'ajax/cliente/(?P<id_cliente>[0-9]+)/',
+        views.clientes,
+        name='ajax-cliente'
+    ),
+    re_path(
+        r'ajax/impuesto/(?P<id_impuesto>[0-9]+)/',
+        views.impuestos,
+        name='ajax-impuesto'
+    ),
+    re_path(
+        r'ajax/materia_prima/(?P<id_cliente>[0-9]+)/',
+        views.clientes,
+        name='ajax-materia-prima'
+    ),
+    re_path(
+		'ajax/compra/',
+		views.load_materia,
+		name='ajax-materia'
+	),
 ]

@@ -1,0 +1,56 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Balance de Comprobación Inicial{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarContabilidad.html' %}
+    {% endblock sidebar %}
+    {% block tables %}
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <!-- Breadcrumbs-->
+                <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Estados Financieros</a>
+                </li>
+                <li class="breadcrumb-item active">Balance de Comprobación Inicial</li>
+                </ol>
+            
+                <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fas fa-table"></i>
+                    Balance de Comprobación Inicial
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="text-center">
+                                    {{balance_comprobacion.id_empresa}}
+                                    <br>
+                                    {{balance_comprobacion.nombre_estado_financiero|title}}
+                                    <br>
+                                    Del {{ balance_comprobacion.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{balance_comprobacion.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>
+                                </th>
+                            </tr>
+                        </thead>
+                            <tr>
+                                <th>CUENTAS</th>
+                                <th>DEBE</th>
+                                <th>HABER</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+        <!-- /.content-wrapper -->
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+        </a>
+    {% endblock tables %}
+    
+{% endblock content %}

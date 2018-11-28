@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>{% block title %}{% endblock %}</title>
-    {% load staticfiles %}
+    {% load static %}
 
     <link href="{% static 'media/images/favicon.png' %}" rel="shortcut icon" type="image/png">
     <!-- Bootstrap core CSS-->
@@ -23,7 +23,7 @@
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body id="body">
     <div id="page-top" style="background-color: #fbfcff !important">
         {% block header %}
         {% endblock header %}
@@ -45,20 +45,29 @@
                     case 'CUENTA':
                         location.href = '/edicion/cuenta/'+id;
                         break;
-                    case 'SENSOR':
-                        location.href = '/edicion/sensor/'+id;
+                    case 'PROVEEDOR':
+                        location.href = '/edicion/proveedor/'+id;
                         break;
-                    case 'ACTUADOR':
-                        location.href = '/edicion/actuador/'+id;
+                    case 'CLIENTE':
+                        location.href = '/edicion/cliente/'+id;
                         break;
-                    case 'DISPOSITIVO':
-                        location.href = '/edicion/dispositivo/'+id;
+                    case 'FACTURA':
+                        location.href = '/edicion/factura/'+id;
                         break;
-                    case 'CULTIVO':
-                        location.href = '/edicion/cultivo/'+id;
+                    case 'TRANSACCION':
+                        location.href = '/edicion/transaccion/'+id;
                         break;
-                    case 'PARAMETRO':
-                        location.href = '/edicion/parametro/'+id;
+                    case 'VENTA':
+                        location.href = '/edicion/venta/'+id;
+                        break;
+                    case 'COMPRA':
+                        location.href = '/edicion/compra/'+id;
+                        break;
+                    case 'IMPUESTO':
+                        location.href = '/edicion/impuesto/'+id;
+                        break;
+                    case 'FACTURAIMPUESTO':
+                        location.href = '/edicion/materia_prima/'+id;
                         break;
                 }
             };
@@ -67,20 +76,29 @@
                     case 'CUENTA':
                         location.href = '/detalle/cuenta/'+id;
                         break;
-                    case 'SENSOR':
-                        location.href = '/detalle/sensor/'+id;
+                    case 'PROVEEDOR':
+                        location.href = '/detalle/proveedor/'+id;
                         break;
-                    case 'ACTUADOR':
-                        location.href = '/detalle/actuador/'+id;
+                    case 'CLIENTE':
+                        location.href = '/detalle/cliente/'+id;
                         break;
-                    case 'DISPOSITIVO':
-                        location.href = '/detalle/dispositivo/'+id;
+                    case 'FACTURA':
+                        location.href = '/detalle/factura/'+id;
                         break;
-                    case 'CULTIVO':
-                        location.href = '/detalle/cultivo/'+id;
+                    case 'TRANSACCION':
+                        location.href = '/detalle/transaccion/'+id;
                         break;
-                    case 'PARAMETRO':
-                        location.href = '/detalle/parametro/'+id;
+                    case 'VENTA':
+                        location.href = '/detalle/venta/'+id;
+                        break;
+                    case 'COMPRA':
+                        location.href = '/detalle/compra/'+id;
+                        break;
+                    case 'IMPUESTO':
+                        location.href = '/detalle/impuesto/'+id;
+                        break;
+                    case 'MATERIAPRIMA':
+                        location.href = '/detalle/materia_prima/'+id;
                         break;
                 }
             };
@@ -97,20 +115,29 @@
                     case 'CUENTA':                 
                         url = '/ajax/cuenta/'+id+'/';
                         break;
-                    case 'SENSOR':
-                        url = '/ajax/sensor/'+id+'/';
+                    case 'PROVEEDOR':
+                        url = '/ajax/proveedor/'+id+'/';
                         break;
-                    case 'ACTUADOR':
-                        url = '/ajax/actuador/'+id+'/';
+                    case 'CLIENTE':
+                        url = '/ajax/cliente/'+id+'/';
                         break;
-                    case 'DISPOSITIVO':
-                        url = '/ajax/dispositivo/'+id+'/';
+                    case 'FACTURA':
+                        url = '/ajax/factura/'+id+'/';
                         break;
-                    case 'CULTIVO':
-                        url = '/ajax/cultivo/'+id+'/';
+                    case 'TRANSACCION':
+                        url = '/ajax/transaccion/'+id+'/';
                         break;
-                    case 'PARAMETRO':
-                        url = '/ajax/parametro/'+id+'/';
+                    case 'VENTA':
+                        url = '/ajax/venta/'+id+'/';
+                        break;
+                    case 'COMPRA':
+                        url = '/ajax/compra/'+id+'/';
+                        break;
+                    case 'IMPUESTO':
+                        url = '/ajax/impuesto/'+id+'/';
+                        break;
+                    case 'MATERIAPRIMA':
+                        url = '/ajax/materia_prima/'+id;
                         break;
                 }
                 $('#confirmacion').attr('onclick', 'ejecutarAJAX('+id+',\''+url+'\')');
@@ -162,6 +189,7 @@
             });
         
         </script>
+        {% block js %}
         <!-- Bootstrap core JavaScript-->
         <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
         <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -169,8 +197,10 @@
         <!-- Core plugin JavaScript-->
         <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
 
+        <!-- Angular -->
+        <script src="{% static 'js/angular.js' %}"></script>
+
         <!-- Page level plugin JavaScript-->
-        <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
         <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
         <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
 
@@ -181,7 +211,7 @@
 
         <!-- Demo scripts for this page-->
         <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
-        <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
+        {% endblock js %}
     </div>
     <!--VIEW, EDIT & DELETE MODAL-->
     <div class="modal fade" id="detalleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

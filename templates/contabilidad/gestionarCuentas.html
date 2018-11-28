@@ -3,7 +3,7 @@
 
 {% block content %}    
   {% block sidebar %}
-    {% include 'sidebar.html' %}
+    {% include 'sidebarContabilidad.html' %}
   {% endblock sidebar %}
   {% block tables %}
     <div id="content-wrapper">
@@ -11,9 +11,9 @@
         <!-- Breadcrumbs-->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a href="#">Catálogo de Cuentas</a>
+            <a href="#">Contabilidad</a>
           </li>
-          <li class="breadcrumb-item active">Cuentas</li>
+          <li class="breadcrumb-item active">Catalogo de Cuentas</li>
         </ol>
         <!-- DataTables Example -->
         <div class="alert bold alert-info">
@@ -44,14 +44,18 @@
                     {% for cuenta in cuentas %}
                         <tr id="{{cuenta.id_cuenta}}">
                             <td class="text-center">{{cuenta.id_cuenta}}</td>
-                            <td>{{ cuenta.id_rubro }}</td>
+                            <td>
+                              {% ifnotequal cuenta.id_rubro None %}
+                                {{ cuenta.id_rubro }}
+                              {% endifnotequal %}
+                            </td>
                             <td>{{ cuenta.codigo_cuenta }}</td>
                             <td>{{ cuenta.nombre_cuenta }}</td>
                             <td>
                               {% if cuenta.is_cuenta_acreedora %}
-                                Acreedora
+                                ACREEDORA
                               {% else %}
-                                Deudora
+                                DEUDORA
                               {% endif %}
                             </td>
                             <td class="text-center">
@@ -60,6 +64,16 @@
                                 <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ cuenta.id_cuenta }}, '{{cuenta.nombre_cuenta}}', 'CUENTA');" style="color:gray !important"></a>
                             </td>                          
                         </tr>
+                    {% empty %}
+                      <div class="alert bold alert-danger text-center">
+                        <i class="fas fw fa-question-circle">
+                          <strong>¡Opps! Parece que no tienes ninguna cuenta registrada.</strong>
+                        </i><br><hr>
+                        <i class="fas fw fa-plus-circle"></i>
+                        <a href="{% url 'contabilidad:cuenta-crear' %}">
+                          <strong>¡Click Aquí para agregar una nueva cuenta al catálogo!</strong>
+                        </a>
+                      </div>
                     {% endfor %}
                 </tbody>
               </table>

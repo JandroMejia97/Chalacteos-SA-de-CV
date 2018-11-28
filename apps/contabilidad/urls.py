@@ -7,6 +7,21 @@ from . import views
 app_name ='contabilidad'
 
 urlpatterns = [
+	path(
+		'',
+		views.IndexView.as_view(),
+		name='index'
+	),
+	path(
+		'import/rubro/',
+		views.import_data_rubro,
+		name='import-rubro'
+	),
+	path(
+		'import/cuenta/',
+		views.import_data_cuenta,
+		name='import-cuenta'
+	),
 	re_path(
 		'sign-in/',
 		views.SignInView.as_view(),
@@ -18,7 +33,7 @@ urlpatterns = [
         name='sign-out'
     ),
 	path(
-		'',
+		'cuentas/',
 		views.CuentasListView.as_view(),
 		name='cuentas'
 	),
@@ -38,29 +53,94 @@ urlpatterns = [
 		name='cuenta-detalle'
 	),
 	path(
-		'estados_financieros/',
+		'estados/',
 		views.EstadoFinancieroListView.as_view(),
-		name='estados_financieros'
+		name='estados-financieros'
 	),
 	path(
-		'crear/estados_financieros/',
-		views.EstadoFinancieroCreateView.as_view(),
-		name='estados_financieros-crear'
+		'detalle/estado/general/<slug:pk>/',
+		views.BalanceGeneralDetailView.as_view(),
+		name='balance-general-detalle'
 	),
 	path(
-		'edicion/estados_financieros/<slug:pk>/',
-		views.EstadoFinancieroUpdateView.as_view(),
-		name='estados_financieros-edicion'
+		'detalle/estado/resultados/<slug:pk>/',
+		views.EstadoResultadosDetailView.as_view(),
+		name='balance-resultados-detalle'
 	),
 	path(
-		'detalle/estados_financieros/<slug:pk>/',
-		views.EstadoFinancieroDetailView.as_view(),
-		name='estados_financieros-detalle'
+		'detalle/estado/capital/<slug:pk>/',
+		views.EstadoCapitalDetailView.as_view(),
+		name='balance-capital-detalle'
+	),
+	path(
+		'detalle/estado/comprobacion/<slug:pk>/',
+		views.BalanceComprobacionDetailView.as_view(),
+		name='balance-comprobacion-detalle'
 	),
 	re_path(
         r'ajax/cuenta/(?P<id_cuenta>[0-9]+)/',
         views.cuentas,
         name='ajax-cuenta'
+    ),
+	path(
+		'transacciones/',
+		views.TransaccionesListView.as_view(),
+		name='transacciones'
+	),
+	path(
+		'crear/transaccion/',
+		views.TransaccionCreateView.as_view(),
+		name='transaccion-crear'
+	),
+	path(
+		'edicion/transaccion/<slug:pk>/',
+		views.TransaccionUpdateView.as_view(),
+		name='transaccion-edicion'
+	),
+	path(
+		'detalle/transaccion/<slug:pk>/',
+		views.CuentaDetailView.as_view(),
+		name='transaccion-detalle'
+	),
+	re_path(
+        r'ajax/transaccion/(?P<id_transaccion>[0-9]+)/',
+        views.cuentas,
+        name='ajax-transaccion'
+    ),
+	path(
+		'movimientos/',
+		views.MovimientosListView.as_view(),
+		name='movimientos'
+	),
+	path(
+		'crear/movimiento/',
+		views.MovimientoCreateView.as_view(),
+		name='movimiento-crear'
+	),
+	path(
+		'edicion/movimiento/<slug:pk>/',
+		views.MovimientoUpdateView.as_view(),
+		name='movimiento-edicion'
+	),
+	path(
+		'detalle/movimiento/<slug:pk>/',
+		views.CuentaDetailView.as_view(),
+		name='movimiento-detalle'
+	),
+	re_path(
+		'ajax/cuenta/',
+		views.load_sub_cuenta,
+		name='ajax-subcuenta'
+	),
+	path(
+		'ajax/transaccion/',
+		views.TransaccionCreateView.as_view(),
+		name='ajax-transaccion'
+	),
+	re_path(
+        r'ajax/movimiento/(?P<id_movimiento>[0-9]+)/',
+        views.cuentas,
+        name='ajax-movimiento'
     ),
 	re_path(
         r'detalle/perfil/(?P<pk>[0-9]+)/$',
@@ -77,15 +157,4 @@ urlpatterns = [
         views.estados_financieros,
         name='ajax-estados_financieros'
     ),
- 	path(
-		'import/rubro/',
-		views.import_data_rubro,
-		name='import-rubro'
-	),
-	path(
-		'import/cuenta/',
-		views.import_data_cuenta,
-		name='import-cuenta'
-	),
-	
 ]

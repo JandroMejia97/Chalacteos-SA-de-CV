@@ -1,9 +1,9 @@
 {% extends 'header&footer.html' %}
-{% block title %}SAeL - Gestión de Cuentas{% endblock title %}
+{% block title %}SAeL - Estados Financieros{% endblock title %}
 
 {% block content %}    
   {% block sidebar %}
-    {% include 'sidebar.html' %}
+    {% include 'sidebarContabilidad.html' %}
   {% endblock sidebar %}
   {% block tables %}
     <div id="content-wrapper">
@@ -16,12 +16,12 @@
           <li class="breadcrumb-item active">Estados Financieros</li>
         </ol>
         <!-- DataTables Example -->
-        <!--<div class="alert bold alert-info">
+        <div class="alert bold alert-info">
           <i class="fas fw fa-plus-circle"></i>
           <a href="{% url 'contabilidad:cuenta-crear' %}">
-            <strong>¡Click Aquí para agregar una nueva cuenta al catálogo!</strong>
+            <strong>¡Click Aquí para cerrar período contable!</strong>
           </a>
-        </div>-->
+        </div>
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-table"></i>
@@ -33,8 +33,8 @@
                 <thead>
                   <tr>
                       <th>N°</th>
-                      <th>Período Contable</th>
                       <th>Nombre del Estado Financiero</th>
+                      <th>Período Contable</th>
                       <th>Operaciones</th>
                   </tr>
                 </thead>
@@ -42,14 +42,27 @@
                     {% for estado_financiero in estados_financieros %}
                         <tr id="{{estado_financiero.id_estado_financiero}}">
                             <td class="text-center">{{estado_financiero.id_estado_financiero}}</td>
-                            <td>{{ estado_financiero.id_periodo_contable}}</td>
-                            <td><a href="monitorear/{{ invernadero.id_invernadero }}">{{ invernadero.nombre_invernadero }}</a></td>
-                            <!--<td>{{ estado_financiero.nombre_estado_financiero}}</td>-->
+                            {% ifequal estado_financiero.nombre_estado_financiero 'BALANCE GENERAL' %}
+                                <td><a href="/detalle/estado/general/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Al {{estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>
+                            {% endifequal %}
+                            {% ifequal estado_financiero.nombre_estado_financiero 'BALANCE DE COMPROBACION' %}
+                                <td><a href="/detalle/estado/comprobacion/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
+                            {% endifequal %}
+                            {% ifequal estado_financiero.nombre_estado_financiero 'ESTADO DE RESULTADOS' %}
+                                <td><a href="/detalle/estado/resultados/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
+                            {% endifequal %}
+                            {% ifequal estado_financiero.nombre_estado_financiero 'ESTADO DE CAPITAL' %}
+                                <td><a href="/detalle/estado/capital/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
+                                <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
+                            {% endifequal %}
                             <td class="text-center">
-                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('ESTADOFINANCIERO', {{ estado_financiero.id_estado_financiero }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('ESTADOFINANCIERO', {{ estado_financiero.id_estado_financiero}})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ estado_financiero.id_estado_financiero }}, '{{estado_financiero.id_periodo_contable}', 'ESTADO_FINANCIERO');" style="color:gray !important"></a>
-                            </td>                          
+                              <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('ESTADOFINANCIERO', {{ estado_financiero.id_estado_financiero }})" style="color:gray !important"></a>
+                              <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('ESTADOFINANCIERO', {{ estado_financiero.id_estado_financiero}})" style="color:gray !important"></a>
+                              <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ estado_financiero.id_estado_financiero }}, '{{estado_financiero.id_periodo_contable}', 'ESTADOFINANCIERO');" style="color:gray !important"></a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -66,6 +79,4 @@
       <i class="fas fa-angle-up"></i>
     </a>
   {% endblock tables %}
-    
 {% endblock content %}
-

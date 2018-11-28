@@ -1,0 +1,219 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición / {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-edit"></i>
+                Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="card-body" id="1">
+            <div>
+              <div class="col-lg-12 col-xs-12 border rounded">
+                <form name="transaccion_form" novalidate>
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                      <h4 class="mb-3 text-center header_id">COMPRA</h4>
+                      {{ compra_form|bootstrap_inline }}
+                    </div>
+                  </div>
+                  <br>
+                  <div class="row border-bottom">
+                    <div  class="col-lg-12 col-xs-12" id="div_1">
+                      <h4 class="mb-3 text-center header_id">MATERIA PRIMA</h4>
+                      {{ detalle_compra_form|bootstrap_inline }}
+                    </div>
+                  </div>
+                  <div class="col-12 text-right">    
+                    <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
+                      Registrar compra 
+                      <i class="fas fa-plus-circle"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header">
+                <i class="fas fa-table"></i>
+                  Compra
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th class="text-center">#</th>
+                        <th>Proveedor</th>
+                        <th>Materia Prima</th>                
+                        <th>Cantidad Materia prima</th>
+                        <th>Precio Unitario</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbBody">
+                                
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="4" class="text-right">Sub Total</th>
+                        <th class="text-center" id="subTotal">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="4" class="text-right">Total IVA</th>
+                        <th class="text-center" id="iva">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="4" class="text-right">Total</th>
+                        <th class="text-center" id="total">$ 0.00</th>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="form-group text-center">
+              <br>
+              <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+              <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+            </div>
+          </div>
+          <script>
+                function getMateria(id_proveedor, id_materiales){
+                  console.log("GETMATERIA");
+                  var proveedor = $("#"+id_proveedor).val();
+                  console.log("AJAX: "+proveedor);
+                  if(proveedor!='' && proveedor!='---------'){
+                    $.ajax({
+                      url: '{% url "inventario:ajax-materia" %}',
+                      type: 'GET',
+                      data: {
+                        'id_proveedor': proveedor,
+                      },
+                      success: function(data){
+                        console.log(data.message);
+                        console.log(data);
+                        console.log("SUCCESS");
+                      },
+                      dataType: 'json'
+                    }).done(function(data){
+                      if(data.materiales != null){
+                        $("#"+id_materiales).empty();
+                        $("#"+id_materiales).append('<option value="" selected="">---------</option>');
+                        $.each(data.materiales, function(index, value){
+                          $("#"+id_materiales).append(
+                          "<option id='"+value.id_materia_prima + "' value='" +
+                          value.id_materia_prima + "'>" + value + "</option>");
+                        });
+                        $("#"+id_materiales).removeAttr('disabled');
+                      }else{
+                        alert(data.message);
+                        $("#"+id_materiales).append('<option value="" selected="">---------</option>');
+                        $("#"+id_materiales).attr('disabled','disabled');
+                      }
+                    }).fail(function(data) {
+                      console.log("error");
+                      console.log(data.message);
+                    }).always(function() {
+                      console.log("complete");
+                    });
+                  }
+                };
+
+                //Declarando variable globales
+                var count = 0;
+                var total = "";
+                var totalCompra = 0;
+                var subTotal = 0;
+                var proveedores = "";
+                var materiales = "";
+                var cantidades = "";
+
+                function getData(){
+                    console.log("ADDROWS")
+                    count = count + 1;
+                    var codigoProveedor = $("#id_id_proveedor").val();
+                    var codigoMateriaPrima = $("#id_id_materia_prima").val();
+
+                    var cbProveedor = document.getElementById("id_id_proveedor");
+                    var cbMateriaPrima = document.getElementById("id_id_materia_prima");
+                    
+                    var proveedor = cbProveedor.options[cbProveedor.selectedIndex].text;
+                    var materiaPrima = cbMateriaPrima.options[cbMateriaPrima.selectedIndex].text;
+                    
+                    var cantidad = parseInt($("#id_cantidad_detalle").val());
+                    var precio = parseInt($("#id_precio_unitario").val());
+
+                    $(".dataTables_empty").remove();
+
+                    if(proveedor!='' && proveedor!='---------' && materiaPrima!='' && materiaPrima!='---------' && !isNaN(cantidad) && !isNaN(precio)){
+                        console.log("prueba")
+                        addRows(proveedor, materiaPrima, cantidad, precio);
+                    }
+                };
+
+                function addRows(proveedor, materiaPrima, cantidad, precio){
+                  console.log("registro")
+                  total.push(cantidad*precio);
+                  subTotal=subTotal+cantidad*precio;
+                  iva=subTotal*{{impuesto}};
+                  totalCompra=Math.round(subTotal*1.13*100)/100;
+                  proveedores.push(proveedor);
+                  materiales.push(materiaPrima);
+                  cantidades.push(cantidad);
+
+                  console.log("CANTIDAD")
+                  $("#tbBody").append(
+                    "<tr><td class='text-center'>"+count+"</td>"+
+                    "<td>"+proveedor+"</td>"+
+                    "<td>"+materiaPrima+"</td>"+
+                    "<td class='text-center'>"+cantidad+"</td>"+
+                    "<td class='text-center'>$ "+precio+"</td></tr>"
+                  );
+                  $("#subTotal").empty();
+                  $("#subTotal").append("$ "+subTotal);
+                  $("#iva").empty();
+                  $("#iva").append("$ "+iva);
+                  $("#total").empty();
+                  $("#total").append("$ "+totalCompra);
+                };
+          </script>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}
+{% block js %}
+    {% load static %}
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Page level plugin JavaScript-->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin.min.js' %}"></script>
+    <script src="{% static 'js/invernaderos.js' %}"></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+{% endblock js %}
