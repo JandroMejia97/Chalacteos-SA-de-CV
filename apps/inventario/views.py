@@ -361,3 +361,11 @@ def load_materia(request):
 				'message': "La materia seleccionada no posee datos"
 			}
 		return JsonResponse(data=data)
+def verkardex(request):
+	movimientos = Movimiento.objects.all()
+	saldos = Saldo.objects.all()
+	context = {
+		'movimientos':movimientos,
+		'saldos':saldos,
+	}
+	return render(request,'inventario/verKardex.html',context)
