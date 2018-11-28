@@ -25,19 +25,19 @@
             <i class="fas fa-plus-circle"></i>
           </div>
           <div class="card-body" id="1">
-            <div class="row">
+            <div>
               <div class="col-lg-12 col-xs-12 border rounded">
                 <form name="transaccion_form" novalidate>
                 {% csrf_token %}
                   <div class="row">
-                    <div class="col-lg-12 col-xs-12 border">
+                    <div class="col-lg-12 col-xs-12">
                       <h4 class="mb-3 text-center header_id">COMPRA</h4>
                       {{ compra_form|bootstrap_inline }}
                     </div>
                   </div>
                   <br>
                   <div class="row border-bottom">
-                    <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                    <div  class="col-lg-12 col-xs-12" id="div_1">
                       <h4 class="mb-3 text-center header_id">MATERIA PRIMA</h4>
                       {{ detalle_compra_form|bootstrap_inline }}
                     </div>
@@ -97,51 +97,54 @@
           </div>
           <script>
                 function getMateria(id_proveedor, id_materiales){
-                    console.log("GETMATERIA");
-                    var materia = $("#"+id_proveedor).val();
-                    console.log("AJAX: "+materia);
+                  console.log("GETMATERIA");
+                  var proveedor = $("#"+id_proveedor).val();
+                  console.log("AJAX: "+proveedor);
+                  if(proveedor!='' && proveedor!='---------'){
                     $.ajax({
-                        url: '{% url "inventario:ajax-materia" %}',
-                        type: 'GET',
-                        data: {
-                            'id_proveedor': materia,
-                        },
-                        success: function(data){
-                            console.log(data.message);
-                            console.log(data);
-                            console.log("SUCCESS");
-                        },
-                        dataType: 'json'
-                    }).done(function(data){
-                        if(data.materiales != null){
-                            $("#"+id_materiales).append('<option value="" selected="">---------</option>');
-                            $.each(data.materiales, function(index, value){
-                                $("#"+id_materiales).append(
-                                    "<option id='"+value.id_materia_prima + "' value='" +
-                                    value.id_materia_prima + "'>" + value + "</option>");
-                            });
-                            $("#"+id_materiales).removeAttr('disabled');
-                        }else{
-                            alert(data.message);
-                            $("#"+id_materiales).append('<option value="" selected="">---------</option>');
-                            $("#"+id_materiales).attr('disabled','disabled');
-                        }
-                    }).fail(function(data) {
-                        console.log("error");
+                      url: '{% url "inventario:ajax-materia" %}',
+                      type: 'GET',
+                      data: {
+                        'id_proveedor': proveedor,
+                      },
+                      success: function(data){
                         console.log(data.message);
+                        console.log(data);
+                        console.log("SUCCESS");
+                      },
+                      dataType: 'json'
+                    }).done(function(data){
+                      if(data.materiales != null){
+                        $("#"+id_materiales).empty();
+                        $("#"+id_materiales).append('<option value="" selected="">---------</option>');
+                        $.each(data.materiales, function(index, value){
+                          $("#"+id_materiales).append(
+                          "<option id='"+value.id_materia_prima + "' value='" +
+                          value.id_materia_prima + "'>" + value + "</option>");
+                        });
+                        $("#"+id_materiales).removeAttr('disabled');
+                      }else{
+                        alert(data.message);
+                        $("#"+id_materiales).append('<option value="" selected="">---------</option>');
+                        $("#"+id_materiales).attr('disabled','disabled');
+                      }
+                    }).fail(function(data) {
+                      console.log("error");
+                      console.log(data.message);
                     }).always(function() {
-                        console.log("complete");
+                      console.log("complete");
                     });
+                  }
                 };
 
                 //Declarando variable globales
                 var count = 0;
-                var total = [];
+                var total = "";
                 var totalCompra = 0;
                 var subTotal = 0;
-                var proveedores = [];
-                var materiales = [];
-                var cantidades = [];
+                var proveedores = "";
+                var materiales = "";
+                var cantidades = "";
 
                 function getData(){
                     console.log("ADDROWS")
@@ -168,30 +171,28 @@
 
                 function addRows(proveedor, materiaPrima, cantidad, precio){
                   console.log("registro")
-                    if(!isNaN(cantidad) && !isNaN(precio)){
-                      total.push(cantidad*precio);
-                      subTotal=subTotal+cantidad*precio;
-                      iva=subTotal*0.13;
-                      totalCompra=Math.round(subTotal*1.13*100)/100;
-                      proveedores.push(proveedor);
-                      materiales.push(materiaPrima);
-                      cantidades.push(cantidad);
+                  total.push(cantidad*precio);
+                  subTotal=subTotal+cantidad*precio;
+                  iva=subTotal*{{impuesto}};
+                  totalCompra=Math.round(subTotal*1.13*100)/100;
+                  proveedores.push(proveedor);
+                  materiales.push(materiaPrima);
+                  cantidades.push(cantidad);
 
-                      console.log("CANTIDAD")
-                      $("#tbBody").append(
-                        "<tr><td class='text-center'>"+count+"</td>"+
-                          "<td>"+proveedor+"</td>"+
-                          "<td>"+materiaPrima+"</td>"+
-                          "<td class='text-center'>"+cantidad+"</td>"+
-                          "<td class='text-center'>$ "+precio+"</td></tr>"
-                      );
-                      $("#subTotal").empty();
-                      $("#subTotal").append("$ "+subTotal);
-                      $("#iva").empty();
-                      $("#iva").append("$ "+iva);
-                      $("#total").empty();
-                      $("#total").append("$ "+totalCompra);
-                    }
+                  console.log("CANTIDAD")
+                  $("#tbBody").append(
+                    "<tr><td class='text-center'>"+count+"</td>"+
+                    "<td>"+proveedor+"</td>"+
+                    "<td>"+materiaPrima+"</td>"+
+                    "<td class='text-center'>"+cantidad+"</td>"+
+                    "<td class='text-center'>$ "+precio+"</td></tr>"
+                  );
+                  $("#subTotal").empty();
+                  $("#subTotal").append("$ "+subTotal);
+                  $("#iva").empty();
+                  $("#iva").append("$ "+iva);
+                  $("#total").empty();
+                  $("#total").append("$ "+totalCompra);
                 };
           </script>
         </div>

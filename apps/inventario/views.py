@@ -147,7 +147,7 @@ class DetalleCompraCreateView(LoginRequiredMixin, CreateView):
 	fields = [
 		'id_materia_prima',
 		'cantidad_detalle'
-	]
+	] 
 
 class VentaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedVentaForm.html'
@@ -165,10 +165,9 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		context['proveedor_form'] = ProveedorForm()
-		context['materia_prima_form'] = MateriaPrima()
-		context['compra_form'] = CompraForm()
+		context['compra_form'] = ProveedorCompraForm()
 		context['detalle_compra_form'] = DetalleCompraForm()
+		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
 
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
@@ -350,14 +349,20 @@ def impuestos(request, id_impuesto):
 def load_materia(request):
 	if request.method == 'GET':
 		id_proveedor = request.GET['id_proveedor']
-		materiales = MateriaPrima.objects.all().filter(id_proveedor=id_proveedor).values()
-		if materias:
+		materiales = MateriaPrima.objects.filter(id_proveedor=id_proveedor)
+		message =  str(materiales.query)
+		materiales = materiales.values()
+		recursos = []
+		#for material in materiales:
+			#material.id_materia_prima=material.id_recurso.nombre_recurso
+
+		if materiales:
 			data = {
-				'message': "Datos recuperados",
-				'materiales': list(materiales)
+				'message': message,
+				'materiales': list(materiales),
 			}
 		else:
 			data = {
-				'message': "La materia seleccionada no posee datos"
+				'message': "No se le han registrado materias primas al proveedor seleccionado"
 			}
 		return JsonResponse(data=data)
