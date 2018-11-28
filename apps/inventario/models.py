@@ -104,7 +104,7 @@ class Movimiento(models.Model):
                 message="Este campo debe ser positivo"
             )
         ],
-        help_text="Este campo es auto generado"
+        help_text="Este campo es auto generado",
     )
     is_Input = models.BooleanField(
         verbose_name='¿Es una entrada?',
@@ -113,18 +113,22 @@ class Movimiento(models.Model):
         help_text="Defina si esta transacción es una entrada o salida de materia prima o producto"
     )
 
+    def save(self, *args, **kwargs):
+        self.monto_movimiento = self.cantidad_movimiento * self.costo_unitario_movimiento
+        super(Movimiento, self).save(*args, **kwargs)
+
     def transaction_date(self):
         self.fecha_movimiento = timezone.now()
         self.save()
 
     def __str__(self):
-        return self.fecha_movimiento
+        return str(self.fecha_movimiento)
 
     class Meta:
         verbose_name = 'Movimiento'
         verbose_name_plural = 'Movimientos'
         get_latest_by = 'fecha_movimiento'
-        ordering = ['-fecha_movimiento']
+        ordering = ['fecha_movimiento']
 
 
 class Saldo(models.Model):
@@ -176,14 +180,29 @@ class Saldo(models.Model):
         ],
         help_text="Este campo es auto generado"
     )
+    def save(self, *args, **kwargs):
+        movimientos=Movimiento.objects.all()
+        monto=0
+        cantidad=0
+        for movimiento in movimientos:
+            if movimiento.is_Input:
+                monto=monto+movimiento.cantidad_movimiento*movimiento.costo_unitario_movimiento
+                cantidad=cantidad+movimiento.cantidad_movimiento
+            else:
+                monto=monto-movimiento.cantidad_movimiento*movimiento.costo_unitario_movimiento
+                cantidad=cantidad-movimiento.cantidad_movimiento
+        self.monto_saldo = monto
+        self.cantidad_saldo = cantidad  
+        self.costo_unitario_saldo = self.monto_saldo / self.cantidad_saldo 
+        super(Saldo, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.id_saldor
+        return str(self.id_saldor)
 
     class Meta:
         verbose_name = 'Saldo'
         verbose_name_plural = 'Saldos'
-        ordering = ['id_movimiento']
+        ordering = ['id_movimiento','id_saldor']
     
 
 class Producto(models.Model):
@@ -197,9 +216,6 @@ class Producto(models.Model):
         blank=False,
         help_text='Seleccione el recurso del producto'
     )
-    
-    def __str__(self):
-        return str(self.id_recurso)
 
     def __str__(self):
         return str(self.id_recurso)
@@ -266,6 +282,13 @@ class MateriaPrima(models.Model):
     id_materia_prima = models.AutoField(
         primary_key=True
     )
+    id_producto = models.ForeignKey(
+        Producto,
+        verbose_name='Producto',
+        on_delete=models.DO_NOTHING,
+        blank=False,
+        help_text='Seleccion el producto que esta conformado por materia prima'
+    )
     id_recurso = models.OneToOneField(
         Recurso,
         verbose_name='Recurso',
@@ -287,7 +310,7 @@ class MateriaPrima(models.Model):
     class Meta:
         verbose_name = 'Materia Prima'
         verbose_name_plural = 'Materias Primas'
-        ordering = ['id_proveedor', 'id_recurso']
+        ordering = ['id_producto', 'id_recurso']
 
 
 class Factura(models.Model):
