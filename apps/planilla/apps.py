@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class PlanillaConfig(AppConfig):
+class AppsicConfig(AppConfig):
     name = 'planilla'
