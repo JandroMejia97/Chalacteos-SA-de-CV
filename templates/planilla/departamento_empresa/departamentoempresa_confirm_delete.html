@@ -1,0 +1,28 @@
+
+
+{% extends "base.html" %}
+{% block contenido %}
+
+
+
+
+<div class="container">
+
+<form class="form-horizontal" method="post">
+	
+	{% csrf_token %}
+	<div class="form-group has-error">
+    <br><br>
+	<h2> ¿Estás seguro que deseas borrar esta asignacion Departamento | Empresa "{{ object }}"?</h2>
+    </div>
+
+    <div class="form-group has-warning">
+    <input  class="btn btn-danger col-md-2 col-md-offset-3" type="submit" value="Borrar" />
+    <a class="btn btn-warning col-md-2 col-md-offset-1" href="{% url "appsic:list_departamentoempresa" %}">Cancelar</a>
+    </div>
+</form>
+
+</div>
+
+
+{% endblock %}

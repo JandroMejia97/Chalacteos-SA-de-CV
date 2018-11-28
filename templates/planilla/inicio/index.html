@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+
+{% block contenido %}
+
+
+<!-- Container (Guia rapida) -->
+<div class="container-fluid text-center">
+	<br><br>
+	<h1>BIENVENID@</h1>
+	<h4>Navega entre las distintas opciones que tenemos para tí</h4>
+	<br><br><br>
+	
+	<div class="row col-sm-12">
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-folder-open logo-small"></span>
+			<h3>Empresas</h3>
+			<p>Registra - Modifica las Empresa</p>
+			<p><a href="{% url 'appsic:list' %}">Gestionar</a></p>
+		</div>
+		
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-user logo-small"></span>
+			<h3>Empleados</h3>
+			<p>Resgistra - Modifica los Empleados</p>
+			<p><a href="{%url 'appsic:list_empleado' %}">Gestionar</a></p>
+		</div>
+		
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-book logo-small"></span>
+			<h3>Puestos</h3>
+			<p>Registra - Modifica los Puestos</p>
+			<p><a href="{%url 'appsic:list_puesto' %}">Gestionar</a></p>
+			
+		</div>
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-stats logo-small"></span>
+			<h3>Departamentos</h3>
+			<p>Registra - Modifica los Departamentos</p>
+			<p><a href="{%url 'appsic:list_departamento' %}">Gestionar</a></p>
+			<br><br>
+		</div>
+
+	</div>
+	
+
+	<div class="row col-sm-12">
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-pencil logo-small"></span>
+			<h3>Agregar Empleados</h3>
+			<p>Añade - Remueve los Empleados a las Empresas</p>
+			<p><a href="{% url 'appsic:list_empleadoempresa' %}">Gestionar</a></p>
+		</div>
+		
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-pencil logo-small"></span>
+			<h3>Agregar Puestos</h3>
+			<p>Añade - Remueve Puestos a las Empresas</p>
+			<br>
+			<p><a href="{%url 'appsic:list_puestoempresa' %}">Gestionar</a></p>
+		</div>
+		
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-pencil logo-small"></span>
+			<h3>Agregar Departamentos</h3>
+			<p>Añade - Remueve Deparatamentos a las Empresas</p>
+			<p><a href="{%url 'appsic:list_departamentoempresa' %}">Gestionar</a></p>
+			<br>
+		</div>
+		<div class="col-sm-3">
+			<span class="glyphicon glyphicon-open-file logo-small"></span>
+			<h3>Asignaciones</h3>
+			<p>Crea - Modifica las Asignaciones a las Empresas</p>
+			<p><a href="{%url 'appsic:empresa_asignacion' %}">Gestionar</a></p>
+			<br><br><br>
+		</div>
+	</div>
+
+</div>
+
+
+{% endblock %}
+

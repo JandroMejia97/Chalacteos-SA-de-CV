@@ -1,0 +1,127 @@
+
+{% extends "base.html" %}
+{% block contenido %}
+
+<form action="" method="post">
+	{% csrf_token %}
+<fieldset class="well the-fieldset">
+		<div class="row">
+		<legend class="the-legend"><h3>Asignacion</h3><i><p>Registre o Modifique las asignaciones</p></i> </legend>
+			{% if form.errors %}
+				<p style="color: red;">Por favor corrige lo siguiente: </p>
+			{% endif %}
+		</div>
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<label >Empleado</label>&nbsp;<span class="glyphicon glyphicon-pencil logo-little"></span>
+						<select type="text"  name="empleado_empresa" id="grid-size" class="form-control">
+                                {% for m in empleados %}
+                               <option name="empleado_empresa" class="" value="{{m.id}}">
+                                {{m.empleado.primer_nombre}}
+                                </option>
+                                {% endfor %}
+                      </select>
+						{{ form.empleado_empresa.errors }}
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<label >Puesto</label>&nbsp;<span class="glyphicon glyphicon-pencil logo-little"></span>
+						<select type="text"  name="puesto_empresa" id="grid-size" class="form-control">
+                                {% for m in puestos %}
+                               <option name="puesto_empresa" class="" value="{{m.id}}">
+                                {{m.puesto.nombre_funcional}}
+                                </option>
+                                {% endfor %}
+                      </select>
+						{{ form.puesto_empresa.errors }}
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<label >Departamento</label>&nbsp;<span class="glyphicon glyphicon-pencil logo-little"></span>
+						<select type="text"  name="departamento_empresa" id="grid-size" class="form-control">
+                                {% for m in departamentos %}
+                               <option name="departamento_empresa" class="" value="{{m.id}}">
+                                {{m.departamento.nombre}}
+                                </option>
+                                {% endfor %}
+                      </select>
+						{{ form.departamento_empresa.errors }}
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<label >Salario Asiganado</label>&nbsp;<span class="glyphicon glyphicon-pencil logo-little"></span>
+						{{ form.salario_asignado }}
+						{{ form.salario_asignado.errors }}
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<label >Fecha de la Asignacion</label>&nbsp;<span class="glyphicon glyphicon-pencil logo-little"></span>
+						{{ form.fecha_asignacion }}
+						{{ form.fecha_asignacion.errors }}
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<label >Calendario Base</label>&nbsp;<span class="glyphicon glyphicon-pencil logo-little"></span>
+						{{ form.calendario }}
+						{{ form.calendario.errors }}
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						<button class="btn btn-primary col-md-12 col-xs-12" type="submit">Guardar</button>
+					</div>
+				</div>
+			</div>
+			<br> 
+
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+						{{ form.errors }}
+					</div>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="form-group">
+					<a class="btn btn-warning col-md-12 col-xs-12" href="{%url 'appsic:empresa_asignacion' %}">Cancelar</a>
+					</div>
+				</div>
+			</div>
+
+			</fieldset>
+
+			
+
+</form>
+
+{% endblock %}
+

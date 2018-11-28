@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+
+
+<div class="container">
+
+        <br><br>
+
+        <h3>Lista de Empresas</h3>
+        <p>Seleccione la empresa a realizar la asignación</p>
+        
+        <div class="table-responsive">
+            <br>
+            <table class="table table-striped table-bordered table-hover table-condensed">
+            <tr class="danger">
+                <th>Nombre Comercial</th>
+                <th>Calendario Base</th>
+                <th style="width: 250px;" >Accion</th>
+            </tr>
+            
+
+                {% if object_list %}
+                {% for empresa in object_list %}
+            <tr>
+                <td>{{ empresa.ncr }}</td>
+                <td>{{ empresa.calendar }}</td>
+                <td><a class="btn btn-primary btn-md" href="{% url "appsic:asignacion" empresa.id %}">Realizar Asignación</a>
+                </td>
+            </tr>
+                {% endfor %}
+
+                {% else %}
+                    <h3>No hay registros de Empresas</h3>
+                {% endif %}
+           
+
+
+        </table>
+
+        <ul class="pager">
+            <li>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            {% endif %}
+            </li>
+            <li>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+            {% endif %}
+            </li>
+        </ul>
+        
+        </div>        
+    </div>
+    
+
+{% endblock %}

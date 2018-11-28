@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="container">
+
+        <h3>Lista de asignaciones</h3>
+        
+        <div class="table-responsive">
+            <br>
+            <table class="table table-striped table-bordered table-hover table-condensed">
+            <tr class="info">
+                <th>Nombre del Empleado</th>
+                <th>Nombre del Puesto</th>
+                <th>Nombre de la Empresa</th>
+                <th>Salario Asignado</th>
+                <th>Fecha de Asignacion</th>
+                <th>Calendario de Pago</th>
+                <th style="width: 150px;" >Accion</th>
+            </tr>
+            
+
+
+                {% for inn in asignaciones %}
+            <tr>
+                <td>{{ inn.empleado_empresa.empleado.primer_nombre }} {{ inn.empleado_empresa.empleado.primer_apellido}}</td>
+                <td>{{ inn.puesto_empresa.puesto.nombre_funcional }}</td>
+                <td>{{ inn.departamento_empresa.empresa.ncr }}</td>
+                <td>{{ inn.salario_asignado }}</td>
+                <td>{{ inn.fecha_asignacion }}</td>
+                <td>{{ inn.calendario }}</td>
+                <td>
+                <a class="btn btn-primary btn-xs" href="{% url "appsic:asignacion_editar" inn.id %}">Editar</a>
+                <a class="btn btn-primary btn-xs" href="{% url "appsic:asignacion_eliminar" inn.id %}">Eliminar</a>
+                </td>
+            </tr>
+                {% endfor %}
+           
+
+
+        </table>
+
+        <ul class="pager">
+            <li>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            {% endif %}
+            </li>
+            <li>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+            {% endif %}
+            </li>
+        </ul>
+        
+        </div>
+
+        
+        
+    </div>
+    
+
+{% endblock %}

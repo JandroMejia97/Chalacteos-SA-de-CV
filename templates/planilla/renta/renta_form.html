@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+
+<div class="container">
+
+<h3>Tabla de Asignacion de Renta</h3>
+<i><p>Modifique los datos del tramo de la renta correspondiente</p></i>
+
+<form class="form-horizontal cold-md-4 col-md-offset-4" action="" method="post">
+	{% csrf_token %}
+
+	<div  class="field form-group has-warning">
+	{{ form.tipo.errors }}
+	<label for="id_empleado_empresa" class="control-label col-md-2">Remuneracion</label>
+		<div class="form-group col-md-10">
+		{{ form.tipo }}
+		</div>
+	</div>
+
+
+	<div  class="field form-group has-warning">
+	{{ form.v1.errors }}
+	<label for="id_puesto_empresa" class="control-label col-md-2">Desde</label>
+		<div class="form-group col-md-10">
+		{{ form.v1 }}
+		</div>
+	</div>
+	
+
+	<div  class="field form-group has-warning">
+	
+	<label for="id_departamento_empresa" class="control-label col-md-2">Hasta</label>
+		<div class="form-group col-md-10">
+		{{ form.v2 }}
+		{{ form.v2.errors }}
+		</div>
+	</div>
+
+
+	<div  class="field form-group has-warning">
+	
+	<label for="id_salario_asignado" class="control-label col-md-2">% A Aplicar</label>
+		<div class="form-group col-md-10">
+		{{ form.porc }}
+		{{ form.porc.errors }}
+		</div>
+	</div>
+
+
+<div class="form-group">
+<div class="col-md-offset-2">
+<input class="btn btn-primary  " type="submit" value="Guardar">
+<a class="btn btn-warning  col-md-offset-0" href="{% url "appsic:list_renta" %}">Cancelar</a>
+</div>
+</div>
+
+
+
+</form>
+
+</div>
+
+
+{% endblock %}
+

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+
+
+
+        
+   
+
+
+<div class="container">
+        <h3>Consultar planillas</h3>
+            <i><p>Planillas Generales</p></i>
+
+        <a class="btn btn-info" href="/consultar">Crear nueva planilla</a>
+
+        <div class="table-responsive">
+            <br>
+            <table class="table table-striped table-bordered table-hover table-condensed">
+
+            <tr class="danger">
+              
+              <th>fecha</th>
+              <th>Empleado</th>
+              <th>Salario Asignado</th>
+              <th>dias trabajados</th>
+              <th>descuentos</th>
+              <th>ingresos</th>
+              <th>isss_empleado</th>
+              <th>afp_empleado</th>
+              <th>renta</th>
+              <th>salario_neto</th>
+              <th style="width: 100px;">Accion</th>
+            </tr>
+
+
+            {% for al in planillas %}
+            
+          <tr>
+            <td>{{ al.fecha }}</td>
+            <td>{{ al.asignacion.empleado_empresa.empleado.primer_nombre }}</td>
+            <td>{{ al.asignacion.salario_asignado }}</td>
+            <td>{{ al.dias_trabajados }}</td>
+            <td>{{ al.descuentos }}</td>
+            <td>{{ al.ingresos }}</td>
+            <td>{{ al.isss_empleado }}</td>
+            <td>{{ al.afp_empleado }}</td>
+            <td>{{ al.renta }}</td>
+            <td>{{ al.salario_neto }}</td>
+            <td><a class="btn btn-danger btn-xs" href="{% url "appsic:delete_planilla" al.id %}">Borrar</a></td>
+          </tr>
+            
+          {% endfor %}
+
+          
+           
+        </table>
+        </div>
+        
+    </div>
+    
+
+{% endblock %}
+
+
+

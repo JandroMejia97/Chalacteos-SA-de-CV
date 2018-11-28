@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+	<form  action="" method="post">
+		{% csrf_token %}
+
+		<fieldset class="well the-fieldset">
+		
+
+			<div class="col-md-12 col-md-offset-0">
+			<legend class="the-legend"><h3>Datos Generales del Empleado</h3> <i><p>Registre o Modifique los datos del empleado</p></i></legend>
+			{% if form.errors %}
+			<p style="color: red;">Por favor corrige lo siguiente: </p>
+			{% endif %}
+				<div class="form-group col-md-3">
+					<label for="">Dui</label>
+					{{form.dui}} {{ form.dui.errors }}
+				</div>
+				<div class="form-group col-md-3">
+					<label for="">Código</label>
+					{{form.codigo}} {{ form.codigo.errors }}
+				</div>
+				<div class="form-group col-md-3">
+					<label for="">Fecha de Nacimiento</label>
+					{{form.fecha_nacimiento}} {{ form.fecha_nacimiento.errors }}
+				</div>
+				<div class="form-group col-md-3">
+					<label for="">Telefono</label>
+					{{form.telefono}} {{ form.telefono.errors }}
+				</div>
+			</div>
+
+			<div class="col-md-12 col-md-offset-0">
+				<div class="form-group col-md-3">
+					<label for="">Primer Nombre</label>
+					{{form.primer_nombre}} {{ form.primer_nombre.errors }}
+				</div>
+				<div class="form-group col-md-3">
+					<label for="">Segundo Nombre</label>
+					{{form.segundo_nombre}} {{ form.segundo_nombre.errors }}
+				</div>
+				<div class="form-group col-md-3">
+					<label for="">Primer Apellido</label>
+					{{form.primer_apellido}} {{ form.primer_apellido.errors }}
+				</div>
+
+				<div class="form-group col-md-3">
+					<label for="">Segundo Apellido</label>
+					{{form.segundo_apellido}} {{ form.segundo_apellido.errors }}
+				</div>
+			</div>
+
+
+
+			<div class="col-md-12 col-md-offset-0">
+				<div class="form-group col-md-9">
+					<label for="">Direccion</label>
+					{{form.direccion}} {{ form.direccion.errors }}
+				</div>
+				<div class="form-group col-md-3">
+					<label for="">Activo</label>
+					{{form.activo}} {{ form.activo.errors }}
+				</div>
+
+			</div>
+
+			<div class="col-md-12 col-md-offset-0">
+				<div class="form-group col-md-6">
+					<button class="btn btn-info col-md-6 col-xs-12 col-md-offset-6" type="submit">GUARDAR</button>
+				</div>
+				<div class="form-group col-md-6">
+					<a class="btn btn-warning col-md-6 col-xs-12 col-md-offset-0" href="{% url "appsic:list_empleado" %}">Cancelar</a>
+				</div>
+			</div>
+	</fieldset>
+
+
+			
+
+
+	</form>
+
+{% endblock %}
+
+
+
+
+
+
+
+

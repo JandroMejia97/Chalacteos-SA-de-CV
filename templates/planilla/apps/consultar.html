@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+
+
+
+
+
+<div class="container">
+
+<br>
+<form action="/buscar/" method="get" class="form-horizontal col-lg-offset-3">
+
+
+
+    <div class="form-group has-warning">
+          <div class="col-md-8">
+            <h3>Crear Nueva Planilla</h3>
+            <i><p>Seleccione una empresa</p></i>
+          </div>
+    </div>
+
+    <div class="form-group has-warning">
+        <label for="empresa" class="control-label col-md-2" style="font-size: 0.5cm;"></label>
+           <div class="col-md-4">
+            <select type="text"  name="q" id="grid-size" class="form-control">
+                      {% for m in empresas %}
+                     <option name="q" class="" value="{{m.nombre}}">
+                      {{m.ncr}}
+                     </option>
+                      {% endfor %}
+            </select>
+            </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-9 col-xs-12 col-sm-12 col-md-offset-2">
+          <input  class="btn btn-primary col-md-5 col-xs-12 col-sm-12"  type="submit" value="Crear">   
+        </div>
+        
+    </div>
+          
+
+    </form>
+
+
+</div>
+
+
+{% endblock %}
+
+
+
+
+
+
+
+

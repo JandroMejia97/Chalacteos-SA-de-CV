@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+
+
+
+<div class="container">
+<br><br>
+<h3>Gestionar Puesto - Empresa</h3>
+<i><p>Asigne el puesto relacionado con la empresa</p></i>
+
+<form class="form-horizontal cold-md-4 col-md-offset-4" action="" method="post">
+	{% csrf_token %}
+
+	<div  class="field form-group has-warning">
+	
+	<label for="id_puesto" class="control-label col-md-2">Puesto:</label>
+		{{ form.puesto }}
+		{{ form.puesto.errors }}
+	</div>
+	
+
+	<div class="field form-group has-warning">
+		
+		<label for="id_empresa" class="control-label col-md-2">Empresa:</label>
+		{{ form.empresa }}
+		{{ form.empresa.errors }}
+	</div>
+
+{{form.errors}}
+
+<div class="form-group">
+<div class="col-md-offset-2">
+<input class="btn btn-primary  " type="submit" value="Guardar">
+<a class="btn btn-warning  col-md-offset-0" href="{% url "appsic:list_puestoempresa" %}">Cancelar</a>
+</div>
+</div>
+
+
+
+</form>
+
+</div>
+
+
+{% endblock %}
+
