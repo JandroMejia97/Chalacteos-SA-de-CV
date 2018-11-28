@@ -64,6 +64,24 @@ class MovimientosListView(LoginRequiredMixin, ListView):
 	context_object_name = 'movimientos'
 
 
+class EstadoFinancieroListView(LoginRequiredMixin, ListView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/gestionarEstadosFinancieros.html'
+	context_object_name = 'estados_financieros'
+
+	def get_queryset(self):
+		user = self.request.user
+		context = EstadoFinanciero.objects.all()
+		if context:
+			return context
+		else:
+			return render(self.request, template_name='404.html')
+
+	def get_context_data(self, **kwargs):
+		context = super(EstadoFinancieroListView, self).get_context_data(**kwargs)
+		return context
+
+
 class CuentaCreateView(LoginRequiredMixin, CreateView):
 	model = Cuenta
 	template_name = 'editForm.html'
@@ -78,7 +96,7 @@ class CuentaCreateView(LoginRequiredMixin, CreateView):
 
 class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'contabilidad/chainedForm.html'
-	success_url = reverse_lazy('contabilidad:transacciones')
+	success_url = 'contabilidad:transacciones'
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
@@ -107,26 +125,73 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 	def post(self, request, *args, **kwargs):
 		periodo = PeriodoContable.objects.all().last()
 		ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
-		abonos_data = self.request.POST['abonos']
-		cargos_data = request.POST['cargos']
-		codigos_cuentas_data = request.POST['codigo_cuentas']
 
-		transaccion = Transaccion.objects.create(
-			id_perido_contable=periodo,
-			id_tipo=request.POST['codigoTipo'],
-			numero_transaccion=ultima_transaccion+1,
-			descripcion_transaccion=request.POST['descripcion'],
-			monto_transaccion=request.POST['monto']
-		)
-		for i in range(len(codigos_cuentas_data)):
-			Movimiento.objects.create(
-				id_transaccion=transaccion.id_transaccion,
-				id_cuenta=codigos_cuentas_data[i],
-				monto_cargo=cargos_data[i],
-				monto_abono=abonos_data[i]
-			)
-		return JsonResponse({'message':'Transacción registrada'}, status=422)
+		abonos_str = request.POST['abonos']
+		cargos_str = request.POST['cargos']
+		codigos_cuentas_str = request.POST['codigo_cuentas']
+		
+		abonos_data = abonos_str.split(',')
+		cargos_data = cargos_str.split(',')
+		codigos_cuentas_data = codigos_cuentas_str.split(',')
 
+		tipo = TipoTransaccion.objects.get(id_tipo=request.POST['codigoTipo'])
+
+		monto_transaccion=float(request.POST['monto'])
+
+		correcto = False
+		message = None
+		
+		total_abonos = 0
+		total_cargos = 0
+
+		for i in range(0, len(codigos_cuentas_data)-1):
+			if abonos_data[i] == 'None':
+				cargos_data[i] = float(cargos_data[i]) 
+				total_cargos += cargos_data[i]
+			if cargos_data[i] == 'None':
+				abonos_data[i] = float(abonos_data[i])
+				total_abonos += abonos_data[i]
+		
+		if total_abonos == total_cargos:
+			if total_abonos == monto_transaccion:
+
+				transaccion = Transaccion.objects.create(
+					id_perido_contable=periodo,
+					id_tipo=tipo,
+					numero_transaccion=ultima_transaccion+1,
+					descripcion_transaccion=request.POST['descripcion'],
+					monto_transaccion=monto_transaccion
+				)
+
+				for i in range(0, len(codigos_cuentas_data)-1):
+					codigo = int(codigos_cuentas_data[i])	
+					cuenta = Cuenta.objects.get(id_cuenta=codigo)
+					
+					if abonos_data[i] == 'None':
+						Movimiento.objects.create(
+							id_transaccion=transaccion,
+							id_cuenta=cuenta,
+							monto_cargo=cargos_data[i],
+							monto_abono=None
+						)
+					if cargos_data[i] == 'None':
+						Movimiento.objects.create(
+							id_transaccion=transaccion,
+							id_cuenta=cuenta,
+							monto_cargo=None,
+							monto_abono=abonos_data[i]
+						)
+				message = 'Registro exitoso, será redireccionado'
+				correcto = True
+			else:
+				message = 'El monto de la partida doble no concuerda con el monto de la transaccion'
+		else:
+			message = 'Los movimientos registrados para esta transacción no cumplen partida doble'
+		
+		if correcto:
+			return JsonResponse(data={'message':message, 'success_url': '/transacciones/'})
+		else:
+			return JsonResponse(data={'message':message})
 
 class MovimientoCreateView(LoginRequiredMixin, CreateView):
 	model = Movimiento
@@ -210,6 +275,50 @@ class PerfilDetailView(LoginRequiredMixin, DetailView):
         'last_login'
     ]
     context_object_name = 'user'
+
+class BalanceGeneralDetailView(LoginRequiredMixin, DetailView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/estados/balanceGeneral.html'
+	fields = [
+		'id_empresa',
+		'nombre_estado_financiero'
+		'id_perido_contable',
+	]
+	context_object_name = 'balance_general'
+
+
+class EstadoResultadosDetailView(LoginRequiredMixin, DetailView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/estados/estadoResultados.html'
+	fields = [
+		'id_empresa',
+		'nombre_estado_financiero'
+		'id_perido_contable',
+	]
+	context_object_name = 'estado_resultados'
+
+
+class BalanceComprobacionDetailView(LoginRequiredMixin, DetailView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/estados/balanceComprobacion.html'
+	fields = [
+		'id_empresa',
+		'nombre_estado_financiero'
+		'id_perido_contable',
+	]
+	context_object_name = 'balance_comprobacion'
+
+
+class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/estados/estadoCapital.html'
+	fields = [
+		'id_empresa',
+		'nombre_estado_financiero'
+		'id_perido_contable',
+	]
+	context_object_name = 'estado_capital'
+	
 
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   

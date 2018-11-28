@@ -45,6 +45,7 @@
                             <td class="text-center">{{transaccion.numero_transaccion}}</td>
                             <td>{{ transaccion.fecha_transaccion | date:"SHORT_DATE_FORMAT" }}</td>
                             <td>{{ transaccion.fecha_transaccion | time:"h i s A" }}</td>
+                            <td>{{ transaccion.id_tipo }}</td>
                             <td>{{ transaccion.monto_transaccion }}</td>
                             <td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>

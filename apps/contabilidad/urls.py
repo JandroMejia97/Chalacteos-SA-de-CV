@@ -47,6 +47,31 @@ urlpatterns = [
 		views.CuentaDetailView.as_view(),
 		name='cuenta-detalle'
 	),
+	path(
+		'estados_financieros/',
+		views.EstadoFinancieroListView.as_view(),
+		name='estados-financieros'
+	),
+	path(
+		'detalle/estado/general/<slug:pk>/',
+		views.BalanceGeneralDetailView.as_view(),
+		name='balance-general-detalle'
+	),
+	path(
+		'detalle/estado/resultados/<slug:pk>/',
+		views.EstadoResultadosDetailView.as_view(),
+		name='balance-resultados-detalle'
+	),
+	path(
+		'detalle/estado/capital/<slug:pk>/',
+		views.EstadoCapitalDetailView.as_view(),
+		name='balance-capital-detalle'
+	),
+	path(
+		'detalle/estado/comprobacion/<slug:pk>/',
+		views.BalanceComprobacionDetailView.as_view(),
+		name='balance-comprobacion-detalle'
+	),
 	re_path(
         r'ajax/cuenta/(?P<id_cuenta>[0-9]+)/',
         views.cuentas,
