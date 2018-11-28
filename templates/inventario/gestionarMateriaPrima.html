@@ -31,16 +31,28 @@
             <div class="table-responsive">
               <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
-                  <tr>
-                      <th>Codigo Material</th>
-                      <th>Proveedor</th>
-                      <th>Nombre Material</th>
-                      <th>Descripción</th>
-                      <th>Operaciones</th>
+                  <tr class="text-center">
+                    <th>#</th>
+                    <th>Proveedor</th>
+                    <th>Nombre Material</th>
+                    <th>Descripción</th>
+                    <th>Operaciones</th>
                   </tr>
                 </thead>
                 <tbody id="tbBody">
-                                
+                  {% for material in materiales %}
+                    <tr id="{{ material.id_materia_materia_prima }}">
+                      <td class="text-center">{{ material.id_materia_prima }}</td>
+                      <td>{{ material.id_proveedor }}</td>
+                      <td>{{ material }}</td>
+                      <td>{{ material.id_recurso.descripcion_recurso|truncatechars:20 }}</td>
+                      <td class="text-center">
+                        <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('MATERIAPRIMA', {{ material.id_materia_prima }})" style="color:gray !important"></a>
+                        <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('MATERIAPRIMA', {{ material.id_materia_prima }})" style="color:gray !important"></a>
+                        <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ material.id_materia_prima }}, '{{ material.id_recurso.nombre_recurso }}', 'MATERIAPRIMA');" style="color:gray !important"></a>
+                      </td>                          
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>

@@ -66,8 +66,6 @@
                         <th>Materia Prima</th>                
                         <th>Cantidad Materia prima</th>
                         <th>Precio Unitario</th>
-                        <th>Subtotal</th>
-                        <th>Total</th>
                       </tr>
                     </thead>
                     <tbody id="tbBody">
@@ -75,15 +73,15 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th colspan="5" class="text-right">Sub Total</th>
+                        <th colspan="4" class="text-right">Sub Total</th>
                         <th class="text-center" id="subTotal">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="5" class="text-right">Total IVA</th>
+                        <th colspan="4" class="text-right">Total IVA</th>
                         <th class="text-center" id="iva">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="5" class="text-right">Total</th>
+                        <th colspan="4" class="text-right">Total</th>
                         <th class="text-center" id="total">$ 0.00</th>
                       </tr>
                     </tfoot>
@@ -138,11 +136,9 @@
 
                 //Declarando variable globales
                 var count = 0;
-
                 var total = [];
                 var totalCompra = 0;
                 var subTotal = 0;
-                var totalImp = 0;
                 var proveedores = [];
                 var materiales = [];
                 var cantidades = [];
@@ -176,7 +172,7 @@
                       total.push(cantidad*precio);
                       subTotal=subTotal+cantidad*precio;
                       iva=subTotal*0.13;
-                      total=subTotal*1.13;
+                      totalCompra=Math.round(subTotal*1.13*100)/100;
                       proveedores.push(proveedor);
                       materiales.push(materiaPrima);
                       cantidades.push(cantidad);
@@ -187,14 +183,14 @@
                           "<td>"+proveedor+"</td>"+
                           "<td>"+materiaPrima+"</td>"+
                           "<td class='text-center'>"+cantidad+"</td>"+
-                          "<td class='text-center'>$ "+precio+"</td><td></td></tr>"
+                          "<td class='text-center'>$ "+precio+"</td></tr>"
                       );
                       $("#subTotal").empty();
                       $("#subTotal").append("$ "+subTotal);
                       $("#iva").empty();
                       $("#iva").append("$ "+iva);
                       $("#total").empty();
-                      $("#total").append("$ "+total);
+                      $("#total").append("$ "+totalCompra);
                     }
                 };
           </script>
@@ -203,3 +199,20 @@
     </div>
   {% endblock tables %}
 {% endblock content %}
+{% block js %}
+    {% load static %}
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Page level plugin JavaScript-->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin.min.js' %}"></script>
+    <script src="{% static 'js/invernaderos.js' %}"></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+{% endblock js %}

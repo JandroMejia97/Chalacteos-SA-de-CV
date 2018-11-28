@@ -15,6 +15,8 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
+import json
+
 # Create your views here.
 
 class ProveedoresListView(LoginRequiredMixin, ListView):
@@ -182,7 +184,7 @@ class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 
 class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedMateriaPrimaForm.html'
-	success_url = reverse_lazy('inventario:materia_prima')
+	success_url = reverse_lazy('inventario:materia-prima')
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
@@ -190,13 +192,30 @@ class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 		context['proveedor_form'] = ProveedorForm()
 		return self.render_to_response(context)
 
-	def put(self, request, *args, **kwargs):
-		request_data = json.loads(request.body)
+	def post(self, request, *args, **kwargs):
+		proveedor = request.POST.get('nombre_proveedor')
+		nombre = request.POST['nombre_recurso']
+		descripcion = request.POST['descripcion_recurso']
+
+		proveedor = Proveedor.objects.get(id_proveedor=proveedor)
+		recurso = Recurso.objects.create(
+			nombre_recurso=nombre,
+			descripcion_recurso=descripcion
+		)
+		kardex = Kardex.objects.create(
+			id_recurso=recurso
+		)
+		materia = MateriaPrima.objects.create(
+			id_recurso=recurso,
+			id_proveedor=proveedor
+		)
+		message = 'La materia prima ha sido registrada'
+		"""request_data = json.loads(request.body)
 		recurso_form = RecursoForm(
-			data=request_data.get(RecursoForm.scope_prefix, {})
+			request.POST.get('recurso_form', {})
 		)
 		proveedor_form = ProveedorForm(
-			data=request_data.get(ProveedorForm.scope_prefix, {})
+			request.POST.get('proveedor_form', {})
 		)
 		response_data = {}
 
@@ -209,8 +228,8 @@ class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 		response_data.update({
 			recurso_form.form_name: recurso_form.errors,
 			proveedor_form.form_name: proveedor_form.errors,
-		})
-		return JsonResponse(response_data, status=422)		
+		})"""
+		return redirect(self.success_url)
 
 
 class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
