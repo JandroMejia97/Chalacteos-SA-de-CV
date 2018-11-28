@@ -80,10 +80,26 @@ class MateriaPrimaForm(forms.ModelForm):
 class ProveedorCompraForm(forms.ModelForm):
     scope_prefix = 'proveedor_data'
     form_name = 'proveedor_form'
+    is_credito = forms.BooleanField(
+        label='¿La compra es al crédito?',
+        help_text='Indique si está factura será pagada al crédito ya sea total o parcialmente'
+    )
+    is_contado = forms.BooleanField(
+        label='¿La compra es al contado?',
+        help_text='Indique si está factura será pagada al contado ya sea total o parcialmente'
+    )
+    proporcion = forms.DecimalField(
+        label='Proporcion',
+        help_text='Ingrese la proporcion de la compra que será al credito',
+        decimal_places=2
+    )
     class Meta:
         model = Proveedor
         fields = [
-            'nombre_proveedor'
+            'nombre_proveedor',
+            'is_credito',
+            'is_contado',
+            'proporcion'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -98,6 +114,11 @@ class ProveedorCompraForm(forms.ModelForm):
                 }
             )
         )
+        self.fields['proporcion'].widget.attrs.update({
+            'min':'0',
+            'step':0.01,
+            'hidden':False
+        })
 
 class ProveedorForm(forms.ModelForm):
     scope_prefix = 'proveedor_data'

@@ -338,6 +338,16 @@ class Factura(models.Model):
         ],
         help_text="Ingrese el recargo por el impuesto a la compra o venta"
     )
+    is_credito = models.BooleanField(
+        verbose_name='¿La compra es al crédito?',
+        default=False,
+        help_text='Indique si está factura será pagada al crédito ya sea total o parcialmente'
+    )
+    is_contado = models.BooleanField(
+        verbose_name='¿La compra es al contado?',
+        default=False,
+        help_text='Indique si está factura será pagada al contado ya sea total o parcialmente'
+    )
 
     def __str__(self):
         return '{}'.format(self.id_factura)
