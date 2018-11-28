@@ -36,7 +36,8 @@ class DetalleCompraForm(forms.ModelForm):
     form_name = 'detalle_compra_form'
     precio_unitario = forms.DecimalField(
         label='Precio unitario',
-        help_text='Ingrese el precio unitario'
+        help_text='Ingrese el precio unitario usando coma decimal',
+        decimal_places=2
     )
     class Meta:
         model = Detalle
@@ -48,6 +49,7 @@ class DetalleCompraForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DetalleCompraForm, self).__init__(*args,**kwargs)
+        self.fields['cantidad_detalle'].widget.attrs.update({'min':'0'})
         self.fields['precio_unitario'].widget.attrs.update({'min':'0'})
         self.fields['id_materia_prima'].choices = (('', '---------'),)
         self.fields['id_materia_prima'].widget.attrs.update({'disabled': 'true'})

@@ -8,6 +8,7 @@
   {% endblock sidebar %}
   {% block tables %}
   {% load bootstrap %}
+  {% load l10n %}
     <div id="content-wrapper">
       <div class="container-fluid">
         <!-- Breadcrumbs-->
@@ -63,9 +64,10 @@
                       <tr>
                         <th class="text-center">#</th>
                         <th>Proveedor</th>
-                        <th>Materia Prima</th>                
-                        <th>Cantidad Materia prima</th>
+                        <th>Detalle</th>                
+                        <th>Cantidad</th>
                         <th>Precio Unitario</th>
+                        <th>SubTotal</th>
                       </tr>
                     </thead>
                     <tbody id="tbBody">
@@ -73,15 +75,15 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th colspan="4" class="text-right">Sub Total</th>
+                        <th colspan="5" class="text-right">Sub Total</th>
                         <th class="text-center" id="subTotal">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Total IVA</th>
+                        <th colspan="5" class="text-right">Total IVA</th>
                         <th class="text-center" id="iva">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Total</th>
+                        <th colspan="5" class="text-right">Total</th>
                         <th class="text-center" id="total">$ 0.00</th>
                       </tr>
                     </tfoot>
@@ -108,23 +110,24 @@
                         'id_proveedor': proveedor,
                       },
                       success: function(data){
-                        console.log(data.message);
                         console.log(data);
                         console.log("SUCCESS");
                       },
                       dataType: 'json'
                     }).done(function(data){
-                      if(data.materiales != null){
+                      if(data.nombres != null){
                         $("#"+id_materiales).empty();
                         $("#"+id_materiales).append('<option value="" selected="">---------</option>');
-                        $.each(data.materiales, function(index, value){
+                        var id = data.identificador.split("-");
+                        var nombres = data.nombres.split("-");
+                        for(var i=0; i < nombres.length-1 ; i++){
                           $("#"+id_materiales).append(
-                          "<option id='"+value.id_materia_prima + "' value='" +
-                          value.id_materia_prima + "'>" + value + "</option>");
-                        });
+                          "<option id='"+id[i] + "' value='" +
+                          id[i] + "'>" + nombres[i] + "</option>");
+                        };
+                        console.log("endfor");
                         $("#"+id_materiales).removeAttr('disabled');
                       }else{
-                        alert(data.message);
                         $("#"+id_materiales).append('<option value="" selected="">---------</option>');
                         $("#"+id_materiales).attr('disabled','disabled');
                       }
@@ -139,9 +142,10 @@
 
                 //Declarando variable globales
                 var count = 0;
-                var total = "";
+                var total = 0;
                 var totalCompra = 0;
                 var subTotal = 0;
+                var totales = "";
                 var proveedores = "";
                 var materiales = "";
                 var cantidades = "";
@@ -152,14 +156,14 @@
                     var codigoProveedor = $("#id_id_proveedor").val();
                     var codigoMateriaPrima = $("#id_id_materia_prima").val();
 
-                    var cbProveedor = document.getElementById("id_id_proveedor");
+                    var cbProveedor = document.getElementById("id_nombre_proveedor");
                     var cbMateriaPrima = document.getElementById("id_id_materia_prima");
                     
                     var proveedor = cbProveedor.options[cbProveedor.selectedIndex].text;
                     var materiaPrima = cbMateriaPrima.options[cbMateriaPrima.selectedIndex].text;
                     
                     var cantidad = parseInt($("#id_cantidad_detalle").val());
-                    var precio = parseInt($("#id_precio_unitario").val());
+                    var precio = parseFloat($("#id_precio_unitario").val());
 
                     $(".dataTables_empty").remove();
 
@@ -171,13 +175,14 @@
 
                 function addRows(proveedor, materiaPrima, cantidad, precio){
                   console.log("registro")
-                  total.push(cantidad*precio);
+                  total=cantidad*precio;
+                  totales+=total+",";
                   subTotal=subTotal+cantidad*precio;
-                  iva=subTotal*{{impuesto}};
-                  totalCompra=Math.round(subTotal*1.13*100)/100;
-                  proveedores.push(proveedor);
-                  materiales.push(materiaPrima);
-                  cantidades.push(cantidad);
+                  iva=subTotal*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}});
+                  totalCompra=Math.round(subTotal*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}))*100)/100;
+                  proveedores+=proveedor+",";
+                  materiales+=materiaPrima+",";
+                  cantidades+=cantidad+",";
 
                   console.log("CANTIDAD")
                   $("#tbBody").append(
@@ -185,7 +190,8 @@
                     "<td>"+proveedor+"</td>"+
                     "<td>"+materiaPrima+"</td>"+
                     "<td class='text-center'>"+cantidad+"</td>"+
-                    "<td class='text-center'>$ "+precio+"</td></tr>"
+                    "<td class='text-center'>$ "+precio+"</td>"+
+                    "<td class='text-center'>$ "+total+"</td></tr>"
                   );
                   $("#subTotal").empty();
                   $("#subTotal").append("$ "+subTotal);
@@ -193,7 +199,7 @@
                   $("#iva").append("$ "+iva);
                   $("#total").empty();
                   $("#total").append("$ "+totalCompra);
-                };
+                }
           </script>
         </div>
       </div>

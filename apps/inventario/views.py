@@ -98,17 +98,6 @@ class MateriasPrimasListView(LoginRequiredMixin, ListView):
 	template_name = 'inventario/gestionarMateriaPrima.html'
 	context_object_name = 'materiales'
 
-	"""def get_queryset(self):
-					 = MateriaPrima.objects.all()
-					if context:
-						return context
-					else:
-						return render(self.request, template_name='404.html')
-			
-				def get_context_data(self, **kwargs):
-					context = super(MateriasPrimasListView, self).get_context_data(**kwargs)
-					return context"""
-
 
 class ProveedorCreateView(LoginRequiredMixin, CreateView):
 	model = Proveedor
@@ -350,16 +339,20 @@ def load_materia(request):
 	if request.method == 'GET':
 		id_proveedor = request.GET['id_proveedor']
 		materiales = MateriaPrima.objects.filter(id_proveedor=id_proveedor)
-		message =  str(materiales.query)
-		materiales = materiales.values()
-		recursos = []
-		#for material in materiales:
-			#material.id_materia_prima=material.id_recurso.nombre_recurso
+		recursos = ""
+		ident = ""
+		for material in materiales:
+			result = Recurso.objects.get(id_recurso=material.id_recurso.id_recurso)
+			ident += str(result.id_recurso)+"-"
+			recursos += str(result.nombre_recurso)+"-"
 
-		if materiales:
+		materiales = materiales.values()
+
+		if recursos:
 			data = {
-				'message': message,
-				'materiales': list(materiales),
+				'message': 'Datos recuperados',
+				'identificador': ident,
+				'nombres': recursos
 			}
 		else:
 			data = {

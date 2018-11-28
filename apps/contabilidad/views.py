@@ -115,6 +115,7 @@ class EstadoFinancieroCreateView(LoginRequiredMixin, CreateView):
 		'id_estado_financiero',
 		'id_periodo_contable',
 		'nombre_estado_financiero'
+	]
 
 
 class TransaccionCreateView(LoginRequiredMixin, TemplateView):
