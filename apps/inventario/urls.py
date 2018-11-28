@@ -82,6 +82,11 @@ urlpatterns = [
 		name='impuesto-edicion'
 	),
 	path(
+		'edicion/materia_prima/<slug:pk>/',
+		views.MateriaPrimaUpdateView.as_view(),
+		name='materia_prima-edicion'
+	),
+	path(
 		'detalle/proveedor/<slug:pk>/',
 		views.ProveedorDetailView.as_view(),
 		name='proveedor-detalle'
@@ -97,7 +102,7 @@ urlpatterns = [
 		name='impuesto-detalle'
 	),
 	path(
-		'detalle/impuesto/<slug:pk>/',
+		'detalle/materia_prima/<slug:pk>/',
 		views.MateriaPrimaDetailView.as_view(),
 		name='materia-prima-detalle'
 	),
@@ -117,8 +122,8 @@ urlpatterns = [
         name='ajax-impuesto'
     ),
     re_path(
-        r'ajax/materia_prima/(?P<id_cliente>[0-9]+)/',
-        views.clientes,
+        r'ajax/materia_prima/(?P<id_materia_prima>[0-9]+)/',
+        views.materiales,
         name='ajax-materia-prima'
     ),
     re_path(

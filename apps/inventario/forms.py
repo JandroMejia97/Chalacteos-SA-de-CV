@@ -48,7 +48,7 @@ class DetalleCompraForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DetalleCompraForm, self).__init__(*args,**kwargs)
-        self.fields['precio_unitario'].widget.attrs.update({'min':'0'})
+        self.fields['precio_unitario'].widget.attrs.update({'min':'0', 'step':0.01})
 
 class RecursoForm(forms.ModelForm):
     scope_prefix = 'recurso_data'

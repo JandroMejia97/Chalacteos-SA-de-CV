@@ -263,16 +263,37 @@ class ImpuestoUpdateView(LoginRequiredMixin, UpdateView):
 		'tasa_impuesto'
 	]
 
-class MateriaPrimaUpdateView(LoginRequiredMixin, UpdateView):
-	model = Impuesto
-	template_name = 'editForm.html'
-	success_url = reverse_lazy('inventario:materia_prima')
-	fields = [
-		'id_materia_prima',
-		'id_producto',
-		'id_recurso',
-		'id_proveedor'
-	]
+class MateriaPrimaUpdateView(LoginRequiredMixin, TemplateView):
+	template_name = 'inventario/chainedMateriaPrimaForm.html'
+	success_url = reverse_lazy('inventario:materia-prima')
+	
+	def get_context_data(self, **kwargs):
+		context = super(MateriaPrimaUpdateView,self).get_context_data(**kwargs)
+		pk = self.kwargs.get('pk', 0)
+		materia_prima = MateriaPrima.objects.get(id_materia_prima=pk)
+		proveedor = Proveedor.objects.get(nombre_proveedor=materia_prima.id_proveedor)
+		recurso = Recurso.objects.get(nombre_recurso=materia_prima.id_recurso)
+		if 'proveedor_form' not in context:
+			context['proveedor_form'] = ProveedorForm(instance=proveedor)
+		if 'recurso_form' not in context:
+			context['recurso_form'] = RecursoForm(instance=recurso)
+		context['id_materia_prima'] = pk
+		return context
+
+	def post(self, request, *args, **kwargs):
+		id_materia_prima = kwargs['pk']
+		materia_prima = MateriaPrima.objects.get(id_materia_prima=id_materia_prima)
+		proveedor = Proveedor.objects.get(nombre_proveedor=materia_prima.id_proveedor)
+		recurso = Recurso.objects.get(nombre_recurso=materia_prima.id_recurso)
+		proveedor_form = ProveedorForm(request.POST, instance=proveedor)
+		recurso_form = RecursoForm(request.POST, instance=recurso)
+
+		if proveedor_form.is_valid() and recurso_form.is_valid():
+			proveedor_form.save()
+			recurso_form.save()
+			return redirect(self.success_url)
+		else:
+			return redirect(self.success_url)
 
 
 class ProveedorDetailView(LoginRequiredMixin, DetailView):
@@ -310,14 +331,13 @@ class ImpuestoDetailView(LoginRequiredMixin, DetailView):
 	context_object_name = 'impuesto'
 
 class MateriaPrimaDetailView(LoginRequiredMixin, DetailView):
-	model = Impuesto
+	model = MateriaPrima
 	template_name = 'inventario/viewMateriaPrima.html'
 	success_url = reverse_lazy('inventario:materia_prima')
 	fields = [
-		'id_materia_prima',
-		'id_producto',
-		'id_recurso',
-		'id_proveedor'
+		'nombre_proveedor',
+		'nombre_recurso',
+		'descripcion_recurso'
 	]
 	context_object_name = 'materia_prima'
 
@@ -335,7 +355,7 @@ def clientes(request, id_cliente):
         #id_parametro = request.POST['id']
         parametro = Cliente.objects.get(id_cliente=id_cliente)
         parametro.delete()
-        message = "El proveedor fue borrado exitosamente"
+        message = "El cliente fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
 def impuestos(request, id_impuesto):   
@@ -346,6 +366,13 @@ def impuestos(request, id_impuesto):
         message = "El proveedor fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
+def materiales(request, id_materia_prima):   
+    if request.method == 'DELETE':
+        #id_parametro = request.POST['id']
+        parametro = MateriaPrima.objects.get(id_materia_prima=id_materia_prima)
+        parametro.delete()
+        message = "La materia prima fue borrada exitosamente"
+        return JsonResponse(data={'message': message})
 		
 def load_materia(request):
 	if request.method == 'GET':
