@@ -32,14 +32,16 @@
               <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                   <tr>
+                      <th>N°</th>
                       <th>Nombre del Estado Financiero</th>
                       <th>Período Contable</th>
+                      <th>Operaciones</th>
                   </tr>
                 </thead>
                 <tbody>
                     {% for estado_financiero in estados_financieros %}
                         <tr id="{{estado_financiero.id_estado_financiero}}">
-                            <!--<td class="text-center">{{estado_financiero.id_estado_financiero}}</td>-->
+                            <td class="text-center">{{estado_financiero.id_estado_financiero}}</td>
                             {% ifequal estado_financiero.nombre_estado_financiero 'BALANCE GENERAL' %}
                                 <td><a href="/detalle/estado/general/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
                                 <td>Al {{estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>
@@ -56,6 +58,11 @@
                                 <td><a href="/detalle/estado/capital/{{estado_financiero.id_estado_financiero}}">{{ estado_financiero.nombre_estado_financiero }}</a></td>
                                 <td>Del {{ estado_financiero.id_perido_contable.fecha_inicio_periodo|date:"j F Y"}} al {{ estado_financiero.id_perido_contable.fecha_final_periodo|date:"j F Y"}}</td>                        
                             {% endifequal %}
+                            <td class="text-center">
+                              <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('ESTADOFINANCIERO', {{ estado_financiero.id_estado_financiero }})" style="color:gray !important"></a>
+                              <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('ESTADOFINANCIERO', {{ estado_financiero.id_estado_financiero}})" style="color:gray !important"></a>
+                              <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ estado_financiero.id_estado_financiero }}, '{{estado_financiero.id_periodo_contable}', 'ESTADOFINANCIERO');" style="color:gray !important"></a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
