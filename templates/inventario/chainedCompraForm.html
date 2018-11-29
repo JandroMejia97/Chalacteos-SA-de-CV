@@ -28,17 +28,15 @@
           <div class="card-body" id="1">
             <div>
               <div class="col-lg-12 col-xs-12 border rounded">
-                <form name="transaccion_form" novalidate>
+                <form name="compra_form" novalidate>
                 {% csrf_token %}
                   <div class="row">
-                    <div class="col-lg-12 col-xs-12">
+                    <div class="col-lg-6 col-xs-12">
                       <h4 class="mb-3 text-center header_id">COMPRA</h4>
                       {{ compra_form|bootstrap_inline }}
                     </div>
-                  </div>
-                  <br>
-                  <div class="row border-bottom">
-                    <div  class="col-lg-12 col-xs-12" id="div_1">
+                    <br>
+                    <div  class="col-lg-6 col-xs-12">
                       <h4 class="mb-3 text-center header_id">MATERIA PRIMA</h4>
                       {{ detalle_compra_form|bootstrap_inline }}
                     </div>
@@ -81,6 +79,14 @@
                       <tr>
                         <th colspan="5" class="text-right">Total IVA</th>
                         <th class="text-center" id="iva">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="5" class="text-right">Contado</th>
+                        <th class="text-center" id="contado">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="5" class="text-right">Crédito</th>
+                        <th class="text-center" id="credito">$ 0.00</th>
                       </tr>
                       <tr>
                         <th colspan="5" class="text-right">Total</th>
@@ -149,12 +155,33 @@
                 var proveedores = "";
                 var materiales = "";
                 var cantidades = "";
+                var proporcion =  0;
+                var codigoProveedor = null;
+                var codigoMateriaPrima = null;
+                var contado = 0;
+                var credito = 0;
+
+                function getCheckbox(){
+                    var is_contado = $("#id_is_contado").prop("checked");
+                    var is_credito = $("#id_is_credito").prop("checked");
+                    if(is_contado && is_credito){
+                        $("#id_proporcion").removeAttr('disabled');
+                        return true;
+                    }else{
+                        $("#id_proporcion").val("");
+                        $("#id_proporcion").attr('disabled','disabled');
+                        proporcion = 0;
+                        contado = 0;
+                        credito = 0;
+                        return false;
+                    }
+                }
 
                 function getData(){
                     console.log("ADDROWS")
                     count = count + 1;
-                    var codigoProveedor = $("#id_id_proveedor").val();
-                    var codigoMateriaPrima = $("#id_id_materia_prima").val();
+                    codigoProveedor = $("#id_id_proveedor").val();
+                    codigoMateriaPrima = $("#id_id_materia_prima").val();
 
                     var cbProveedor = document.getElementById("id_nombre_proveedor");
                     var cbMateriaPrima = document.getElementById("id_id_materia_prima");
@@ -165,10 +192,11 @@
                     var cantidad = parseInt($("#id_cantidad_detalle").val());
                     var precio = parseFloat($("#id_precio_unitario").val());
 
-                    $(".dataTables_empty").remove();
+                    if(getCheckbox()){
+                      proporcion =  parseFloat($("#id_proporcion").val());
+                    }
 
                     if(proveedor!='' && proveedor!='---------' && materiaPrima!='' && materiaPrima!='---------' && !isNaN(cantidad) && !isNaN(precio)){
-                        console.log("prueba")
                         addRows(proveedor, materiaPrima, cantidad, precio);
                     }
                 };
@@ -177,11 +205,14 @@
                   console.log("registro")
                   total=cantidad*precio;
                   totales+=total+",";
-                  subTotal=subTotal+cantidad*precio;
-                  iva=subTotal*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}});
-                  totalCompra=Math.round(subTotal*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}))*100)/100;
-                  proveedores+=proveedor+",";
-                  materiales+=materiaPrima+",";
+                  subTotal=round((subTotal+cantidad*precio));
+                  iva=round(subTotal*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
+
+                  totalCompra=round(subTotal*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
+                  credito = round(totalCompra*proporcion/100);
+                  contado = round(totalCompra*(1-proporcion/100));
+                  proveedores+=codigoProveedor+",";
+                  materiales+=codigoMateriaPrima+",";
                   cantidades+=cantidad+",";
 
                   console.log("CANTIDAD")
@@ -197,8 +228,17 @@
                   $("#subTotal").append("$ "+subTotal);
                   $("#iva").empty();
                   $("#iva").append("$ "+iva);
+                  $("#contado").empty();
+                  $("#contado").append("$ "+contado);
+                  $("#credito").empty();
+                  $("#credito").append("$ "+credito);
                   $("#total").empty();
                   $("#total").append("$ "+totalCompra);
+                }
+
+                function round(number){
+                  number = Math.round(number*100)/100;
+                  return number;
                 }
           </script>
         </div>

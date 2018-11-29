@@ -116,9 +116,13 @@ class ProveedorCompraForm(forms.ModelForm):
         )
         self.fields['proporcion'].widget.attrs.update({
             'min':'0',
+            'max':'100',
             'step':0.01,
-            'hidden':False
+            'disabled':True
         })
+        self.fields['is_contado'].widget.attrs.update({'onchange':'getCheckbox()'})
+        self.fields['is_credito'].widget.attrs.update({'onchange':'getCheckbox()'})
+
 
 class ProveedorForm(forms.ModelForm):
     scope_prefix = 'proveedor_data'
