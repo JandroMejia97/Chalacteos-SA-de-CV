@@ -421,3 +421,12 @@ def load_materia(request):
 				'message': "No se le han registrado materias primas al proveedor seleccionado"
 			}
 		return JsonResponse(data=data)
+
+def verkardex(request):
+	movimientos = Movimiento.objects.all()
+	saldos = Saldo.objects.all()
+	context = {
+		'movimientos':movimientos,
+		'saldos':saldos,
+	}
+	return render(request,'inventario/verKardex.html',context)
