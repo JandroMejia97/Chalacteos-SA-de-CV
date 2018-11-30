@@ -136,12 +136,16 @@ class Movimiento(models.Model):
         help_text="Defina si esta transacción es una entrada o salida de materia prima o producto"
     )
 
+    def save(self, *args, **kwargs):
+        self.monto_movimiento = self.cantidad_movimiento * self.costo_unitario_movimiento
+        super(Movimiento, self).save(*args, **kwargs)
+
     def transaction_date(self):
         self.fecha_movimiento = timezone.now()
         self.save()
 
     def __str__(self):
-        return self.fecha_movimiento
+        return str(self.fecha_movimiento)
 
 
     class Meta:
@@ -200,10 +204,25 @@ class Saldo(models.Model):
         ],
         help_text="Este campo es auto generado"
     )
+    def save(self, *args, **kwargs):
+        movimientos=Movimiento.objects.all()
+        monto=0
+        cantidad=0
+        for movimiento in movimientos:
+            if movimiento.is_Input:
+                monto=monto+movimiento.cantidad_movimiento*movimiento.costo_unitario_movimiento
+                cantidad=cantidad+movimiento.cantidad_movimiento
+            else:
+                monto=monto-movimiento.cantidad_movimiento*movimiento.costo_unitario_movimiento
+                cantidad=cantidad-movimiento.cantidad_movimiento
+        self.monto_saldo = monto
+        self.cantidad_saldo = cantidad  
+        self.costo_unitario_saldo = self.monto_saldo / self.cantidad_saldo 
+        super(Saldo, self).save(*args, **kwargs)
+
 
     def __str__(self):
-        return self.id_saldor
-
+        return str(self.id_saldo)
     class Meta:
         verbose_name = 'Saldo'
         verbose_name_plural = 'Saldos'
