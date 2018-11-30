@@ -148,9 +148,8 @@
 
                 //Declarando variable globales
                 var count = 0;
-                var total = 0;
                 var totalCompra = 0;
-                var subTotal = 0;
+                var subTotalCompra = 0;
                 var totales = "";
                 var proveedores = "";
                 var materiales = "";
@@ -160,11 +159,13 @@
                 var codigoMateriaPrima = null;
                 var contado = 0;
                 var credito = 0;
+                var isContado = true;
+                var isCredito = false;
 
                 function getCheckbox(){
-                    var is_contado = $("#id_is_contado").prop("checked");
-                    var is_credito = $("#id_is_credito").prop("checked");
-                    if(is_contado && is_credito){
+                    isContado = $("#id_is_contado").prop("checked");
+                    isCredito = $("#id_is_credito").prop("checked");
+                    if(isContado && isCredito){
                         $("#id_proporcion").removeAttr('disabled');
                         return true;
                     }else{
@@ -180,7 +181,7 @@
                 function getData(){
                     console.log("ADDROWS")
                     count = count + 1;
-                    codigoProveedor = $("#id_id_proveedor").val();
+                    codigoProveedor = $("#id_nombre_proveedor").val();
                     codigoMateriaPrima = $("#id_id_materia_prima").val();
 
                     var cbProveedor = document.getElementById("id_nombre_proveedor");
@@ -203,41 +204,46 @@
 
                 function addRows(proveedor, materiaPrima, cantidad, precio){
                   console.log("registro")
-                  if(materiaPrima!='' && materiaPrima!='---------' && proveedor!='' && proveedor!='---------' && !isNaN(cantidad) && !isNaN(precio)){
-                    total=cantidad*precio;
-                    subTotal=round((subTotal+cantidad*precio));
-                    iva=round(subTotal*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
-                    totalCompra=round(subTotal*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
-                    
+                  var totalFila=round(cantidad*precio);
+                  totales+=totalFila+",";
+                  subTotalCompra=round((subTotalCompra+totalFila));
+                  iva=round(subTotalCompra*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
+
+                  totalCompra=round(subTotalCompra*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
+                  if(isCredito && isContado){
                     credito = round(totalCompra*proporcion/100);
                     contado = round(totalCompra*(1-proporcion/100));
-                    
-                    totales+=total+",";
-                    proveedores+=codigoProveedor+",";
-                    materiales+=codigoMateriaPrima+",";
-                    cantidades+=cantidad+",";
-
-                    console.log("CANTIDAD")
-                    $("#tbBody").append(
-                      "<tr><td class='text-center'>"+count+"</td>"+
-                      "<td>"+proveedor+"</td>"+
-                      "<td>"+materiaPrima+"</td>"+
-                      "<td class='text-center'>"+cantidad+"</td>"+
-                      "<td class='text-center'>$ "+precio+"</td>"+
-                      "<td class='text-center'>$ "+total+"</td></tr>"
-                    );
-                    $("#subTotal").empty();
-                    $("#subTotal").append("$ "+subTotal);
-                    $("#iva").empty();
-                    $("#iva").append("$ "+iva);
-                    $("#contado").empty();
-                    $("#contado").append("$ "+contado);
-                    $("#credito").empty();
-                    $("#credito").append("$ "+credito);
-                    $("#total").empty();
-                    $("#total").append("$ "+totalCompra);
+                  }else{
+                    if(isCredito){
+                      credito = totalCompra;
+                    }else{
+                      contado = totalCompra;
+                    }
                   }
-                };
+                  proveedores+=codigoProveedor+",";
+                  materiales+=codigoMateriaPrima+",";
+                  cantidades+=cantidad+",";
+
+                  console.log("CANTIDAD");
+                  $("#tbBody").append(
+                    "<tr><td class='text-center'>"+count+"</td>"+
+                    "<td>"+proveedor+"</td>"+
+                    "<td>"+materiaPrima+"</td>"+
+                    "<td class='text-center'>"+cantidad+"</td>"+
+                    "<td class='text-center'>$ "+precio+"</td>"+
+                    "<td class='text-center'>$ "+totalFila+"</td></tr>"
+                  );
+                  $("#subTotal").empty();
+                  $("#subTotal").append("$ "+subTotalCompra);
+                  $("#iva").empty();
+                  $("#iva").append("$ "+iva);
+                  $("#contado").empty();
+                  $("#contado").append("$ "+contado);
+                  $("#credito").empty();
+                  $("#credito").append("$ "+credito);
+                  $("#total").empty();
+                  $("#total").append("$ "+totalCompra);
+                }
 
                 function round(number){
                   number = Math.round(number*100)/100;
@@ -280,6 +286,57 @@
                     }).always(function() {
                       console.log("complete");
                     });
+                  }
+                }
+
+                function sendData() {
+                  var data = {}
+                  console.log(
+                    'totalCompra: '+ subTotalCompra+
+                    '\ntotales: '+ totales+
+                    '\nproveedores: '+proveedores+
+                    '\nmateriales: '+ materiales+
+                    '\ncantidades: '+ cantidades+
+                    '\nproporcion: '+ proporcion
+                  )
+                  if(totalCompra > 0){
+                    if(isCredito && isContado){
+                      data = {
+                        'totalCompra': subTotalCompra,
+                        'totales': totales,
+                        'proveedores': proveedores,
+                        'materiales': materiales,
+                        'cantidades': cantidades,
+                        'proporcion': proporcion
+                      }
+                    }else{
+                      data = {
+                        'totalCompra': subTotalCompra,
+                        'totales': totales,
+                        'proveedores': proveedores,
+                        'materiales': materiales,
+                        'cantidades': cantidades,
+                        'isCredito': isCredito
+                      }
+                    }
+                    $.ajax({
+                        url: '{% url 'inventario:compra-crear' %}',
+                        type: 'POST',
+                        data: data,
+                        success: function(data){
+                          console.log(data);
+                          console.log("SUCCESS");
+                        },
+                        dataType: 'json'
+                      }).done(function(data){
+                        alert(data.message)
+                        location.href = data.success_url;
+                      }).fail(function(data) {
+                        console.log("error");
+                        console.log(data.message);
+                      }).always(function() {
+                        console.log("complete");
+                      });
                   }
                 }
           </script>

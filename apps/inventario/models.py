@@ -19,6 +19,14 @@ class Recurso(models.Model):
         max_length=250,
         help_text="Una breve descripción del recurso"
     )
+    unidad_medida = models.CharField(
+        verbose_name='Unidad de medida',
+        blank=False,
+        default=None,
+        max_length=50,
+        null=True,
+        help_text="Unidad de medida del recurso. Por ejemplo: libras, litros etc."
+    )
 
     def __str__(self):
         return self.nombre_recurso
@@ -43,6 +51,21 @@ class Kardex(models.Model):
 
     def __str__(self):
         return str(self.id_recurso)
+
+    def get_existencias():
+        entradas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=True).aggregate(total_entradas=models.Sum('cantidad_movimiento'))
+        salidas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=False).aggregate(total_salidas=models.Sum('cantidad_movimiento'))
+        return entradas['total_entradas']-salidas['total_salidas']
+
+    def get_costo():
+        costo = get_monto()/get_existencias()
+
+
+    def get_monto():
+        monto_entradas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=True).aggregate(total_monto=models.Sum('monto_movimiento'))
+        monto_salidas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=False).aggregate(total_monto=models.Sum('monto_movimiento'))
+        return monto_entradas['total_monto']-monto_salidas['total_monto']
+
 
     class Meta:
         verbose_name = 'Kardex'
@@ -120,6 +143,7 @@ class Movimiento(models.Model):
     def __str__(self):
         return self.fecha_movimiento
 
+
     class Meta:
         verbose_name = 'Movimiento'
         verbose_name_plural = 'Movimientos'
@@ -128,7 +152,7 @@ class Movimiento(models.Model):
 
 
 class Saldo(models.Model):
-    id_saldor = models.AutoField(
+    id_saldo = models.AutoField(
         primary_key=True
     )
     id_movimiento =models.OneToOneField(
@@ -348,6 +372,22 @@ class Factura(models.Model):
         default=False,
         help_text='Indique si está factura será pagada al contado ya sea total o parcialmente'
     )
+    proporcion = models.DecimalField(
+        verbose_name='proporcion de compra al credito',
+        decimal_places=2,
+        max_digits=5,
+        null=True,
+        validators=[
+            MinValueValidator(
+                0, 
+                message='Este campo debe ser positivo'
+            ),
+            MaxValueValidator(
+                100, 
+                message='La proporcion debe ser menor 100'
+            )
+        ]
+    )
 
     def __str__(self):
         return '{}'.format(self.id_factura)
@@ -390,10 +430,9 @@ class Compra(models.Model):
     id_compra = models.AutoField(
         primary_key=True
     )
-    id_proveedor = models.ForeignKey(
+    id_proveedor = models.ManyToManyField(
         Proveedor,
         verbose_name='Proveedor',
-        on_delete=models.DO_NOTHING,
         blank=False,
         help_text='Seleccion el proveedor al que le pertenece la compra'
     )
@@ -411,7 +450,7 @@ class Compra(models.Model):
     class Meta:
         verbose_name = 'Compra'
         verbose_name_plural = 'Compras'
-        ordering = ['id_factura','id_proveedor']
+        ordering = ['id_factura']
 
 
 class Detalle(models.Model):

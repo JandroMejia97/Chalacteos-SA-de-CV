@@ -120,7 +120,7 @@ class ProveedorCompraForm(forms.ModelForm):
             'step':0.01,
             'disabled':True
         })
-        self.fields['is_contado'].widget.attrs.update({'onchange':'getCheckbox()'})
+        self.fields['is_contado'].widget.attrs.update({'onchange':'getCheckbox()', 'checked': 'checked'})
         self.fields['is_credito'].widget.attrs.update({'onchange':'getCheckbox()'})
 
 

@@ -163,6 +163,68 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		
 		return redirect(self.success_url)
 
+	def post(self, request, *args, **kwargs):
+		sub_total_compra = float(request.POST['totalCompra'])
+		totales_data =  request.POST['totales'].split(',')
+		proveedores_data = request.POST['proveedores'].split(',')
+		materiales_data = request.POST['materiales'].split(',')
+		cantidades_data = request.POST['cantidades'].split(',')
+
+		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
+		iva = sub_total_compra*float(impuesto.tasa_impuesto)
+		total = iva + sub_total_compra
+		if(request.POST.get('isCredito')):
+			is_credito = request.POST['isCredito']
+			if is_credito:
+				factura = Factura.objects.create(
+					sub_total_factura=sub_total_compra,
+					total_factura=total,
+					monto_aplicacion=iva,
+					is_credito=True,
+					is_contado=False
+				)
+			else:
+				factura = Factura.objects.create(
+					sub_total_factura=sub_total_compra,
+					total_factura=total,
+					monto_aplicacion=iva,
+					is_credito=False,
+					is_contado=True
+				)
+		else:
+			proporcion = float(request.POST['proporcion'])
+			factura = Factura.objects.create(
+				sub_total_factura=sub_total_compra,
+				total_factura=total,
+				monto_aplicacion=iva,
+				is_credito=True,
+				is_contado=True,
+				proporcion=proporcion
+			)
+
+		compra = Compra.objects.create(
+			id_factura=factura
+		)
+
+		for i in range(0, len(proveedores_data)-1):
+			materia_prima = MateriaPrima.objects.get(id_materia_prima=materiales_data[i])
+			recurso = Recurso.objects.get(id_recurso=materia_prima.id_recurso.id_recurso)
+			kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+			totales_data[i]=float(totales_data[i])
+			cantidades_data[i]=int(cantidades_data[i])
+			Movimiento.objects.create(
+				id_kardex=kardex,
+				cantidad_movimiento=cantidades_data[i],
+				costo_unitario_movimiento=totales_data[i]/cantidades_data[i],
+				monto_movimiento=totales_data[i],
+				is_Input=True,
+			)
+			compra.id_proveedor.add(proveedores_data[i])
+		message = 'La compra ha sido registrada'
+		return JsonResponse(data={'message': message, 'success_url': self.success_url})
+
+
+
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 	model = Impuesto
 	template_name = 'editForm.html'

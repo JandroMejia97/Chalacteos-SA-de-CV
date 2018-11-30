@@ -42,7 +42,7 @@
                     {% for compra in compras %}
                         <tr id="{{ compra.id_compra }}">
                             <td class="text-center">{{ compra.id_compra }}</td>
-                            <td>{{ compra.id_proveedor }}</td>
+                            <td>{{ compra.id_factura.fecha }}</td>
                             <td>{{ compra.id_factura }}</td>
                             <td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
