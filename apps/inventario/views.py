@@ -158,6 +158,10 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		context['detalle_compra_form'] = DetalleCompraForm()
 		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
+	
+	def post(self, request, *args, **kwargs):
+		
+		return redirect(self.success_url)
 
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 	model = Impuesto

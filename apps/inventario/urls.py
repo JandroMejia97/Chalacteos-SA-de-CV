@@ -121,6 +121,11 @@ urlpatterns = [
         views.clientes,
         name='ajax-materia-prima'
     ),
+	path(
+		'ajax/compra/',
+		views.CompraCreateView.as_view(),
+		name='ajax-compra'
+	),
     re_path(
 		'ajax/compra/',
 		views.load_materia,

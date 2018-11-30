@@ -41,12 +41,12 @@
                       {{ detalle_compra_form|bootstrap_inline }}
                     </div>
                   </div>
-                  <div class="col-12 text-right">    
+                  <div class="col-12 text-center">    
                     <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
                       Registrar compra 
                       <i class="fas fa-plus-circle"></i>
                     </button>
-                  </div>
+                  </div><br>
                 </form>
               </div>
             </div>
@@ -99,7 +99,7 @@
             </div>
             <div class="form-group text-center">
               <br>
-              <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+              <button id='aprobar' type="submit" onclick="sendData()" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
               <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
             </div>
           </div>
@@ -203,42 +203,84 @@
 
                 function addRows(proveedor, materiaPrima, cantidad, precio){
                   console.log("registro")
-                  total=cantidad*precio;
-                  totales+=total+",";
-                  subTotal=round((subTotal+cantidad*precio));
-                  iva=round(subTotal*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
+                  if(materiaPrima!='' && materiaPrima!='---------' && proveedor!='' && proveedor!='---------' && !isNaN(cantidad) && !isNaN(precio)){
+                    total=cantidad*precio;
+                    subTotal=round((subTotal+cantidad*precio));
+                    iva=round(subTotal*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
+                    totalCompra=round(subTotal*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
+                    
+                    credito = round(totalCompra*proporcion/100);
+                    contado = round(totalCompra*(1-proporcion/100));
+                    
+                    totales+=total+",";
+                    proveedores+=codigoProveedor+",";
+                    materiales+=codigoMateriaPrima+",";
+                    cantidades+=cantidad+",";
 
-                  totalCompra=round(subTotal*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
-                  credito = round(totalCompra*proporcion/100);
-                  contado = round(totalCompra*(1-proporcion/100));
-                  proveedores+=codigoProveedor+",";
-                  materiales+=codigoMateriaPrima+",";
-                  cantidades+=cantidad+",";
-
-                  console.log("CANTIDAD")
-                  $("#tbBody").append(
-                    "<tr><td class='text-center'>"+count+"</td>"+
-                    "<td>"+proveedor+"</td>"+
-                    "<td>"+materiaPrima+"</td>"+
-                    "<td class='text-center'>"+cantidad+"</td>"+
-                    "<td class='text-center'>$ "+precio+"</td>"+
-                    "<td class='text-center'>$ "+total+"</td></tr>"
-                  );
-                  $("#subTotal").empty();
-                  $("#subTotal").append("$ "+subTotal);
-                  $("#iva").empty();
-                  $("#iva").append("$ "+iva);
-                  $("#contado").empty();
-                  $("#contado").append("$ "+contado);
-                  $("#credito").empty();
-                  $("#credito").append("$ "+credito);
-                  $("#total").empty();
-                  $("#total").append("$ "+totalCompra);
-                }
+                    console.log("CANTIDAD")
+                    $("#tbBody").append(
+                      "<tr><td class='text-center'>"+count+"</td>"+
+                      "<td>"+proveedor+"</td>"+
+                      "<td>"+materiaPrima+"</td>"+
+                      "<td class='text-center'>"+cantidad+"</td>"+
+                      "<td class='text-center'>$ "+precio+"</td>"+
+                      "<td class='text-center'>$ "+total+"</td></tr>"
+                    );
+                    $("#subTotal").empty();
+                    $("#subTotal").append("$ "+subTotal);
+                    $("#iva").empty();
+                    $("#iva").append("$ "+iva);
+                    $("#contado").empty();
+                    $("#contado").append("$ "+contado);
+                    $("#credito").empty();
+                    $("#credito").append("$ "+credito);
+                    $("#total").empty();
+                    $("#total").append("$ "+totalCompra);
+                  }
+                };
 
                 function round(number){
                   number = Math.round(number*100)/100;
                   return number;
+                };
+
+                function sendData(){
+                  if(proveedor!='' && proveedor!='---------' && cantidades!='' && proveedores!='' && materiales!='' && totales!=''){
+                    data = {}
+                    if(getData){
+                      data = {
+                        'materias_primas': materiales,
+                        'proveedores': proveedores,
+                        'totales': totales,
+                        'cantidades': cantidades,
+                        'proporcion': proporcion
+                      }
+                    }else{
+                      data = {
+                        'materias_primas': materiales,
+                        'proveedores': proveedores,
+                        'totales': totales,
+                        'cantidades': cantidades,
+                      }
+                    }
+                    $.ajax({
+                      url: "{% url 'inventario:ajax-compra' %}",
+                      type: "POST",
+                      data: data,
+                      success: function(data){
+                        console.log(data);
+                        console.log("SUCCES");
+                      },
+                      dataType: "json"
+                    }).done(function(data){
+                      location.href = data.success_url;
+                    }).fail(function() {
+                      console.log("error");
+                      alert("La transaccion no pudo ser realizada");
+                    }).always(function() {
+                      console.log("complete");
+                    });
+                  }
                 }
           </script>
         </div>
