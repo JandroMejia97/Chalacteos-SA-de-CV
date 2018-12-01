@@ -37,6 +37,11 @@ urlpatterns = [
 		name='impuestos'
 	),
 	path(
+		'kardex/',
+		views.verkardex,
+		name='kardex'
+	),
+	path(
 		'crear/proveedor/',
 		views.ProveedorCreateView.as_view(),
 		name='proveedor-crear'

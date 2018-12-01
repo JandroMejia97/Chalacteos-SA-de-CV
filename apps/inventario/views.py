@@ -99,6 +99,19 @@ class MateriasPrimasListView(LoginRequiredMixin, ListView):
 	context_object_name = 'materiales'
 
 
+class MovimientosListView(LoginRequiredMixin, ListView):
+	model = Movimiento
+	template_name = 'inventario/viewKardex.html'
+	context_object_name = 'kardex'
+
+	def get_context_data(self, *args, **kwargs):
+		context = super(MovimientosListView, self).get_context_data(*args, **kwargs)
+		return context
+
+	def get_queryset(self):
+		return self.context_object_name
+
+
 class ProveedorCreateView(LoginRequiredMixin, CreateView):
 	model = Proveedor
 	template_name = 'editForm.html'
@@ -425,3 +438,12 @@ def load_materia(request):
 				'message': "No se le han registrado materias primas al proveedor seleccionado"
 			}
 		return JsonResponse(data=data)
+
+def verkardex(request):
+	movimientos = Movimiento.objects.all()
+	saldos = Saldo.objects.all()
+	context = {
+		'movimientos':movimientos,
+		'saldos':saldos,
+	}
+	return render(request,'inventario/verKardex.html',context)
