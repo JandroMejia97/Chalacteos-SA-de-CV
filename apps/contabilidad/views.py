@@ -69,8 +69,9 @@ class MovimientosListView(LoginRequiredMixin, ListView):
 	context_object_name = 'movimientos'
 
 	def get_queryset(self):
-		transaccion = Transaccion.objects.get(id_transaccion=self.request.GET[''])
-		context = Movimiento.objects.filter()
+		transaccion = Transaccion.objects.get(id_transaccion=self.request.GET['pk'])
+		context = Movimiento.objects.filter(id_transaccion=transaccion)
+		return context
 
 	def get_context_data(self, *args, **kwargs):
 		context = super(MovimientosListView, self).get_context_data(*args, **kwargs)
