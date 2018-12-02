@@ -87,7 +87,7 @@ urlpatterns = [
 		name='impuesto-edicion'
 	),
 	path(
-		'edicion/materia_prima/<slug:pk>/',
+		'edicion/material/<slug:pk>/',
 		views.MateriaPrimaUpdateView.as_view(),
 		name='materia_prima-edicion'
 	),
@@ -108,7 +108,7 @@ urlpatterns = [
 	),
 	path(
 		'detalle/material/<slug:pk>/',
-		views.RecursoDetailView.as_view(),
+		views.MateriaPrimaDetailView.as_view(),
 		name='materia-prima-detalle'
 	),
 	re_path(

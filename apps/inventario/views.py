@@ -314,7 +314,7 @@ class MateriaPrimaUpdateView(LoginRequiredMixin, TemplateView):
 		pk = self.kwargs.get('pk', 0)
 		materia_prima = MateriaPrima.objects.get(id_materia_prima=pk)
 		proveedor = Proveedor.objects.get(nombre_proveedor=materia_prima.id_proveedor)
-		recurso = Recurso.objects.get(nombre_recurso=materia_prima.id_recurso)
+		recurso = Recurso.objects.get(id_recurso=materia_prima.id_recurso.id_recurso)
 		if 'proveedor_form' not in context:
 			context['proveedor_form'] = ProveedorForm(instance=proveedor)
 		if 'recurso_form' not in context:
