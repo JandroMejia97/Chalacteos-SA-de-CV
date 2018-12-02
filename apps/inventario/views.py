@@ -529,7 +529,7 @@ def import_data_materia(request):
 				proveedor = Proveedor.objects.get(id_proveedor=id_proveedor)
 				recurso = Recurso.objects.get(id_recurso=id_recurso)
 				objecto, created = MateriaPrima.objects.update_or_create(
-					id_proveedor=proveedor
+					id_proveedor=proveedor,
 					id_recurso=recurso
 				)
 	return HttpResponse('Hecho')
