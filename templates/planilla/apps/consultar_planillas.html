@@ -1,6 +1,9 @@
-{% extends "base.html" %}
-{% block contenido %}
-
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Ver Kardex{% endblock title %}
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
 
 
 
@@ -60,7 +63,7 @@
     </div>
     
 
-{% endblock %}
+{% endblock content %}
 
 
 
