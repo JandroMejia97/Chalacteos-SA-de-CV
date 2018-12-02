@@ -36,9 +36,9 @@ urlpatterns = [
 		views.ImpuestosListView.as_view(),
 		name='impuestos'
 	),
-	path(
-		'kardex/',
-		views.verkardex,
+	re_path(
+		r'kardex/(?P<id_kardex>[0-9]+)/',
+		views.get_movimientos,
 		name='kardex'
 	),
 	path(
@@ -102,8 +102,8 @@ urlpatterns = [
 		name='impuesto-detalle'
 	),
 	path(
-		'detalle/impuesto/<slug:pk>/',
-		views.MateriaPrimaDetailView.as_view(),
+		'detalle/material/<slug:pk>/',
+		views.RecursoDetailView.as_view(),
 		name='materia-prima-detalle'
 	),
 	re_path(

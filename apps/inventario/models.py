@@ -52,21 +52,6 @@ class Kardex(models.Model):
     def __str__(self):
         return str(self.id_recurso)
 
-    def get_existencias():
-        entradas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=True).aggregate(total_entradas=models.Sum('cantidad_movimiento'))
-        salidas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=False).aggregate(total_salidas=models.Sum('cantidad_movimiento'))
-        return entradas['total_entradas']-salidas['total_salidas']
-
-    def get_costo():
-        costo = get_monto()/get_existencias()
-
-
-    def get_monto():
-        monto_entradas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=True).aggregate(total_monto=models.Sum('monto_movimiento'))
-        monto_salidas = Movimiento.objects.filter(id_kardex=self.id_kardex).filter(is_Input=False).aggregate(total_monto=models.Sum('monto_movimiento'))
-        return monto_entradas['total_monto']-monto_salidas['total_monto']
-
-
     class Meta:
         verbose_name = 'Kardex'
         verbose_name_plural = 'Kardexs'
@@ -135,10 +120,48 @@ class Movimiento(models.Model):
         default=True,
         help_text="Defina si esta transacción es una entrada o salida de materia prima o producto"
     )
-
-    def save(self, *args, **kwargs):
-        self.monto_movimiento = self.cantidad_movimiento * self.costo_unitario_movimiento
-        super(Movimiento, self).save(*args, **kwargs)
+    cantidad_saldo = models.DecimalField(
+        verbose_name='Cantidad',
+        max_digits=1000,
+        decimal_places=2,
+        blank=False,
+        validators=[
+            MinValueValidator(
+                0, 
+                message="Este campo debe ser positivo"
+            )
+        ],
+        help_text="Ingrese la cantidad actual del producto o materia prima",
+        null=True
+    )
+    costo_unitario_saldo = models.DecimalField(
+        verbose_name='Costo Unitario',
+        max_digits=1000,
+        decimal_places=2,
+        blank=False,
+        validators=[
+            MinValueValidator(
+                0, 
+                message="Este campo debe ser positivo"
+            )
+        ],
+        help_text="Ingrese el costo unitario del producto o materia prima",
+        null=True
+    )
+    monto_saldo = models.DecimalField(
+        verbose_name='Monto',
+        max_digits=1000,
+        decimal_places=2,
+        blank=False,
+        validators=[
+            MinValueValidator(
+                0, 
+                message="Este campo debe ser positivo"
+            )
+        ],
+        help_text="Este campo es auto generado",
+        null=True
+    )
 
     def transaction_date(self):
         self.fecha_movimiento = timezone.now()
@@ -155,80 +178,6 @@ class Movimiento(models.Model):
         ordering = ['-fecha_movimiento']
 
 
-class Saldo(models.Model):
-    id_saldo = models.AutoField(
-        primary_key=True
-    )
-    id_movimiento =models.OneToOneField(
-        Movimiento,
-        on_delete=models.DO_NOTHING,
-        blank=False,
-        help_text='Seleccion el movimiento al que le corresponde el saldo'
-    )
-    cantidad_saldo = models.DecimalField(
-        verbose_name='Cantidad',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Ingrese la cantidad actual del producto o materia prima"
-    )
-    costo_unitario_saldo = models.DecimalField(
-        verbose_name='Costo Unitario',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Ingrese el costo unitario del producto o materia prima"
-    )
-    monto_saldo = models.DecimalField(
-        verbose_name='Monto',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Este campo es auto generado"
-    )
-    def save(self, *args, **kwargs):
-        movimientos=Movimiento.objects.all()
-        monto=0
-        cantidad=0
-        for movimiento in movimientos:
-            if movimiento.is_Input:
-                monto=monto+movimiento.cantidad_movimiento*movimiento.costo_unitario_movimiento
-                cantidad=cantidad+movimiento.cantidad_movimiento
-            else:
-                monto=monto-movimiento.cantidad_movimiento*movimiento.costo_unitario_movimiento
-                cantidad=cantidad-movimiento.cantidad_movimiento
-        self.monto_saldo = monto
-        self.cantidad_saldo = cantidad  
-        self.costo_unitario_saldo = self.monto_saldo / self.cantidad_saldo 
-        super(Saldo, self).save(*args, **kwargs)
-
-
-    def __str__(self):
-        return str(self.id_saldo)
-    class Meta:
-        verbose_name = 'Saldo'
-        verbose_name_plural = 'Saldos'
-        ordering = ['id_movimiento']
-    
-
 class Producto(models.Model):
     id_producto = models.AutoField(
         primary_key=True
@@ -241,9 +190,6 @@ class Producto(models.Model):
         help_text='Seleccione el recurso del producto'
     )
     
-    def __str__(self):
-        return str(self.id_recurso)
-
     def __str__(self):
         return str(self.id_recurso)
 
@@ -562,41 +508,3 @@ class Impuesto(models.Model):
         verbose_name = "Impuesto"
         verbose_name_plural = "Impuestos"
         ordering = ['nombre_impuesto', 'tasa_impuesto']
-
-
-class FacturaImpuesto(models.Model):
-    id_aplicacion = models.AutoField(
-        primary_key=True
-    )
-    id_factura = models.ForeignKey(
-        Factura,
-        on_delete=models.DO_NOTHING,
-        verbose_name='Factura',
-        null=True,
-        help_text='Seleccione la factura que se aplicara en la factura con impuesto'
-    )
-    id_impuesto = models.ForeignKey(
-        Impuesto,
-        on_delete=models.DO_NOTHING,
-        verbose_name='Impuesto',
-        null=True,
-        help_text='Seleccione el impuesto que se aplicara a la factura con impuesto'
-    )
-    monto_aplicacion = models.DecimalField(
-        verbose_name='Monto Aplicado',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Ingrese el recargo por el impuesto a la compra o venta"
-    )
-
-    class Meta:
-        verbose_name = 'Factura - Impuesto'
-        verbose_name_plural = 'Facturas - Impuestos'
-        ordering = ['id_factura', 'id_impuesto']

@@ -2,6 +2,9 @@
 {% block title %}SCIeL - Gestión de Dispositivos{% endblock title %}
 
 {% block content %}
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
   {% block tables %}
     <div id="content-wrapper">
       <div class="container-fluid">

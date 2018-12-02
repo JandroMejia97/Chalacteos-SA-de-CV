@@ -22,6 +22,9 @@
             <strong>¡Click Aquí para agregar un nuevo material!</strong>
           </a>
         </div>
+        <div class="alert bold alert-success text-center">
+          <strong>Seleccione una materia prima para ver su registro de entradas y salidas</strong>
+        </div>
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-table"></i>
@@ -44,7 +47,7 @@
                     <tr id="{{ material.id_materia_materia_prima }}">
                       <td class="text-center">{{ material.id_materia_prima }}</td>
                       <td>{{ material.id_proveedor }}</td>
-                      <td>{{ material }}</td>
+                      <td><a href="/kardex/{{ material.id_materia_prima }}">{{ material }}</a></td>
                       <td>{{ material.id_recurso.descripcion_recurso|truncatechars:20 }}</td>
                       <td class="text-center">
                         <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('MATERIAPRIMA', {{ material.id_materia_prima }})" style="color:gray !important"></a>
