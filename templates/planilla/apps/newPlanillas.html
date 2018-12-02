@@ -1,4 +1,9 @@
-{% extends "base.html" %}
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Ver Kardex{% endblock title %}
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
 
 {% block scripts %}
 
@@ -128,5 +133,5 @@ function setid_confirmar(idprecio, accion) {
 </div>
 
 
-{% endblock %}
+{% endblock content %}
 
