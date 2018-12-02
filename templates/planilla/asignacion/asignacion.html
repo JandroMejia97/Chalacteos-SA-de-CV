@@ -1,7 +1,9 @@
-
-{% extends "base.html" %}
-{% block contenido %}
-
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Ver Kardex{% endblock title %}
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
 <form action="" method="post">
 	{% csrf_token %}
 <fieldset class="well the-fieldset">
@@ -123,5 +125,5 @@
 
 </form>
 
-{% endblock %}
+{% endblock content %}
 
