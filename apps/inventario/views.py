@@ -210,25 +210,6 @@ class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 			id_proveedor=proveedor
 		)
 		message = 'La materia prima ha sido registrada'
-		"""request_data = json.loads(request.body)
-		recurso_form = RecursoForm(
-			request.POST.get('recurso_form', {})
-		)
-		proveedor_form = ProveedorForm(
-			request.POST.get('proveedor_form', {})
-		)
-		response_data = {}
-
-		if recurso_form.is_valid() and proveedor_form.is_valid():
-			response_data.update({
-				'success_url': self.success_url
-			})
-			return JsonResponse(response_data)
-		
-		response_data.update({
-			recurso_form.form_name: recurso_form.errors,
-			proveedor_form.form_name: proveedor_form.errors,
-		})"""
 		return redirect(self.success_url)
 
 
