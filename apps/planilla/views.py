@@ -24,7 +24,7 @@ from django.views.generic.edit import (
 # Create your views here.
 
 def index(request):
-    return render(request,"inicio/index.html")
+    return render(request,"planilla/inicio/index.html")
 
 class EmpresaDetail(DetailView):
     model = Empresa
