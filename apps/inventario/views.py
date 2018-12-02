@@ -15,9 +15,11 @@ from django.utils import timezone
 
 from .models import *
 from .forms import *
+from apps.contabilidad import views as conta
 
 import json
 import csv
+import datetime
 
 # Create your views here.
 
@@ -175,33 +177,48 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
 		iva = sub_total_compra*float(impuesto.tasa_impuesto)
 		total = iva + sub_total_compra
+
+		data = {}
+		data['tipo'] = 'COMPRA'
+		data['total'] = total
+		
 		if(request.POST.get('isCredito')):
 			is_credito = request.POST['isCredito']
 			if is_credito:
+				data['compra'] = 'CREDITO'
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_compra,
 					total_factura=total,
 					monto_aplicacion=iva,
 					is_credito=True,
-					is_contado=False
+					is_contado=False,
+					transaccion=transaccion
 				)
 			else:
+				data['compra'] = 'CONTADO'
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_compra,
 					total_factura=total,
 					monto_aplicacion=iva,
 					is_credito=False,
-					is_contado=True
+					is_contado=True,
+					transaccion=transaccion
 				)
 		else:
-			proporcion = float(request.POST['proporcion'])
+			data['proporcion'] = float(request.POST['proporcion'])
+			data['compra'] = 'PROPORCION'
+			transaccion = conta.registrar_transaccion(data)
+
 			factura = Factura.objects.create(
 				sub_total_factura=sub_total_compra,
 				total_factura=total,
 				monto_aplicacion=iva,
 				is_credito=True,
 				is_contado=True,
-				proporcion=proporcion
+				proporcion=data['proporicion'],
+				transaccion=transaccion
 			)
 
 		compra = Compra.objects.create(
@@ -226,6 +243,7 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 			movimiento.monto_saldo = get_monto(kardex)
 			movimiento.costo_unitario_saldo = get_costo(kardex)
 			movimiento.save()
+
 			if not compra.id_proveedor.filter(id_proveedor=proveedores_data[i]):
 				compra.id_proveedor.add(proveedores_data[i])
 		message = 'La compra ha sido registrada'
@@ -497,6 +515,23 @@ def import_data_proveedor(request):
 				)
 	return HttpResponse('Hecho')
 
+def import_data_recursos(request):
+	f = 'C:\\recursos.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_recurso":
+				nombre_recurso = new[1]
+				descripcion_recurso = new[2]
+				unidad_medida = new[3]
+				objecto, created = Recurso.objects.update_or_create(
+					nombre_recurso=nombre_recurso,
+					descripcion_recurso=descripcion_recurso,
+					unidad_medida=unidad_medida
+				)
+	return HttpResponse('Hecho')
+
 def import_data_cliente(request):
 	f = 'C:\\clientes.csv'
 	with open(f) as file:
@@ -509,5 +544,22 @@ def import_data_cliente(request):
 				objeto, created = Cliente.objects.update_or_create(
 					nombre_cliente=nombre_cliente,
 					nombre_titular_cliente=nombre_titular_cliente
+				)
+	return HttpResponse('Hecho')
+
+def import_data_materia(request):
+	f = 'C:\\materia_prima.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_materia_prima":
+				id_proveedor = new[1]
+				id_recurso = new[2]
+				proveedor = Proveedor.objects.get(id_proveedor=id_proveedor)
+				recurso = Recurso.objects.get(id_recurso=id_recurso)
+				objecto, created = MateriaPrima.objects.update_or_create(
+					id_proveedor=proveedor,
+					id_recurso=recurso
 				)
 	return HttpResponse('Hecho')

@@ -17,6 +17,11 @@ urlpatterns = [
 		name='import-proveedor'
 	),
 	path(
+		'import/recursos/',
+		views.import_data_recursos,
+		name='import-recursos'
+	),
+	path(
 		'proveedores/',
 		views.ProveedoresListView.as_view(),
 		name='proveedores'

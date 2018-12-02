@@ -322,7 +322,7 @@ class TipoTransaccion(models.Model):
         }
 	)
 	descripcion_tipo = models.CharField(
-		max_length = 100,
+		max_length = 250,
 		verbose_name='Descripción del tipo transacción',
         blank=False,
         null=True,
@@ -374,7 +374,6 @@ class Transaccion(models.Model):
 	)
 	fecha_transaccion = models.DateTimeField(
 		verbose_name='Fecha de transacción',
-        auto_now=True,
         help_text='Fecha en que se realiza la transacción',
         error_messages={
             'empty': 'Este campo no debe quedar vacío'
