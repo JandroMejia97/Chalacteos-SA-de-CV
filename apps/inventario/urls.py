@@ -27,6 +27,11 @@ urlpatterns = [
 		name='import-materias'
 	),
 	path(
+		'import/impuestos/',
+		views.import_data_impuesto,
+		name='import-impuesto'
+	),
+	path(
 		'proveedores/',
 		views.ProveedoresListView.as_view(),
 		name='proveedores'

@@ -563,3 +563,20 @@ def import_data_materia(request):
 					id_recurso=recurso
 				)
 	return HttpResponse('Hecho')
+
+def import_data_impuesto(request):
+	f = 'C:\\impuestos.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_impuesto":
+				nombre_impuesto = new[1]
+				descripcion_impuesto = new[2]
+				tasa_impuesto = float(new[3])
+				objeto, created = Impuesto.objects.update_or_create(
+					nombre_impuesto=nombre_impuesto,
+					descripcion_impuesto=descripcion_impuesto,
+					tasa_impuesto=tasa_impuesto
+				)
+	return HttpResponse('Hecho')
