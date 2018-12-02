@@ -7,6 +7,31 @@ from . import views
 app_name = 'inventario'
 urlpatterns = [
 	path(
+		'import/cliente/',
+		views.import_data_cliente,
+		name='import-cliente'
+	),
+	path(
+		'import/proveedor/',
+		views.import_data_proveedor,
+		name='import-proveedor'
+	),
+	path(
+		'import/recursos/',
+		views.import_data_recursos,
+		name='import-recursos'
+	),
+	path(
+		'import/materias/',
+		views.import_data_materia,
+		name='import-materias'
+	),
+	path(
+		'import/impuestos/',
+		views.import_data_impuesto,
+		name='import-impuesto'
+	),
+	path(
 		'proveedores/',
 		views.ProveedoresListView.as_view(),
 		name='proveedores'
@@ -140,5 +165,10 @@ urlpatterns = [
 		'ajax/load/materia/',
 		views.load_materia,
 		name='ajax-materia'
+	),
+	path(
+		'ajax/venta/',
+		views.VentaCreateView.as_view(),
+		name='ajax-venta'
 	),
 ]

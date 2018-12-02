@@ -17,6 +17,7 @@ from .models import *
 from .forms import *
 
 import json
+import csv
 
 # Create your views here.
 
@@ -143,11 +144,91 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedVentaForm.html'
 	success_url = reverse_lazy('inventario:ventas')
 
+	def get_context_data(self, **kwargs):
+		context = super(VentaCreateView,self).get_context_data(**kwargs)
+		producto= Producto.objects.filter()[:1].get()
+		recurso = Recurso.objects.get(nombre_recurso=producto)
+		kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+		movimiento = Movimiento.objects.last()[:1].get()
+
+		if 'movimiento_form' not in context:
+			context['movimiento_form'] = MovimientoForm(instance=movimiento)
+		context['id_producto'] = producto
+		return context
+
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		context['venta_form'] = VentaForm()
+		context['venta_form'] = ClienteVentaForm()
 		context['detalle_venta_form'] = DetalleVentaForm()
+		context['movimiento_form'] = MovimientoForm()
+		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
+
+	def post(self, request, *args, **kwargs):
+		sub_total_venta = float(request.POST['totalVenta'])
+		totales_data =  request.POST['totales'].split(',')
+		clientes_data = request.POST['clientes'].split(',')
+		cantidades_data = request.POST['cantidades'].split(',')
+
+		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
+		iva = sub_total_venta*float(impuesto.tasa_impuesto)
+		total = iva + sub_total_venta
+		if(request.POST.get('isCredito')):
+			is_credito = request.POST['isCredito']
+			if is_credito:
+				factura = Factura.objects.create(
+					sub_total_factura=sub_total_venta,
+					total_factura=total,
+					monto_aplicacion=iva,
+					is_credito=True,
+					is_contado=False
+				)
+			else:
+				factura = Factura.objects.create(
+					sub_total_factura=sub_total_venta,
+					total_factura=total,
+					monto_aplicacion=iva,
+					is_credito=False,
+					is_contado=True
+				)
+		else:
+			proporcion = float(request.POST['proporcion'])
+			factura = Factura.objects.create(
+				sub_total_factura=sub_total_venta,
+				total_factura=total,
+				monto_aplicacion=iva,
+				is_credito=True,
+				is_contado=True,
+				proporcion=proporcion
+			)
+
+		venta = Venta.objects.create(
+			id_factura=factura
+		)
+
+		for i in range(0, len(clientes_data)-1):
+			producto = Producto.objects.get(id_producto=1)
+			recurso = Recurso.objects.get(id_recurso=producto.id_recurso.id_recurso)
+			kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+			totales_data[i]=float(totales_data[i])
+			cantidades_data[i]=int(cantidades_data[i])
+			movimiento = Movimiento.objects.create(
+				id_kardex=kardex,
+				cantidad_movimiento=cantidades_data[i],
+				costo_unitario_movimiento=totales_data[i]/cantidades_data[i],
+				monto_movimiento=totales_data[i],
+				is_Input=True,
+			)
+			movimiento.save()
+			movimiento.cantidad_saldo = get_existencias(kardex)
+			movimiento.monto_saldo = get_monto(kardex)
+			movimiento.costo_unitario_saldo = get_costo(kardex)
+			movimiento.save()
+			if not venta.id_cliente.filter(id_cliente=clientes_data[i]):
+				venta.id_cliente.add(clientes_data[i])
+		message = 'La venta ha sido registrada'
+		return JsonResponse(data={'message': message, 'success_url': self.success_url})
+
 
 class CompraCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedCompraForm.html'
@@ -159,10 +240,6 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		context['detalle_compra_form'] = DetalleCompraForm()
 		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
-	
-	def post(self, request, *args, **kwargs):
-		
-		return redirect(self.success_url)
 
 	def post(self, request, *args, **kwargs):
 		sub_total_compra = float(request.POST['totalCompra'])
@@ -174,33 +251,48 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
 		iva = sub_total_compra*float(impuesto.tasa_impuesto)
 		total = iva + sub_total_compra
+
+		data = {}
+		data['tipo'] = 'COMPRA'
+		data['total'] = total
+		
 		if(request.POST.get('isCredito')):
 			is_credito = request.POST['isCredito']
 			if is_credito:
+				data['compra'] = 'CREDITO'
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_compra,
 					total_factura=total,
 					monto_aplicacion=iva,
 					is_credito=True,
-					is_contado=False
+					is_contado=False,
+					transaccion=transaccion
 				)
 			else:
+				data['compra'] = 'CONTADO'
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_compra,
 					total_factura=total,
 					monto_aplicacion=iva,
 					is_credito=False,
-					is_contado=True
+					is_contado=True,
+					transaccion=transaccion
 				)
 		else:
-			proporcion = float(request.POST['proporcion'])
+			data['proporcion'] = float(request.POST['proporcion'])
+			data['compra'] = 'PROPORCION'
+			transaccion = conta.registrar_transaccion(data)
+
 			factura = Factura.objects.create(
 				sub_total_factura=sub_total_compra,
 				total_factura=total,
 				monto_aplicacion=iva,
 				is_credito=True,
 				is_contado=True,
-				proporcion=proporcion
+				proporcion=data['proporcion'],
+				transaccion=transaccion
 			)
 
 		compra = Compra.objects.create(
@@ -225,11 +317,12 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 			movimiento.monto_saldo = get_monto(kardex)
 			movimiento.costo_unitario_saldo = get_costo(kardex)
 			movimiento.save()
+
 			if not compra.id_proveedor.filter(id_proveedor=proveedores_data[i]):
 				compra.id_proveedor.add(proveedores_data[i])
 		message = 'La compra ha sido registrada'
 		return JsonResponse(data={'message': message, 'success_url': self.success_url})
-
+		
 
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 	model = Impuesto
@@ -480,3 +573,84 @@ def get_costo(id_kardex):
 		costo = get_monto(id_kardex)/get_existencias(id_kardex)
     
 	return float(costo)
+
+def import_data_proveedor(request):
+	f = 'C:\\proveedores.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_proveedor":
+				nombre_proveedor=new[1]
+				nombre_titular_proveedor=new[2]
+				objeto, created = Proveedor.objects.update_or_create(
+					nombre_proveedor=nombre_proveedor,
+					nombre_titular_proveedor=nombre_titular_proveedor
+				)
+	return HttpResponse('Hecho')
+
+def import_data_recursos(request):
+	f = 'C:\\recursos.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_recurso":
+				nombre_recurso = new[1]
+				descripcion_recurso = new[2]
+				unidad_medida = new[3]
+				objecto, created = Recurso.objects.update_or_create(
+					nombre_recurso=nombre_recurso,
+					descripcion_recurso=descripcion_recurso,
+					unidad_medida=unidad_medida
+				)
+	return HttpResponse('Hecho')
+
+def import_data_cliente(request):
+	f = 'C:\\clientes.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_cliente":
+				nombre_cliente=new[1]
+				nombre_titular_cliente=new[2]
+				objeto, created = Cliente.objects.update_or_create(
+					nombre_cliente=nombre_cliente,
+					nombre_titular_cliente=nombre_titular_cliente
+				)
+	return HttpResponse('Hecho')
+
+def import_data_materia(request):
+	f = 'C:\\materia_prima.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_materia_prima":
+				id_proveedor = new[1]
+				id_recurso = new[2]
+				proveedor = Proveedor.objects.get(id_proveedor=id_proveedor)
+				recurso = Recurso.objects.get(id_recurso=id_recurso)
+				objecto, created = MateriaPrima.objects.update_or_create(
+					id_proveedor=proveedor,
+					id_recurso=recurso
+				)
+	return HttpResponse('Hecho')
+
+def import_data_impuesto(request):
+	f = 'C:\\impuestos.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "ID_IMPUESTO":
+				nombre_impuesto = new[1]
+				descripcion_impuesto = new[2]
+				tasa_impuesto = float(new[3])
+				objeto, created = Impuesto.objects.update_or_create(
+					nombre_impuesto=nombre_impuesto,
+					descripcion_impuesto=descripcion_impuesto,
+					tasa_impuesto=tasa_impuesto
+				)
+	return HttpResponse('Hecho')
