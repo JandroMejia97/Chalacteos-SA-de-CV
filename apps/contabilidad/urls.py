@@ -22,6 +22,11 @@ urlpatterns = [
 		views.import_data_cuenta,
 		name='import-cuenta'
 	),
+	path(
+		'import/transaccion/',
+		views.import_data_transaccion,
+		name='import-transaccion'
+	),
 	re_path(
 		'sign-in/',
 		views.SignInView.as_view(),

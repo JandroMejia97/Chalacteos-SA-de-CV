@@ -7,6 +7,11 @@ from . import views
 app_name = 'inventario'
 urlpatterns = [
 	path(
+		'import/recursos/',
+		views.import_data_recursos,
+		name='import-recursos'
+	),
+	path(
 		'proveedores/',
 		views.ProveedoresListView.as_view(),
 		name='proveedores'

@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from apps.contabilidad import models as conta
+
 
 class Recurso(models.Model):
     id_recurso = models.AutoField(
@@ -352,6 +354,12 @@ class Factura(models.Model):
                 message='La proporcion debe ser menor 100'
             )
         ]
+    )
+    transaccion = models.OneToOneField(
+        conta.Transaccion,
+        verbose_name='Transaccion',
+        on_delete=models.CASCADE,
+        null=True
     )
 
     def __str__(self):

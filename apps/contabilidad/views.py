@@ -19,6 +19,7 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
+import datetime
 import csv
 import json
 
@@ -127,25 +128,8 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 		context = self.get_context_data(**kwargs)
 		context['transaccion_form'] = TransaccionForm()
 		context['movimiento_form'] = MovimientoForm()
+		context['fecha'] = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[:1]
 		return self.render_to_response(context)
-
-	def put(self, request, *args, **kwargs):
-		request_data = json.loads(request.body)
-		transaccion_form = TransaccionForm(
-			data=request_data.get(TransaccionForm.scope_prefix, {})
-		)
-		response_data = {}
-
-		if transaccion_form.is_valid():
-			response_data.update({
-				'success_url': self.success_url
-			})
-			return JsonResponse(response_data)
-		
-		response_data.update({
-			transaccion_form.form_name: transaccion_form.errors,
-		})
-		return JsonResponse(response_data, status=422)
 
 	def post(self, request, *args, **kwargs):
 		periodo = PeriodoContable.objects.all().last()
@@ -154,6 +138,7 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 		abonos_str = request.POST['abonos']
 		cargos_str = request.POST['cargos']
 		codigos_cuentas_str = request.POST['codigo_cuentas']
+		fecha = request.POST['fecha']
 		
 		abonos_data = abonos_str.split(',')
 		cargos_data = cargos_str.split(',')
@@ -185,7 +170,8 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 					id_tipo=tipo,
 					numero_transaccion=ultima_transaccion+1,
 					descripcion_transaccion=request.POST['descripcion'],
-					monto_transaccion=monto_transaccion
+					monto_transaccion=monto_transaccion,
+					fecha_transaccion=fecha
 				)
 
 				for i in range(0, len(codigos_cuentas_data)-1):
@@ -367,7 +353,77 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 		'id_perido_contable',
 	]
 	context_object_name = 'estado_capital'
+
+def registrar_transaccion(self, data):
+	ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
+	periodo = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[1]
+	tipo = None
+	transaccion = Transaccion.objects.create(
+		id_periodo_contable=periodo,
+		id_tipo=tipo,
+		numero_transaccion=ultima_transaccion,
+		fecha_transaccion=datetime.datetime.now(),
+		descripcion_transaccion='Compra de materia prima',
+		monto_transaccion=data['total']
+	)
+
+	if data['tipo'] == 'COMPRA':
+		if data['compra'] == 'CREDITO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CREDITO')
+			cuentas = {
+				'cp': Cuenta.objects.get(codigo_cuenta=2102),
+				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
+			}
+			movimiento_abono = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cp'],
+				monto_cargo=None,
+				monto_abono=data['total']
+			)
+		elif data['compra'] == 'CONTADO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CONTADO')
+			cuentas = {
+				'cg': Cuenta.objects.get(codigo_cuenta=110101),
+				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
+			}
+			movimiento_abono = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=None,
+				monto_abono=data['total']
+			)
+		elif data['compra'] == 'PROPORCION':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA PARCIALMENTE AL CREDITO')
+			cuentas = {
+				'cp': Cuenta.objects.get(codigo_cuenta=2102),
+				'cg': Cuenta.objects.get(codigo_cuenta=110101),
+				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
+			}
+			movimiento_abono1 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=None,
+				monto_abono=data['total']*(1-data['proporcion'])
+			)
+			movimiento_abono2 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cp'],
+				monto_cargo=None,
+				monto_abono=data['total']*data['proporcion']
+			)
+		transaccion.id_tipo = tipo
+		transaccion.save()
+		movimiento_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['inv_mp'],
+			monto_cargo=None,
+			monto_abono=data['total']
+		)
+	return transaccion
+			
 	
+
+
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
     if request.method == 'DELETE':
@@ -459,5 +515,20 @@ def import_data_cuenta(request):
 					is_alta=is_alta,
 					id_rubro=id_rubro,
 					codigo_cuenta_padre=codigo_cuenta_padre
+				)
+	return HttpResponse('Hecho')
+
+def import_data_transaccion(self):
+	f = 'C:\\tipo_transaccion.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_tipo":
+				nombre_tipo = new[1]
+				descripcion_tipo = new[2]
+				objecto, created = TipoTransaccion.objects.update_or_create(
+					nombre_tipo=nombre_tipo,
+					descripcion_tipo=descripcion_tipo
 				)
 	return HttpResponse('Hecho')
