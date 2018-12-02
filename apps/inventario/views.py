@@ -213,7 +213,7 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 				monto_aplicacion=iva,
 				is_credito=True,
 				is_contado=True,
-				proporcion=data['proporicion'],
+				proporcion=data['proporcion'],
 				transaccion=transaccion
 			)
 
