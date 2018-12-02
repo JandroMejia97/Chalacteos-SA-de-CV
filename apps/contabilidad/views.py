@@ -133,7 +133,7 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 
 	def post(self, request, *args, **kwargs):
 		periodo = PeriodoContable.objects.all().last()
-		ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
+		ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo).count()
 
 		abonos_str = request.POST['abonos']
 		cargos_str = request.POST['cargos']
@@ -166,7 +166,7 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 			if total_abonos == monto_transaccion:
 
 				transaccion = Transaccion.objects.create(
-					id_perido_contable=periodo,
+					id_periodo_contable=periodo,
 					id_tipo=tipo,
 					numero_transaccion=ultima_transaccion+1,
 					descripcion_transaccion=request.POST['descripcion'],
@@ -317,7 +317,7 @@ class BalanceGeneralDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'balance_general'
 
@@ -328,7 +328,7 @@ class EstadoResultadosDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'estado_resultados'
 
@@ -339,7 +339,7 @@ class BalanceComprobacionDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'balance_comprobacion'
 
@@ -350,16 +350,19 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'estado_capital'
 
-def registrar_transaccion(self, data):
-	ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
-	periodo = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[1]
+def registrar_transaccion(data):
+	periodos = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[:1]
+	periodo_instance = None
+	for periodo in periodos:
+		periodo_instance = periodo
+	ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo_instance).count()
 	tipo = None
 	transaccion = Transaccion.objects.create(
-		id_periodo_contable=periodo,
+		id_periodo_contable=periodo_instance,
 		id_tipo=tipo,
 		numero_transaccion=ultima_transaccion,
 		fecha_transaccion=datetime.datetime.now(),

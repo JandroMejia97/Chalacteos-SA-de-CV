@@ -345,7 +345,7 @@ class Transaccion(models.Model):
 	id_transaccion = models.AutoField(
 		primary_key = True
 	)
-	id_perido_contable = models.ForeignKey(
+	id_periodo_contable = models.ForeignKey(
 		PeriodoContable,
 		verbose_name='Período Contable',
         on_delete=models.SET_NULL,

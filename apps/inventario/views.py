@@ -162,10 +162,6 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		context['detalle_compra_form'] = DetalleCompraForm()
 		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
-	
-	def post(self, request, *args, **kwargs):
-		
-		return redirect(self.success_url)
 
 	def post(self, request, *args, **kwargs):
 		sub_total_compra = float(request.POST['totalCompra'])
@@ -529,6 +525,9 @@ def import_data_recursos(request):
 					nombre_recurso=nombre_recurso,
 					descripcion_recurso=descripcion_recurso,
 					unidad_medida=unidad_medida
+				)
+				created = Kardex.objects.update_or_create(
+					id_recurso=objecto
 				)
 	return HttpResponse('Hecho')
 
