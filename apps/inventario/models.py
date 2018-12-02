@@ -257,10 +257,10 @@ class MateriaPrima(models.Model):
     id_materia_prima = models.AutoField(
         primary_key=True
     )
-    id_recurso = models.OneToOneField(
+    id_recurso = models.ForeignKey(
         Recurso,
         verbose_name='Recurso',
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         blank=False,
         help_text='Seleccion el recurso para la kardex',
     )
