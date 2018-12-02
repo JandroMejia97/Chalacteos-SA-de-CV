@@ -570,7 +570,7 @@ def import_data_impuesto(request):
 		reader = csv.reader(file)
 		for new in reader:
 			row=new[0].split(";")
-			if row[0] != "id_impuesto":
+			if row[0] != "ID_IMPUESTO":
 				nombre_impuesto = new[1]
 				descripcion_impuesto = new[2]
 				tasa_impuesto = float(new[3])
