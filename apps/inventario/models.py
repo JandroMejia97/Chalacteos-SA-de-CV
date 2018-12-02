@@ -399,7 +399,8 @@ class Compra(models.Model):
         Proveedor,
         verbose_name='Proveedor',
         blank=False,
-        help_text='Seleccion el proveedor al que le pertenece la compra'
+        help_text='Seleccion el proveedor al que le pertenece la compra',
+        unique=False
     )
     id_factura = models.ForeignKey(
         Factura,
@@ -410,7 +411,7 @@ class Compra(models.Model):
     )
 
     def __str__(self):
-        return self.id_compra
+        return str(self.id_compra)
 
     class Meta:
         verbose_name = 'Compra'

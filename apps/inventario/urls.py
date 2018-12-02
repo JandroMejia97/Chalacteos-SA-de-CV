@@ -127,7 +127,7 @@ urlpatterns = [
         name='ajax-impuesto'
     ),
     re_path(
-        r'ajax/materia_prima/(?P<id_materia_prima>[0-9]+)/',
+        r'ajax/materiaprima/(?P<id_materia_prima>[0-9]+)/',
         views.materiales,
         name='ajax-materia-prima'
     ),
@@ -137,7 +137,7 @@ urlpatterns = [
 		name='ajax-compra'
 	),
     re_path(
-		'ajax/compra/',
+		'ajax/load/materia/',
 		views.load_materia,
 		name='ajax-materia'
 	),

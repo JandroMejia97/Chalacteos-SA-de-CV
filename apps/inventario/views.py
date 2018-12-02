@@ -220,11 +220,13 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 				monto_movimiento=totales_data[i],
 				is_Input=True,
 			)
+			movimiento.save()
 			movimiento.cantidad_saldo = get_existencias(kardex)
 			movimiento.monto_saldo = get_monto(kardex)
 			movimiento.costo_unitario_saldo = get_costo(kardex)
 			movimiento.save()
-			compra.id_proveedor.add(proveedores_data[i])
+			if not compra.id_proveedor.filter(id_proveedor=proveedores_data[i]):
+				compra.id_proveedor.add(proveedores_data[i])
 		message = 'La compra ha sido registrada'
 		return JsonResponse(data={'message': message, 'success_url': self.success_url})
 
@@ -386,38 +388,39 @@ class MateriaPrimaDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'materia_prima'
 
+@login_required(login_url='/sign-in/')
 def proveedores(request, id_proveedor):   
     if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
         parametro = Proveedor.objects.get(id_proveedor=id_proveedor)
         parametro.delete()
         message = "El proveedor fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
+@login_required(login_url='/sign-in/')
 def clientes(request, id_cliente):   
     if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
         parametro = Cliente.objects.get(id_cliente=id_cliente)
         parametro.delete()
         message = "El cliente fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
+@login_required(login_url='/sign-in/')
 def impuestos(request, id_impuesto):   
     if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
         parametro = Impuesto.objects.get(id_impuesto=id_impuesto)
         parametro.delete()
         message = "El proveedor fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
+@login_required(login_url='/sign-in/')
 def materiales(request, id_materia_prima):   
     if request.method == 'DELETE':
-        #id_parametro = request.POST['id']
         parametro = MateriaPrima.objects.get(id_materia_prima=id_materia_prima)
         parametro.delete()
         message = "La materia prima fue borrada exitosamente"
         return JsonResponse(data={'message': message})
-		
+
+@login_required(login_url='/sign-in/')		
 def load_materia(request):
 	if request.method == 'GET':
 		id_proveedor = request.GET['id_proveedor']
@@ -454,23 +457,26 @@ def get_movimientos(request, id_kardex):
 
 def get_existencias(id_kardex):
     entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_entradas=models.Sum('cantidad_movimiento'))
+    if entradas['total_entradas'] == None:
+        entradas['total_entradas'] = 0
     salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_salidas=models.Sum('cantidad_movimiento'))
-    return entradas['total_entradas']-salidas['total_salidas']
+    if salidas['total_salidas'] == None:
+        salidas['total_salidas'] = 0
+    return float(entradas['total_entradas'])-float(salidas['total_salidas'])
 
 def get_monto(id_kardex):
     monto_entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_monto=models.Sum('monto_movimiento'))
+    if monto_entradas['total_monto'] == None:
+        monto_entradas['total_monto'] = 0
     monto_salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_monto=models.Sum('monto_movimiento'))
-    return monto_entradas['total_monto']-monto_salidas['total_monto']
+    if monto_salidas['total_monto'] == None:
+        monto_salidas['total_monto'] = 0
+    return float(monto_entradas['total_monto'])-float(monto_salidas['total_monto'])
 
 def get_costo(id_kardex):
-    costo = get_monto(id_kardex)/get_existencias(id_kardex)
-    return costo
-
-def verkardex(request):
-	movimientos = Movimiento.objects.all()
-	saldos = Saldo.objects.all()
-	context = {
-		'movimientos':movimientos,
-		'saldos':saldos,
-	}
-	return render(request,'inventario/verKardex.html',context)
+	if get_monto(id_kardex) == 0 or get_existencias(id_kardex) == 0:
+		costo = 0
+	else:
+		costo = get_monto(id_kardex)/get_existencias(id_kardex)
+    
+	return float(costo)
