@@ -461,3 +461,4 @@ def import_data_cuenta(request):
 					codigo_cuenta_padre=codigo_cuenta_padre
 				)
 	return HttpResponse('Hecho')
+
