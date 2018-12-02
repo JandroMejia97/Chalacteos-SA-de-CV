@@ -27,7 +27,7 @@
           <div class="card-body" id="1">
             <div class="row">
               <div class="col-lg-12 col-xs-12 border rounded">
-                <form method="POST" name="proveedor_form" id="proveedor_form">
+                <form method="POST" name="proveedor_form" id="proveedor_form" disabled>
                   {%csrf_token%}
                   <h4 class="mb-3 text-center header_id">PROVEEDOR</h4>
                     {{ proveedor_form|bootstrap_inline }}

@@ -29,15 +29,21 @@
                 <tbody id="bodyTable">
                     <tr class="row">
                       <td class="text-right col">
-                        Nombre del Recurso
+                        Proveedor
                       </td>
-                      <td class="text-left col">{{ materia_prima.nombre_recurso }}</td>
+                      <td class="text-left col">{{ materia_prima.id_proveedor }}</td>
                     </tr>
                     <tr class="row">
                       <td class="text-right col">
-                        Descripcion
+                        Nombre material
                       </td>
-                      <td class="text-left col">{{ materia_prima.descripcion_recurso }}</a></td>
+                      <td class="text-left col">{{ materia_prima }}</a></td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Descripción material
+                      </td>
+                      <td class="text-left col">{{ materia_prima.id_recurso.descripcion_recurso }}</a></td>
                     </tr>
                     <tr class="row">
                       <td class="text-right col">

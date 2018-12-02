@@ -50,7 +50,7 @@ class DetalleCompraForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DetalleCompraForm, self).__init__(*args,**kwargs)
         self.fields['cantidad_detalle'].widget.attrs.update({'min':'0'})
-        self.fields['precio_unitario'].widget.attrs.update({'min':'0'})
+        self.fields['precio_unitario'].widget.attrs.update({'min':'0', 'step':0.01})
         self.fields['id_materia_prima'].choices = (('', '---------'),)
         self.fields['id_materia_prima'].widget.attrs.update({'disabled': 'true'})
 

@@ -1,0 +1,53 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición / {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarContabilidad.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header text-center">
+            <i class="fas fa-edit"></i>
+            Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="card-body">
+            <form action="" method="POST" disabled id="detalleForm">
+                {% csrf_token %}
+                {{ proveedor_form|bootstrap_inline }}
+                {{ recurso_form|bootstrap_inline }}
+                <div class="form-group text-center">
+                    <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+                    <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+                </div>
+            </form>
+            <script>
+              window.onload = function({{form}}){
+                  for(item in proveedor_form){
+                  item.disabled(true);
+                };
+                for(item in recurso_form){
+                  item.disabled(true);
+                };
+              };
+              $('#detalleForm').disabled(true);
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}
