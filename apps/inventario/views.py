@@ -500,6 +500,21 @@ def get_costo(id_kardex):
     
 	return float(costo)
 
+def import_data_proveedor(request):
+	f = 'C:\\proveedores.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_proveedor":
+				nombre_proveedor=new[1]
+				nombre_titular_proveedor=new[2]
+				objeto, created = Proveedor.objects.update_or_create(
+					nombre_proveedor=nombre_proveedor,
+					nombre_titular_proveedor=nombre_titular_proveedor
+				)
+	return HttpResponse('Hecho')
+
 def import_data_recursos(request):
 	f = 'C:\\recursos.csv'
 	with open(f) as file:
@@ -514,6 +529,21 @@ def import_data_recursos(request):
 					nombre_recurso=nombre_recurso,
 					descripcion_recurso=descripcion_recurso,
 					unidad_medida=unidad_medida
+				)
+	return HttpResponse('Hecho')
+
+def import_data_cliente(request):
+	f = 'C:\\clientes.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_cliente":
+				nombre_cliente=new[1]
+				nombre_titular_cliente=new[2]
+				objeto, created = Cliente.objects.update_or_create(
+					nombre_cliente=nombre_cliente,
+					nombre_titular_cliente=nombre_titular_cliente
 				)
 	return HttpResponse('Hecho')
 
