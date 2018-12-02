@@ -86,9 +86,9 @@ WSGI_APPLICATION = 'ChalacteosApp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'chalacteosdb',
-        'USER': 'chalacteos',
-        'PASSWORD': 'Admin123',
+        'NAME': 'chalacteosdbLuis',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
         'PORT': '5432',
     }
