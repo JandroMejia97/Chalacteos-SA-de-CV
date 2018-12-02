@@ -176,6 +176,8 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 
 		data = {}
 		data['tipo'] = 'COMPRA'
+		data['sub_total'] = sub_total_compra
+		data['iva'] = iva
 		data['total'] = total
 		
 		if(request.POST.get('isCredito')):
@@ -203,8 +205,9 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 					transaccion=transaccion
 				)
 		else:
-			data['proporcion'] = float(request.POST['proporcion'])
+			data['proporcion'] = float(request.POST['proporcion'])/100
 			data['compra'] = 'PROPORCION'
+			
 			transaccion = conta.registrar_transaccion(data)
 
 			factura = Factura.objects.create(

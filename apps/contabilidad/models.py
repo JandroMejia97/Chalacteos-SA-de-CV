@@ -136,7 +136,7 @@ class PeriodoContable(models.Model):
 	)
 
 	def __str__(self):
-		return str(self.fecha_inicio_periodo)+" - "+str(self.fecha_final_periodo)
+		return str(self.fecha_inicio_periodo.strftime('%d/%m/%y %H:%M:%S'))+" - "+str(self.fecha_final_periodo.strftime('%d/%m/%y %H:%M:%S'))
 
 	class Meta:
 		ordering = ["id_periodo_contable"]

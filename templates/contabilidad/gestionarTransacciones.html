@@ -44,7 +44,7 @@
                         <tr id="{{transaccion.id_transaccion}}">
                             <td class="text-center">{{transaccion.numero_transaccion}}</td>
                             <td>{{ transaccion.fecha_transaccion | date:"SHORT_DATE_FORMAT" }}</td>
-                            <td>{{ transaccion.fecha_transaccion | time:"h i s A" }}</td>
+                            <td>{{ transaccion.fecha_transaccion | time:"h:i:s A" }}</td>
                             <td>{{ transaccion.id_tipo }}</td>
                             <td>{{ transaccion.monto_transaccion }}</td>
                             <td class="text-center">
@@ -66,6 +66,7 @@
                     {% endfor %}
                 </tbody>
               </table>
+              
             </div>
           </div>
         </div>

@@ -354,6 +354,15 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'estado_capital'
 
+def get_movimientos(request, id_transaccion):
+	context = {}
+	context['transaccion'] = Transaccion.objects.get(id_transaccion=id_transaccion)
+	if context['transaccion']:
+		context['movimientos'] = Movimiento.objects.filter(id_transaccion=context['transaccion'])
+		return render(request, template_name='contabilidad/viewTransaccion.html', context=context)
+	else:
+		return render(request, template_name='404.html')
+
 def registrar_transaccion(data):
 	periodos = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[:1]
 	periodo_instance = None
@@ -369,14 +378,13 @@ def registrar_transaccion(data):
 		descripcion_transaccion='Compra de materia prima',
 		monto_transaccion=data['total']
 	)
-
+	cuentas = {}
 	if data['tipo'] == 'COMPRA':
+		cuentas['inv_mp'] = Cuenta.objects.get(codigo_cuenta=111101)
+		cuentas['iva'] = Cuenta.objects.get(codigo_cuenta=2110)
 		if data['compra'] == 'CREDITO':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CREDITO')
-			cuentas = {
-				'cp': Cuenta.objects.get(codigo_cuenta=2102),
-				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
-			}
+			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
 				id_cuenta=cuentas['cp'],
@@ -385,10 +393,7 @@ def registrar_transaccion(data):
 			)
 		elif data['compra'] == 'CONTADO':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CONTADO')
-			cuentas = {
-				'cg': Cuenta.objects.get(codigo_cuenta=110101),
-				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
-			}
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
 				id_cuenta=cuentas['cg'],
@@ -397,11 +402,8 @@ def registrar_transaccion(data):
 			)
 		elif data['compra'] == 'PROPORCION':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA PARCIALMENTE AL CREDITO')
-			cuentas = {
-				'cp': Cuenta.objects.get(codigo_cuenta=2102),
-				'cg': Cuenta.objects.get(codigo_cuenta=110101),
-				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
-			}
+			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono1 = Movimiento.objects.create(
 				id_transaccion=transaccion,
 				id_cuenta=cuentas['cg'],
@@ -416,17 +418,20 @@ def registrar_transaccion(data):
 			)
 		transaccion.id_tipo = tipo
 		transaccion.save()
-		movimiento_cargo = Movimiento.objects.create(
+		inventario_cargo = Movimiento.objects.create(
 			id_transaccion=transaccion,
 			id_cuenta=cuentas['inv_mp'],
-			monto_cargo=None,
-			monto_abono=data['total']
+			monto_cargo=data['sub_total'],
+			monto_abono=None
+		)
+		iva_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['iva'],
+			monto_cargo=data['iva'],
+			monto_abono=None
 		)
 	return transaccion
 			
-	
-
-
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
     if request.method == 'DELETE':
