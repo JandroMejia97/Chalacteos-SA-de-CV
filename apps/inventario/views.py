@@ -146,13 +146,13 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(VentaCreateView,self).get_context_data(**kwargs)
-		producto= Producto.objects.filter()[:1].get()
+		producto= Producto.objects.get(id_recurso=1)
 		recurso = Recurso.objects.get(nombre_recurso=producto)
 		kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
-		movimiento = Movimiento.objects.last()[:1].get()
+		movimiento.costo_unitario_saldo = get_costo(kardex)
 
 		if 'movimiento_form' not in context:
-			context['movimiento_form'] = MovimientoForm(instance=movimiento)
+			context['movimiento_form'] = MovimientoForm(instance=movimiento.costo_unitario_saldo)
 		context['id_producto'] = producto
 		return context
 
@@ -173,9 +173,16 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
 		iva = sub_total_venta*float(impuesto.tasa_impuesto)
 		total = iva + sub_total_venta
+
+		data = {}
+		data['tipo'] = 'VENTA'
+		data['total'] = total
+
 		if(request.POST.get('isCredito')):
 			is_credito = request.POST['isCredito']
 			if is_credito:
+				data['venta'] = 'CREDITO'
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_venta,
 					total_factura=total,
@@ -184,6 +191,8 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 					is_contado=False
 				)
 			else:
+				data['venta'] = 'CONTADO'
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_venta,
 					total_factura=total,
@@ -192,14 +201,17 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 					is_contado=True
 				)
 		else:
-			proporcion = float(request.POST['proporcion'])
+			data['proporcion'] = float(request.POST['proporcion'])
+			data['compra'] = 'PROPORCION'
+			transaccion = conta.registrar_transaccion(data)
 			factura = Factura.objects.create(
 				sub_total_factura=sub_total_venta,
 				total_factura=total,
 				monto_aplicacion=iva,
 				is_credito=True,
 				is_contado=True,
-				proporcion=proporcion
+				proporcion=data['proporcion'],
+				transaccion=transaccion
 			)
 
 		venta = Venta.objects.create(
