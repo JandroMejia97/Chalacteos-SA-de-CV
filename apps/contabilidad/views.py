@@ -26,6 +26,7 @@ import json
 class IndexView(LoginRequiredMixin, TemplateView):
 	template_name = 'index.html'
 
+import csv
 
 class SignInView(LoginView):
     template_name = 'iniciarSesion.html'
@@ -68,8 +69,9 @@ class MovimientosListView(LoginRequiredMixin, ListView):
 	context_object_name = 'movimientos'
 
 	def get_queryset(self):
-		transaccion = Transaccion.objects.get(id_transaccion=self.request.GET[''])
-		context = Movimiento.objects.filter()
+		transaccion = Transaccion.objects.get(id_transaccion=self.request.GET['pk'])
+		context = Movimiento.objects.filter(id_transaccion=transaccion)
+		return context
 
 	def get_context_data(self, *args, **kwargs):
 		context = super(MovimientosListView, self).get_context_data(*args, **kwargs)
@@ -103,6 +105,17 @@ class CuentaCreateView(LoginRequiredMixin, CreateView):
 		'codigo_cuenta',
 		'nombre_cuenta',
 		'is_cuenta_acreedora'
+	]
+
+
+class EstadoFinancieroCreateView(LoginRequiredMixin, CreateView):
+	model = EstadoFinanciero
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:estados_financieros')
+	fields = [
+		'id_estado_financiero',
+		'id_periodo_contable',
+		'nombre_estado_financiero'
 	]
 
 
@@ -228,6 +241,17 @@ class CuentaUpdateView(LoginRequiredMixin, UpdateView):
 	]
 
 
+class EstadoFinancieroUpdateView(LoginRequiredMixin, UpdateView):
+	model = EstadoFinanciero
+	template_name = 'editForm.html'
+	success_url = reverse_lazy('contabilidad:estados_financieros')
+	fields = [
+		'id_estado_financiero',
+		'id_periodo_contable',
+		'nombre_estado_financiero'
+	]
+
+
 class TransaccionUpdateView(LoginRequiredMixin, UpdateView):
 	model = Transaccion
 	template_name = 'editForm.html'
@@ -275,6 +299,18 @@ class CuentaDetailView(LoginRequiredMixin, DetailView):
 	context_object_name = 'cuenta'
 
 
+class EstadoFinancieroDetailView(LoginRequiredMixin, DetailView):
+	model = EstadoFinanciero
+	template_name = 'contabilidad/viewEstadosFinancieros.html'
+	success_url = reverse_lazy('contabilidad:estados_financieros')
+	fields = [
+		'id_estado_financiero',
+		'id_periodo_contable',
+		'nombre_estado_financiero'
+	]
+	context_object_name = 'estados_financieros'
+
+
 class PerfilDetailView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'viewPerfil.html'
@@ -287,6 +323,7 @@ class PerfilDetailView(LoginRequiredMixin, DetailView):
         'last_login'
     ]
     context_object_name = 'user'
+
 
 class BalanceGeneralDetailView(LoginRequiredMixin, DetailView):
 	model = EstadoFinanciero
@@ -331,7 +368,6 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'estado_capital'
 	
-
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
     if request.method == 'DELETE':
@@ -339,6 +375,14 @@ def cuentas(request, id_cuenta):
         parametro.is_alta = False
         parametro.save()
         message = "La cuenta fue borrada exitosamente"
+        return JsonResponse(data={'message': message})
+
+@login_required
+def estados_financieros(request, id_estado_financiero):   
+    if request.method == 'DELETE':
+        parametro = EstadoFinanciero.objects.get(id_estado_financiero=id_estado_financiero)
+        parametro.delete()
+        message = "El estado financiero fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')
@@ -368,16 +412,14 @@ def import_data_rubro(request):
 			row = new[0].split(";")
 			if row[0] != "id_rubro":
 				codigo_rubro=int(row[1])
-
 				nombre_rubro=str(row[2]).upper()
-				
+
 				id_catalogo=Catalogo.objects.get(id_catalogo=int(row[3]))
 				if row[4] == '':
 					rubro_sup=None
 				else:
 					rubro_sup=Rubro.objects.get(id_rubro=row[4])
 				nivel=int(row[5])
-
 				created = Rubro.objects.update_or_create(
 					codigo_rubro=codigo_rubro,
 					nombre_rubro=nombre_rubro,
@@ -410,7 +452,6 @@ def import_data_cuenta(request):
 					codigo_cuenta_padre = None
 				else:
 					codigo_cuenta_padre = Cuenta.objects.get(id_cuenta=int(row[6]))
-
 				objeto, created = Cuenta.objects.update_or_create(
 					codigo_cuenta=codigo_cuenta,
 					nombre_cuenta=nombre_cuenta,

@@ -8,6 +8,7 @@
   {% endblock sidebar %}
   {% block tables %}
   {% load bootstrap %}
+  {% load l10n %}
     <div id="content-wrapper">
       <div class="container-fluid">
         <!-- Breadcrumbs-->
@@ -25,29 +26,27 @@
             <i class="fas fa-plus-circle"></i>
           </div>
           <div class="card-body" id="1">
-            <div class="row">
+            <div>
               <div class="col-lg-12 col-xs-12 border rounded">
-                <form name="transaccion_form" novalidate>
+                <form name="compra_form" novalidate>
                 {% csrf_token %}
                   <div class="row">
-                    <div class="col-lg-12 col-xs-12 border">
+                    <div class="col-lg-6 col-xs-12">
                       <h4 class="mb-3 text-center header_id">COMPRA</h4>
                       {{ compra_form|bootstrap_inline }}
                     </div>
-                  </div>
-                  <br>
-                  <div class="row border-bottom">
-                    <div  class="col-lg-12 col-xs-12 border" id="div_1">
+                    <br>
+                    <div  class="col-lg-6 col-xs-12">
                       <h4 class="mb-3 text-center header_id">MATERIA PRIMA</h4>
                       {{ detalle_compra_form|bootstrap_inline }}
                     </div>
                   </div>
-                  <div class="col-12 text-right">    
+                  <div class="col-12 text-center">    
                     <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
                       Registrar compra 
                       <i class="fas fa-plus-circle"></i>
                     </button>
-                  </div>
+                  </div><br>
                 </form>
               </div>
             </div>
@@ -63,9 +62,10 @@
                       <tr>
                         <th class="text-center">#</th>
                         <th>Proveedor</th>
-                        <th>Materia Prima</th>                
-                        <th>Cantidad Materia prima</th>
+                        <th>Detalle</th>                
+                        <th>Cantidad</th>
                         <th>Precio Unitario</th>
+                        <th>SubTotal</th>
                       </tr>
                     </thead>
                     <tbody id="tbBody">
@@ -73,15 +73,23 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th colspan="4" class="text-right">Sub Total</th>
+                        <th colspan="5" class="text-right">Sub Total</th>
                         <th class="text-center" id="subTotal">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Total IVA</th>
+                        <th colspan="5" class="text-right">Total IVA</th>
                         <th class="text-center" id="iva">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Total</th>
+                        <th colspan="5" class="text-right">Contado</th>
+                        <th class="text-center" id="contado">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="5" class="text-right">Crédito</th>
+                        <th class="text-center" id="credito">$ 0.00</th>
+                      </tr>
+                      <tr>
+                        <th colspan="5" class="text-right">Total</th>
                         <th class="text-center" id="total">$ 0.00</th>
                       </tr>
                     </tfoot>
@@ -91,108 +99,246 @@
             </div>
             <div class="form-group text-center">
               <br>
-              <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+              <button id='aprobar' type="submit" onclick="sendData()" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
               <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
             </div>
           </div>
           <script>
                 function getMateria(id_proveedor, id_materiales){
-                    console.log("GETMATERIA");
-                    var materia = $("#"+id_proveedor).val();
-                    console.log("AJAX: "+materia);
+                  console.log("GETMATERIA");
+                  var proveedor = $("#"+id_proveedor).val();
+                  console.log("AJAX: "+proveedor);
+                  if(proveedor!='' && proveedor!='---------'){
                     $.ajax({
-                        url: '{% url "inventario:ajax-materia" %}',
-                        type: 'GET',
-                        data: {
-                            'id_proveedor': materia,
-                        },
-                        success: function(data){
-                            console.log(data.message);
-                            console.log(data);
-                            console.log("SUCCESS");
-                        },
-                        dataType: 'json'
+                      url: '{% url "inventario:ajax-materia" %}',
+                      type: 'GET',
+                      data: {
+                        'id_proveedor': proveedor,
+                      },
+                      success: function(data){
+                        console.log(data);
+                        console.log("SUCCESS");
+                      },
+                      dataType: 'json'
                     }).done(function(data){
-                        if(data.materiales != null){
-                            $("#"+id_materiales).append('<option value="" selected="">---------</option>');
-                            $.each(data.materiales, function(index, value){
-                                $("#"+id_materiales).append(
-                                    "<option id='"+value.id_materia_prima + "' value='" +
-                                    value.id_materia_prima + "'>" + value + "</option>");
-                            });
-                            $("#"+id_materiales).removeAttr('disabled');
-                        }else{
-                            alert(data.message);
-                            $("#"+id_materiales).append('<option value="" selected="">---------</option>');
-                            $("#"+id_materiales).attr('disabled','disabled');
-                        }
+                      if(data.nombres != null){
+                        $("#"+id_materiales).empty();
+                        $("#"+id_materiales).append('<option value="" selected="">---------</option>');
+                        var id = data.identificador.split("-");
+                        var nombres = data.nombres.split("-");
+                        for(var i=0; i < nombres.length-1 ; i++){
+                          $("#"+id_materiales).append(
+                          "<option id='"+id[i] + "' value='" +
+                          id[i] + "'>" + nombres[i] + "</option>");
+                        };
+                        console.log("endfor");
+                        $("#"+id_materiales).removeAttr('disabled');
+                      }else{
+                        $("#"+id_materiales).append('<option value="" selected="">---------</option>');
+                        $("#"+id_materiales).attr('disabled','disabled');
+                      }
                     }).fail(function(data) {
-                        console.log("error");
-                        console.log(data.message);
+                      console.log("error");
+                      console.log(data.message);
                     }).always(function() {
-                        console.log("complete");
+                      console.log("complete");
                     });
+                  }
                 };
 
                 //Declarando variable globales
                 var count = 0;
-                var total = [];
                 var totalCompra = 0;
-                var subTotal = 0;
-                var proveedores = [];
-                var materiales = [];
-                var cantidades = [];
+                var subTotalCompra = 0;
+                var totales = "";
+                var proveedores = "";
+                var materiales = "";
+                var cantidades = "";
+                var proporcion =  0;
+                var codigoProveedor = null;
+                var codigoMateriaPrima = null;
+                var contado = 0;
+                var credito = 0;
+                var isContado = true;
+                var isCredito = false;
+
+                function getCheckbox(){
+                    isContado = $("#id_is_contado").prop("checked");
+                    isCredito = $("#id_is_credito").prop("checked");
+                    if(isContado && isCredito){
+                        $("#id_proporcion").removeAttr('disabled');
+                        return true;
+                    }else{
+                        $("#id_proporcion").val("");
+                        $("#id_proporcion").attr('disabled','disabled');
+                        proporcion = 0;
+                        contado = 0;
+                        credito = 0;
+                        return false;
+                    }
+                }
 
                 function getData(){
                     console.log("ADDROWS")
                     count = count + 1;
-                    var codigoProveedor = $("#id_id_proveedor").val();
-                    var codigoMateriaPrima = $("#id_id_materia_prima").val();
+                    codigoProveedor = $("#id_nombre_proveedor").val();
+                    codigoMateriaPrima = $("#id_id_materia_prima").val();
 
-                    var cbProveedor = document.getElementById("id_id_proveedor");
+                    var cbProveedor = document.getElementById("id_nombre_proveedor");
                     var cbMateriaPrima = document.getElementById("id_id_materia_prima");
                     
                     var proveedor = cbProveedor.options[cbProveedor.selectedIndex].text;
                     var materiaPrima = cbMateriaPrima.options[cbMateriaPrima.selectedIndex].text;
                     
                     var cantidad = parseInt($("#id_cantidad_detalle").val());
-                    var precio = parseInt($("#id_precio_unitario").val());
+                    var precio = parseFloat($("#id_precio_unitario").val());
 
-                    $(".dataTables_empty").remove();
+                    if(getCheckbox()){
+                      proporcion =  parseFloat($("#id_proporcion").val());
+                    }
 
                     if(proveedor!='' && proveedor!='---------' && materiaPrima!='' && materiaPrima!='---------' && !isNaN(cantidad) && !isNaN(precio)){
-                        console.log("prueba")
                         addRows(proveedor, materiaPrima, cantidad, precio);
                     }
                 };
 
                 function addRows(proveedor, materiaPrima, cantidad, precio){
                   console.log("registro")
-                    if(!isNaN(cantidad) && !isNaN(precio)){
-                      total.push(cantidad*precio);
-                      subTotal=subTotal+cantidad*precio;
-                      iva=subTotal*0.13;
-                      totalCompra=Math.round(subTotal*1.13*100)/100;
-                      proveedores.push(proveedor);
-                      materiales.push(materiaPrima);
-                      cantidades.push(cantidad);
+                  var totalFila=round(cantidad*precio);
+                  totales+=totalFila+",";
+                  subTotalCompra=round((subTotalCompra+totalFila));
+                  iva=round(subTotalCompra*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
 
-                      console.log("CANTIDAD")
-                      $("#tbBody").append(
-                        "<tr><td class='text-center'>"+count+"</td>"+
-                          "<td>"+proveedor+"</td>"+
-                          "<td>"+materiaPrima+"</td>"+
-                          "<td class='text-center'>"+cantidad+"</td>"+
-                          "<td class='text-center'>$ "+precio+"</td></tr>"
-                      );
-                      $("#subTotal").empty();
-                      $("#subTotal").append("$ "+subTotal);
-                      $("#iva").empty();
-                      $("#iva").append("$ "+iva);
-                      $("#total").empty();
-                      $("#total").append("$ "+totalCompra);
+                  totalCompra=round(subTotalCompra*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
+                  if(isCredito && isContado){
+                    credito = round(totalCompra*proporcion/100);
+                    contado = round(totalCompra*(1-proporcion/100));
+                  }else{
+                    if(isCredito){
+                      credito = totalCompra;
+                    }else{
+                      contado = totalCompra;
                     }
+                  }
+                  proveedores+=codigoProveedor+",";
+                  materiales+=codigoMateriaPrima+",";
+                  cantidades+=cantidad+",";
+
+                  console.log("CANTIDAD");
+                  $("#tbBody").append(
+                    "<tr><td class='text-center'>"+count+"</td>"+
+                    "<td>"+proveedor+"</td>"+
+                    "<td>"+materiaPrima+"</td>"+
+                    "<td class='text-center'>"+cantidad+"</td>"+
+                    "<td class='text-center'>$ "+precio+"</td>"+
+                    "<td class='text-center'>$ "+totalFila+"</td></tr>"
+                  );
+                  $("#subTotal").empty();
+                  $("#subTotal").append("$ "+subTotalCompra);
+                  $("#iva").empty();
+                  $("#iva").append("$ "+iva);
+                  $("#contado").empty();
+                  $("#contado").append("$ "+contado);
+                  $("#credito").empty();
+                  $("#credito").append("$ "+credito);
+                  $("#total").empty();
+                  $("#total").append("$ "+totalCompra);
+                }
+
+                function round(number){
+                  number = Math.round(number*100)/100;
+                  return number;
                 };
+
+                function sendData(){
+                  if(proveedor!='' && proveedor!='---------' && cantidades!='' && proveedores!='' && materiales!='' && totales!=''){
+                    data = {}
+                    if(getData){
+                      data = {
+                        'materias_primas': materiales,
+                        'proveedores': proveedores,
+                        'totales': totales,
+                        'cantidades': cantidades,
+                        'proporcion': proporcion
+                      }
+                    }else{
+                      data = {
+                        'materias_primas': materiales,
+                        'proveedores': proveedores,
+                        'totales': totales,
+                        'cantidades': cantidades,
+                      }
+                    }
+                    $.ajax({
+                      url: "{% url 'inventario:ajax-compra' %}",
+                      type: "POST",
+                      data: data,
+                      success: function(data){
+                        console.log(data);
+                        console.log("SUCCES");
+                      },
+                      dataType: "json"
+                    }).done(function(data){
+                      location.href = data.success_url;
+                    }).fail(function() {
+                      console.log("error");
+                      alert("La transaccion no pudo ser realizada");
+                    }).always(function() {
+                      console.log("complete");
+                    });
+                  }
+                }
+
+                function sendData() {
+                  var data = {}
+                  console.log(
+                    'totalCompra: '+ subTotalCompra+
+                    '\ntotales: '+ totales+
+                    '\nproveedores: '+proveedores+
+                    '\nmateriales: '+ materiales+
+                    '\ncantidades: '+ cantidades+
+                    '\nproporcion: '+ proporcion
+                  )
+                  if(totalCompra > 0){
+                    if(isCredito && isContado){
+                      data = {
+                        'totalCompra': subTotalCompra,
+                        'totales': totales,
+                        'proveedores': proveedores,
+                        'materiales': materiales,
+                        'cantidades': cantidades,
+                        'proporcion': proporcion
+                      }
+                    }else{
+                      data = {
+                        'totalCompra': subTotalCompra,
+                        'totales': totales,
+                        'proveedores': proveedores,
+                        'materiales': materiales,
+                        'cantidades': cantidades,
+                        'isCredito': isCredito
+                      }
+                    }
+                    $.ajax({
+                        url: '{% url 'inventario:compra-crear' %}',
+                        type: 'POST',
+                        data: data,
+                        success: function(data){
+                          console.log(data);
+                          console.log("SUCCESS");
+                        },
+                        dataType: 'json'
+                      }).done(function(data){
+                        alert(data.message)
+                        location.href = data.success_url;
+                      }).fail(function(data) {
+                        console.log("error");
+                        console.log(data.message);
+                      }).always(function() {
+                        console.log("complete");
+                      });
+                  }
+                }
           </script>
         </div>
       </div>

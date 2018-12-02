@@ -4,7 +4,7 @@
 {% block content %}
     
   {% block sidebar %}
-    {% include "sidebarInventario.html" %}
+    {% include "sidebar.html" %}
   {% endblock sidebar %}
   {% block tables %}
   {% load bootstrap %}
@@ -21,7 +21,7 @@
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa fa-eye"></i>
-            <strong><i> Detalles de: {{ materia_prima }}</i></strong>
+            <strong><i> Detalles del Estado Financiero: {{ estado_financiero }}</i></strong>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -29,27 +29,15 @@
                 <tbody id="bodyTable">
                     <tr class="row">
                       <td class="text-right col">
-                        Proveedor
+                        Nombre del Estado Financiero
                       </td>
-                      <td class="text-left col">{{ materia_prima.id_proveedor }}</td>
+                      <td class="text-left col">{{estado_financiero.id_estado_financiero}}</td>
                     </tr>
                     <tr class="row">
                       <td class="text-right col">
-                        Nombre material
+                        Período Contable
                       </td>
-                      <td class="text-left col">{{ materia_prima }}</a></td>
-                    </tr>
-                    <tr class="row">
-                      <td class="text-right col">
-                        Descripción material
-                      </td>
-                      <td class="text-left col">{{ materia_prima.id_recurso.descripcion_recurso }}</a></td>
-                    </tr>
-                    <tr class="row">
-                      <td class="text-right col">
-                        Unidade de medida
-                      </td>
-                      <td class="text-left col">{{ materia_prima.unidad_medida }}</a></td>
+                      <td class="text-left col">{{estado_financiero.id_periodo_contable}}</td>
                     </tr>
                 </tbody>
               </table>

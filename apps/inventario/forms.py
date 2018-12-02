@@ -36,7 +36,8 @@ class DetalleCompraForm(forms.ModelForm):
     form_name = 'detalle_compra_form'
     precio_unitario = forms.DecimalField(
         label='Precio unitario',
-        help_text='Seleccione el precio unitario'
+        help_text='Ingrese el precio unitario usando coma decimal',
+        decimal_places=2
     )
     class Meta:
         model = Detalle
@@ -48,7 +49,10 @@ class DetalleCompraForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DetalleCompraForm, self).__init__(*args,**kwargs)
+        self.fields['cantidad_detalle'].widget.attrs.update({'min':'0'})
         self.fields['precio_unitario'].widget.attrs.update({'min':'0', 'step':0.01})
+        self.fields['id_materia_prima'].choices = (('', '---------'),)
+        self.fields['id_materia_prima'].widget.attrs.update({'disabled': 'true'})
 
 class RecursoForm(forms.ModelForm):
     scope_prefix = 'recurso_data'
@@ -72,27 +76,53 @@ class MateriaPrimaForm(forms.ModelForm):
             'id_materia_prima'
         ]
 
+
 class ProveedorCompraForm(forms.ModelForm):
     scope_prefix = 'proveedor_data'
     form_name = 'proveedor_form'
+    is_credito = forms.BooleanField(
+        label='¿La compra es al crédito?',
+        help_text='Indique si está factura será pagada al crédito ya sea total o parcialmente'
+    )
+    is_contado = forms.BooleanField(
+        label='¿La compra es al contado?',
+        help_text='Indique si está factura será pagada al contado ya sea total o parcialmente'
+    )
+    proporcion = forms.DecimalField(
+        label='Proporcion',
+        help_text='Ingrese la proporcion de la compra que será al credito',
+        decimal_places=2
+    )
     class Meta:
         model = Proveedor
         fields = [
-            'nombre_proveedor'
+            'nombre_proveedor',
+            'is_credito',
+            'is_contado',
+            'proporcion'
         ]
 
     def __init__(self, *args, **kwargs):
-        super(ProveedorForm, self).__init__(*args,**kwargs)
+        super(ProveedorCompraForm, self).__init__(*args,**kwargs)
         self.fields['nombre_proveedor'] = forms.ModelChoiceField(
             label='Proveedor',
             queryset=Proveedor.objects.all(),
             help_text='Seleccione el proveedor al que se le comprará la materia prima',
             widget=forms.Select(
                 attrs={
-                    'onchange': 'getMateria("id_id_proveedor", "id_id_materia_prima")'
+                    'onchange': 'getMateria("id_nombre_proveedor", "id_id_materia_prima")'
                 }
             )
         )
+        self.fields['proporcion'].widget.attrs.update({
+            'min':'0',
+            'max':'100',
+            'step':0.01,
+            'disabled':True
+        })
+        self.fields['is_contado'].widget.attrs.update({'onchange':'getCheckbox()', 'checked': 'checked'})
+        self.fields['is_credito'].widget.attrs.update({'onchange':'getCheckbox()'})
+
 
 class ProveedorForm(forms.ModelForm):
     scope_prefix = 'proveedor_data'

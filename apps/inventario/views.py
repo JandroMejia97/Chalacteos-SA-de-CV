@@ -10,6 +10,7 @@ from django.template import loader
 from django.urls import reverse_lazy, reverse
 from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from .models import *
@@ -98,17 +99,6 @@ class MateriasPrimasListView(LoginRequiredMixin, ListView):
 	template_name = 'inventario/gestionarMateriaPrima.html'
 	context_object_name = 'materiales'
 
-	"""def get_queryset(self):
-					 = MateriaPrima.objects.all()
-					if context:
-						return context
-					else:
-						return render(self.request, template_name='404.html')
-			
-				def get_context_data(self, **kwargs):
-					context = super(MateriasPrimasListView, self).get_context_data(**kwargs)
-					return context"""
-
 
 class ProveedorCreateView(LoginRequiredMixin, CreateView):
 	model = Proveedor
@@ -147,7 +137,7 @@ class DetalleCompraCreateView(LoginRequiredMixin, CreateView):
 	fields = [
 		'id_materia_prima',
 		'cantidad_detalle'
-	]
+	] 
 
 class VentaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedVentaForm.html'
@@ -165,11 +155,79 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		context['proveedor_form'] = ProveedorForm()
-		context['materia_prima_form'] = MateriaPrima()
-		context['compra_form'] = CompraForm()
+		context['compra_form'] = ProveedorCompraForm()
 		context['detalle_compra_form'] = DetalleCompraForm()
+		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
+	
+	def post(self, request, *args, **kwargs):
+		
+		return redirect(self.success_url)
+
+	def post(self, request, *args, **kwargs):
+		sub_total_compra = float(request.POST['totalCompra'])
+		totales_data =  request.POST['totales'].split(',')
+		proveedores_data = request.POST['proveedores'].split(',')
+		materiales_data = request.POST['materiales'].split(',')
+		cantidades_data = request.POST['cantidades'].split(',')
+
+		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
+		iva = sub_total_compra*float(impuesto.tasa_impuesto)
+		total = iva + sub_total_compra
+		if(request.POST.get('isCredito')):
+			is_credito = request.POST['isCredito']
+			if is_credito:
+				factura = Factura.objects.create(
+					sub_total_factura=sub_total_compra,
+					total_factura=total,
+					monto_aplicacion=iva,
+					is_credito=True,
+					is_contado=False
+				)
+			else:
+				factura = Factura.objects.create(
+					sub_total_factura=sub_total_compra,
+					total_factura=total,
+					monto_aplicacion=iva,
+					is_credito=False,
+					is_contado=True
+				)
+		else:
+			proporcion = float(request.POST['proporcion'])
+			factura = Factura.objects.create(
+				sub_total_factura=sub_total_compra,
+				total_factura=total,
+				monto_aplicacion=iva,
+				is_credito=True,
+				is_contado=True,
+				proporcion=proporcion
+			)
+
+		compra = Compra.objects.create(
+			id_factura=factura
+		)
+
+		for i in range(0, len(proveedores_data)-1):
+			materia_prima = MateriaPrima.objects.get(id_materia_prima=materiales_data[i])
+			recurso = Recurso.objects.get(id_recurso=materia_prima.id_recurso.id_recurso)
+			kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+			totales_data[i]=float(totales_data[i])
+			cantidades_data[i]=int(cantidades_data[i])
+			movimiento = Movimiento.objects.create(
+				id_kardex=kardex,
+				cantidad_movimiento=cantidades_data[i],
+				costo_unitario_movimiento=totales_data[i]/cantidades_data[i],
+				monto_movimiento=totales_data[i],
+				is_Input=True,
+			)
+			movimiento.cantidad_saldo = get_existencias(kardex)
+			movimiento.monto_saldo = get_monto(kardex)
+			movimiento.costo_unitario_saldo = get_costo(kardex)
+			movimiento.save()
+			compra.id_proveedor.add(proveedores_data[i])
+		message = 'La compra ha sido registrada'
+		return JsonResponse(data={'message': message, 'success_url': self.success_url})
+
 
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 	model = Impuesto
@@ -181,6 +239,7 @@ class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 		'descripcion_impuesto',
 		'tasa_impuesto'
 	]
+
 
 class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedMateriaPrimaForm.html'
@@ -223,6 +282,7 @@ class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_titular_proveedor'
 	]
 
+
 class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 	model = Cliente
 	template_name = 'editForm.html'
@@ -232,6 +292,7 @@ class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_cliente',
 		'nombre_titular_cliente'
 	]
+
 
 class ImpuestoUpdateView(LoginRequiredMixin, UpdateView):
 	model = Impuesto
@@ -288,6 +349,7 @@ class ProveedorDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'proveedor'
 
+
 class ClienteDetailView(LoginRequiredMixin, DetailView):
 	model = Cliente
 	template_name = 'inventario/viewCliente.html'
@@ -298,6 +360,7 @@ class ClienteDetailView(LoginRequiredMixin, DetailView):
 		'nombre_titular_cliente'
 	]
 	context_object_name = 'cliente'
+
 
 class ImpuestoDetailView(LoginRequiredMixin, DetailView):
 	model = Impuesto
@@ -318,10 +381,10 @@ class MateriaPrimaDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'nombre_proveedor',
 		'nombre_recurso',
-		'descripcion_recurso'
+		'descripcion_recurso',
+		'unidad_medida'
 	]
 	context_object_name = 'materia_prima'
-
 
 def proveedores(request, id_proveedor):   
     if request.method == 'DELETE':
@@ -358,14 +421,56 @@ def materiales(request, id_materia_prima):
 def load_materia(request):
 	if request.method == 'GET':
 		id_proveedor = request.GET['id_proveedor']
-		materiales = MateriaPrima.objects.all().filter(id_proveedor=id_proveedor).values()
-		if materias:
+		materiales = MateriaPrima.objects.filter(id_proveedor=id_proveedor)
+		recursos = ""
+		ident = ""
+		for material in materiales:
+			result = Recurso.objects.get(id_recurso=material.id_recurso.id_recurso)
+			ident += str(result.id_recurso)+"-"
+			recursos += str(result.nombre_recurso)+"-"
+
+		materiales = materiales.values()
+
+		if recursos:
 			data = {
-				'message': "Datos recuperados",
-				'materiales': list(materiales)
+				'message': 'Datos recuperados',
+				'identificador': ident,
+				'nombres': recursos
 			}
 		else:
 			data = {
-				'message': "La materia seleccionada no posee datos"
+				'message': "No se le han registrado materias primas al proveedor seleccionado"
 			}
 		return JsonResponse(data=data)
+
+@login_required(login_url='/sign-in/')
+def get_movimientos(request, id_kardex):
+	movimientos = Movimiento.objects.filter(id_kardex=id_kardex).order_by('fecha_movimiento')
+	if movimientos:
+		kardex = Kardex.objects.get(id_kardex=id_kardex)
+		return render(request, template_name='inventario/viewKardex.html', context={'movimientos': movimientos, 'kardex': kardex})
+	else:
+		return render(request, template_name='404.html')
+
+def get_existencias(id_kardex):
+    entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_entradas=models.Sum('cantidad_movimiento'))
+    salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_salidas=models.Sum('cantidad_movimiento'))
+    return entradas['total_entradas']-salidas['total_salidas']
+
+def get_monto(id_kardex):
+    monto_entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_monto=models.Sum('monto_movimiento'))
+    monto_salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_monto=models.Sum('monto_movimiento'))
+    return monto_entradas['total_monto']-monto_salidas['total_monto']
+
+def get_costo(id_kardex):
+    costo = get_monto(id_kardex)/get_existencias(id_kardex)
+    return costo
+
+def verkardex(request):
+	movimientos = Movimiento.objects.all()
+	saldos = Saldo.objects.all()
+	context = {
+		'movimientos':movimientos,
+		'saldos':saldos,
+	}
+	return render(request,'inventario/verKardex.html',context)

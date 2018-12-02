@@ -127,6 +127,11 @@ urlpatterns = [
 		views.CuentaDetailView.as_view(),
 		name='movimiento-detalle'
 	),
+	re_path(
+		'ajax/cuenta/',
+		views.load_sub_cuenta,
+		name='ajax-subcuenta'
+	),
 	path(
 		'ajax/transaccion/',
 		views.TransaccionCreateView.as_view(),
@@ -147,9 +152,9 @@ urlpatterns = [
         views.PerfilUpdateView.as_view(),
         name='perfil-edicion'
     ),
-	re_path(
-		'ajax/cuenta/',
-		views.load_sub_cuenta,
-		name='ajax-subcuenta'
-	)
+    re_path(
+        r'ajax/estados_financieros(?P<id_estado_financiero>[0-9]+)/',
+        views.estados_financieros,
+        name='ajax-estados_financieros'
+    ),
 ]

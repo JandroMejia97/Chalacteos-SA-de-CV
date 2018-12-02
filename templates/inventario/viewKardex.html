@@ -1,0 +1,104 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Ver Kardex{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Kardex</a>
+          </li>
+          <li class="breadcrumb-item active"></li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="alert bold alert-info text-center">
+          <a href="{% url 'inventario:compra-crear' %}">
+            <button class="btn btn-primary btn-plus"  type="button">
+              Registrar Compras
+              <i class="fas fa-plus-circle"></i>
+            </button>
+          </a>
+          <a href="{% url 'inventario:venta-crear' %}">
+            <button class="btn btn-primary btn-plus"  type="button">
+              Registrar Venta
+              <i class="fas fa-plus-circle"></i>
+            </button>
+          </a>
+        </div>
+        <div class="alert bold alert-info text-center">
+          <strong>Registro de Entradas y Salidas de {{kardex}}</strong>
+        </div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            kardex
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" data-sort-order="desc">
+                <thead>
+                  <tr>
+                    <tr class="text-center">
+                      <th rowspan="2" style="vertical-align: middle !important">Fecha</th>
+                      <th colspan="3" style="vertical-align: middle !important">Entradas</th>
+                      <th colspan="3" style="vertical-align: middle !important">Salidas</th>
+                      <th colspan="3" style="vertical-align: middle !important">Saldo</th>
+                    </tr>
+                    <tr class="text-center">
+                      <th style="vertical-align: middle !important">Cantidad</th>
+                      <th style="vertical-align: middle !important">Costo Unitario</th>
+                      <th style="vertical-align: middle !important">Monto</th>
+                      <th style="vertical-align: middle !important">Cantidad</th>
+                      <th style="vertical-align: middle !important">Costo Unitario</th>
+                      <th style="vertical-align: middle !important">Monto</th>
+                      <th style="vertical-align: middle !important">Cantidad</th>
+                      <th style="vertical-align: middle !important">Costo Unitario</th>
+                      <th class="border-right" style="vertical-align: middle !important">Monto</th>
+                    </tr>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for movimiento in movimientos %}
+                        <tr id="{{ movimiento.id_movimiento }}" class="text-center">
+                          <td><strong>{{ movimiento.fecha_movimiento|date:"d/m/Y h:i:s A" }}</strong></td>
+                          {% if movimiento.is_Input %}
+                            <td>{{ movimiento.cantidad_movimiento }}</td>
+                            <td>{{ movimiento.costo_unitario_movimiento }}</td>
+                            <td>{{ movimiento.monto_movimiento }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                          {% else %}
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ movimiento.cantidad_movimiento }}</td>
+                            <td>{{ movimiento.costo_unitario_movimiento }}</td>
+                            <td>{{ movimiento.monto_movimiento }}</td>
+                          {% endif %}
+                          <td>{{ movimiento.cantidad_saldo }}</td>
+                          <td>{{ movimiento.costo_unitario_saldo }}</td>
+                          <td>{{ movimiento.monto_saldo }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}

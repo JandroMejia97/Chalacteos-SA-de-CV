@@ -36,6 +36,11 @@ urlpatterns = [
 		views.ImpuestosListView.as_view(),
 		name='impuestos'
 	),
+	re_path(
+		r'kardex/(?P<id_kardex>[0-9]+)/',
+		views.get_movimientos,
+		name='kardex'
+	),
 	path(
 		'crear/proveedor/',
 		views.ProveedorCreateView.as_view(),
@@ -102,8 +107,8 @@ urlpatterns = [
 		name='impuesto-detalle'
 	),
 	path(
-		'detalle/materia_prima/<slug:pk>/',
-		views.MateriaPrimaDetailView.as_view(),
+		'detalle/material/<slug:pk>/',
+		views.RecursoDetailView.as_view(),
 		name='materia-prima-detalle'
 	),
 	re_path(
@@ -126,6 +131,11 @@ urlpatterns = [
         views.materiales,
         name='ajax-materia-prima'
     ),
+	path(
+		'ajax/compra/',
+		views.CompraCreateView.as_view(),
+		name='ajax-compra'
+	),
     re_path(
 		'ajax/compra/',
 		views.load_materia,

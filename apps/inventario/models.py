@@ -19,6 +19,14 @@ class Recurso(models.Model):
         max_length=250,
         help_text="Una breve descripción del recurso"
     )
+    unidad_medida = models.CharField(
+        verbose_name='Unidad de medida',
+        blank=False,
+        default=None,
+        max_length=50,
+        null=True,
+        help_text="Unidad de medida del recurso. Por ejemplo: libras, litros etc."
+    )
 
     def __str__(self):
         return self.nombre_recurso
@@ -112,31 +120,6 @@ class Movimiento(models.Model):
         default=True,
         help_text="Defina si esta transacción es una entrada o salida de materia prima o producto"
     )
-
-    def transaction_date(self):
-        self.fecha_movimiento = timezone.now()
-        self.save()
-
-    def __str__(self):
-        return self.fecha_movimiento
-
-    class Meta:
-        verbose_name = 'Movimiento'
-        verbose_name_plural = 'Movimientos'
-        get_latest_by = 'fecha_movimiento'
-        ordering = ['-fecha_movimiento']
-
-
-class Saldo(models.Model):
-    id_saldor = models.AutoField(
-        primary_key=True
-    )
-    id_movimiento =models.OneToOneField(
-        Movimiento,
-        on_delete=models.DO_NOTHING,
-        blank=False,
-        help_text='Seleccion el movimiento al que le corresponde el saldo'
-    )
     cantidad_saldo = models.DecimalField(
         verbose_name='Cantidad',
         max_digits=1000,
@@ -148,7 +131,8 @@ class Saldo(models.Model):
                 message="Este campo debe ser positivo"
             )
         ],
-        help_text="Ingrese la cantidad actual del producto o materia prima"
+        help_text="Ingrese la cantidad actual del producto o materia prima",
+        null=True
     )
     costo_unitario_saldo = models.DecimalField(
         verbose_name='Costo Unitario',
@@ -161,7 +145,8 @@ class Saldo(models.Model):
                 message="Este campo debe ser positivo"
             )
         ],
-        help_text="Ingrese el costo unitario del producto o materia prima"
+        help_text="Ingrese el costo unitario del producto o materia prima",
+        null=True
     )
     monto_saldo = models.DecimalField(
         verbose_name='Monto',
@@ -174,17 +159,24 @@ class Saldo(models.Model):
                 message="Este campo debe ser positivo"
             )
         ],
-        help_text="Este campo es auto generado"
+        help_text="Este campo es auto generado",
+        null=True
     )
 
+    def transaction_date(self):
+        self.fecha_movimiento = timezone.now()
+        self.save()
+
     def __str__(self):
-        return self.id_saldor
+        return str(self.fecha_movimiento)
+
 
     class Meta:
-        verbose_name = 'Saldo'
-        verbose_name_plural = 'Saldos'
-        ordering = ['id_movimiento']
-    
+        verbose_name = 'Movimiento'
+        verbose_name_plural = 'Movimientos'
+        get_latest_by = 'fecha_movimiento'
+        ordering = ['-fecha_movimiento']
+
 
 class Producto(models.Model):
     id_producto = models.AutoField(
@@ -198,9 +190,6 @@ class Producto(models.Model):
         help_text='Seleccione el recurso del producto'
     )
     
-    def __str__(self):
-        return str(self.id_recurso)
-
     def __str__(self):
         return str(self.id_recurso)
 
@@ -338,6 +327,32 @@ class Factura(models.Model):
         ],
         help_text="Ingrese el recargo por el impuesto a la compra o venta"
     )
+    is_credito = models.BooleanField(
+        verbose_name='¿La compra es al crédito?',
+        default=False,
+        help_text='Indique si está factura será pagada al crédito ya sea total o parcialmente'
+    )
+    is_contado = models.BooleanField(
+        verbose_name='¿La compra es al contado?',
+        default=False,
+        help_text='Indique si está factura será pagada al contado ya sea total o parcialmente'
+    )
+    proporcion = models.DecimalField(
+        verbose_name='proporcion de compra al credito',
+        decimal_places=2,
+        max_digits=5,
+        null=True,
+        validators=[
+            MinValueValidator(
+                0, 
+                message='Este campo debe ser positivo'
+            ),
+            MaxValueValidator(
+                100, 
+                message='La proporcion debe ser menor 100'
+            )
+        ]
+    )
 
     def __str__(self):
         return '{}'.format(self.id_factura)
@@ -380,10 +395,9 @@ class Compra(models.Model):
     id_compra = models.AutoField(
         primary_key=True
     )
-    id_proveedor = models.ForeignKey(
+    id_proveedor = models.ManyToManyField(
         Proveedor,
         verbose_name='Proveedor',
-        on_delete=models.DO_NOTHING,
         blank=False,
         help_text='Seleccion el proveedor al que le pertenece la compra'
     )
@@ -401,7 +415,7 @@ class Compra(models.Model):
     class Meta:
         verbose_name = 'Compra'
         verbose_name_plural = 'Compras'
-        ordering = ['id_factura','id_proveedor']
+        ordering = ['id_factura']
 
 
 class Detalle(models.Model):
@@ -494,41 +508,3 @@ class Impuesto(models.Model):
         verbose_name = "Impuesto"
         verbose_name_plural = "Impuestos"
         ordering = ['nombre_impuesto', 'tasa_impuesto']
-
-
-class FacturaImpuesto(models.Model):
-    id_aplicacion = models.AutoField(
-        primary_key=True
-    )
-    id_factura = models.ForeignKey(
-        Factura,
-        on_delete=models.DO_NOTHING,
-        verbose_name='Factura',
-        null=True,
-        help_text='Seleccione la factura que se aplicara en la factura con impuesto'
-    )
-    id_impuesto = models.ForeignKey(
-        Impuesto,
-        on_delete=models.DO_NOTHING,
-        verbose_name='Impuesto',
-        null=True,
-        help_text='Seleccione el impuesto que se aplicara a la factura con impuesto'
-    )
-    monto_aplicacion = models.DecimalField(
-        verbose_name='Monto Aplicado',
-        max_digits=1000,
-        decimal_places=2,
-        blank=False,
-        validators=[
-            MinValueValidator(
-                0, 
-                message="Este campo debe ser positivo"
-            )
-        ],
-        help_text="Ingrese el recargo por el impuesto a la compra o venta"
-    )
-
-    class Meta:
-        verbose_name = 'Factura - Impuesto'
-        verbose_name_plural = 'Facturas - Impuestos'
-        ordering = ['id_factura', 'id_impuesto']

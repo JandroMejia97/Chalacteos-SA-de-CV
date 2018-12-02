@@ -1,0 +1,65 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión de Cuentas{% endblock title %}
+
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión de Cuentas{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebar.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <!--<ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Historial de Estados Financieros</a>
+          </li>
+          <li class="breadcrumb-item active">Estados Financieros</li>
+        </ol>-->
+        <!-- DataTables Example -->
+        <!--<div class="alert bold alert-info">
+          <i class="fas fw fa-plus-circle"></i>
+          <a href="{% url 'contabilidad:cuenta-crear' %}">
+            <strong>¡Click Aquí para agregar una nueva cuenta al catálogo!</strong>
+          </a>
+        </div>-->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Balance General o Estado de Situación Financiera
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <tbody>
+                    <tr>
+                      <td colspan="2" class="text-center">{{estado_financiero.id_empresa}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="text-center">{{estado_financiero.nombre_estado_financiero}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="text-center">{{estado_financiero.id_periodo_contable}}</td>
+                    </tr>
+                    <tr>
+                      <td>ACTIVO</td>
+                      <td>PATRIMONIO</td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}
