@@ -19,9 +19,16 @@ class MovimientoForm(forms.ModelForm):
         fields = [
             'costo_unitario_movimiento'
         ]
-    def __init__(self, *args, **kwargs):
-        super(MovimientoForm, self).__init__(*args,**kwargs)
-        self.fields['costo_unitario_movimiento'].fields = co
+
+class RecursoProductoForm(forms.ModelForm):
+    scope_prefix = 'producto_data'
+    form_name = 'producto_form'
+
+    class Meta:
+        model = Recurso
+        fields = [
+            'nombre_recurso'
+        ]
 
 class DetalleVentaForm(forms.ModelForm):
     scope_prefix = 'detalle_venta_data'

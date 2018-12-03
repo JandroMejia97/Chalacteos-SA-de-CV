@@ -15,6 +15,7 @@ from django.utils import timezone
 
 from .models import *
 from .forms import *
+from apps.contabilidad import views as conta
 
 import json
 import csv
@@ -94,7 +95,6 @@ class ImpuestosListView(LoginRequiredMixin, ListView):
 	template_name = 'inventario/gestionarImpuestos.html'
 	context_object_name = 'impuestos'
 
-
 class MateriasPrimasListView(LoginRequiredMixin, ListView):
 	model = MateriaPrima
 	template_name = 'inventario/gestionarMateriaPrima.html'
@@ -121,7 +121,6 @@ class ClienteCreateView(LoginRequiredMixin, CreateView):
 		'nombre_titular_cliente'
 	]
 
-
 class DetalleVentaCreateView(LoginRequiredMixin, CreateView):
 	model = Detalle
 	template_name = 'inventario/chainedVentaForm.html'
@@ -146,13 +145,15 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(VentaCreateView,self).get_context_data(**kwargs)
-		producto= Producto.objects.get(id_recurso=1)
-		recurso = Recurso.objects.get(nombre_recurso=producto)
+		producto= Producto.objects.get(id_producto=1)
+		recurso = Recurso.objects.get(nombre_recurso=producto.id_recurso)
 		kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
-		movimiento.costo_unitario_saldo = get_costo(kardex)
+		movimiento = Movimiento.objects.get(id_kardex=kardex.id_kardex)
 
+		if 'producto_form' not in context:
+			context['producto_form'] = RecursoProductoForm(instance=recurso)
 		if 'movimiento_form' not in context:
-			context['movimiento_form'] = MovimientoForm(instance=movimiento.costo_unitario_saldo)
+			context['movimiento_form'] = MovimientoForm(instance=movimiento)
 		context['id_producto'] = producto
 		return context
 
@@ -160,7 +161,6 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 		context = self.get_context_data(**kwargs)
 		context['venta_form'] = ClienteVentaForm()
 		context['detalle_venta_form'] = DetalleVentaForm()
-		context['movimiento_form'] = MovimientoForm()
 		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
 
@@ -168,6 +168,7 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 		sub_total_venta = float(request.POST['totalVenta'])
 		totales_data =  request.POST['totales'].split(',')
 		clientes_data = request.POST['clientes'].split(',')
+		producto_data = request.POST['productos'].split(',')
 		cantidades_data = request.POST['cantidades'].split(',')
 
 		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
@@ -182,7 +183,7 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 			is_credito = request.POST['isCredito']
 			if is_credito:
 				data['venta'] = 'CREDITO'
-				transaccion = conta.registrar_transaccion(data)
+				#transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_venta,
 					total_factura=total,
@@ -192,7 +193,7 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 				)
 			else:
 				data['venta'] = 'CONTADO'
-				transaccion = conta.registrar_transaccion(data)
+				#transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_venta,
 					total_factura=total,
@@ -202,8 +203,8 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 				)
 		else:
 			data['proporcion'] = float(request.POST['proporcion'])
-			data['compra'] = 'PROPORCION'
-			transaccion = conta.registrar_transaccion(data)
+			data['venta'] = 'PROPORCION'
+			#transaccion = conta.registrar_transaccion(data)
 			factura = Factura.objects.create(
 				sub_total_factura=sub_total_venta,
 				total_factura=total,
@@ -219,7 +220,7 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 		)
 
 		for i in range(0, len(clientes_data)-1):
-			producto = Producto.objects.get(id_producto=1)
+			producto = Producto.objects.get(id_producto=producto_data[i])
 			recurso = Recurso.objects.get(id_recurso=producto.id_recurso.id_recurso)
 			kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
 			totales_data[i]=float(totales_data[i])
@@ -227,7 +228,7 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 			movimiento = Movimiento.objects.create(
 				id_kardex=kardex,
 				cantidad_movimiento=cantidades_data[i],
-				costo_unitario_movimiento=totales_data[i]/cantidades_data[i],
+				costo_unitario_movimiento=get_costo_unitario_venta(producto),
 				monto_movimiento=totales_data[i],
 				is_Input=True,
 			)
@@ -240,7 +241,6 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 				venta.id_cliente.add(clientes_data[i])
 		message = 'La venta ha sido registrada'
 		return JsonResponse(data={'message': message, 'success_url': self.success_url})
-
 
 class CompraCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedCompraForm.html'
@@ -335,7 +335,6 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		message = 'La compra ha sido registrada'
 		return JsonResponse(data={'message': message, 'success_url': self.success_url})
 		
-
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 	model = Impuesto
 	template_name = 'editForm.html'
@@ -346,7 +345,6 @@ class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 		'descripcion_impuesto',
 		'tasa_impuesto'
 	]
-
 
 class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedMateriaPrimaForm.html'
@@ -389,7 +387,6 @@ class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_titular_proveedor'
 	]
 
-
 class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 	model = Cliente
 	template_name = 'editForm.html'
@@ -399,7 +396,6 @@ class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_cliente',
 		'nombre_titular_cliente'
 	]
-
 
 class ImpuestoUpdateView(LoginRequiredMixin, UpdateView):
 	model = Impuesto
@@ -456,7 +452,6 @@ class ProveedorDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'proveedor'
 
-
 class ClienteDetailView(LoginRequiredMixin, DetailView):
 	model = Cliente
 	template_name = 'inventario/viewCliente.html'
@@ -467,7 +462,6 @@ class ClienteDetailView(LoginRequiredMixin, DetailView):
 		'nombre_titular_cliente'
 	]
 	context_object_name = 'cliente'
-
 
 class ImpuestoDetailView(LoginRequiredMixin, DetailView):
 	model = Impuesto
@@ -492,6 +486,17 @@ class MateriaPrimaDetailView(LoginRequiredMixin, DetailView):
 		'unidad_medida'
 	]
 	context_object_name = 'materia_prima'
+
+class RecursoDetailView(LoginRequiredMixin, DetailView):
+	model = Kardex
+	template_name = 'inventario/viewKardex.html'
+	success_url = reverse_lazy('inventario:kardex')
+	fields = [
+		'nombre_proveedor',
+		'nombre_recurso',
+		'descripcion_recurso',
+		'unidad_medida'
+	]
 
 @login_required(login_url='/sign-in/')
 def proveedores(request, id_proveedor):   
@@ -585,6 +590,19 @@ def get_costo(id_kardex):
 		costo = get_monto(id_kardex)/get_existencias(id_kardex)
     
 	return float(costo)
+
+def get_costo_unitario_venta(request, id):
+	producto= Producto.objects.filter(id_producto=id)
+	recurso = Recurso.objects.get(nombre_recurso=producto.id_recurso)
+	kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+	movimiento = Movimiento.objects.get(id_kardex=kardex.id_kardex)
+
+	if 'producto_form' not in context:
+		context['producto_form'] = RecursoProductoForm(instance=recurso)
+	if 'movimiento_form' not in context:
+		context['movimiento_form'] = MovimientoForm(instance=movimiento)
+	context['id_producto'] = producto
+	return context
 
 def import_data_proveedor(request):
 	f = 'C:\\proveedores.csv'

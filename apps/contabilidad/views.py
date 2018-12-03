@@ -19,6 +19,7 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
+import datetime
 import csv
 import json
 
@@ -127,33 +128,17 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 		context = self.get_context_data(**kwargs)
 		context['transaccion_form'] = TransaccionForm()
 		context['movimiento_form'] = MovimientoForm()
+		context['fecha'] = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[:1]
 		return self.render_to_response(context)
-
-	def put(self, request, *args, **kwargs):
-		request_data = json.loads(request.body)
-		transaccion_form = TransaccionForm(
-			data=request_data.get(TransaccionForm.scope_prefix, {})
-		)
-		response_data = {}
-
-		if transaccion_form.is_valid():
-			response_data.update({
-				'success_url': self.success_url
-			})
-			return JsonResponse(response_data)
-		
-		response_data.update({
-			transaccion_form.form_name: transaccion_form.errors,
-		})
-		return JsonResponse(response_data, status=422)
 
 	def post(self, request, *args, **kwargs):
 		periodo = PeriodoContable.objects.all().last()
-		ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
+		ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo).count()
 
 		abonos_str = request.POST['abonos']
 		cargos_str = request.POST['cargos']
 		codigos_cuentas_str = request.POST['codigo_cuentas']
+		fecha = request.POST['fecha']
 		
 		abonos_data = abonos_str.split(',')
 		cargos_data = cargos_str.split(',')
@@ -181,11 +166,12 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 			if total_abonos == monto_transaccion:
 
 				transaccion = Transaccion.objects.create(
-					id_perido_contable=periodo,
+					id_periodo_contable=periodo,
 					id_tipo=tipo,
 					numero_transaccion=ultima_transaccion+1,
 					descripcion_transaccion=request.POST['descripcion'],
-					monto_transaccion=monto_transaccion
+					monto_transaccion=monto_transaccion,
+					fecha_transaccion=fecha
 				)
 
 				for i in range(0, len(codigos_cuentas_data)-1):
@@ -331,7 +317,7 @@ class BalanceGeneralDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'balance_general'
 
@@ -342,7 +328,7 @@ class EstadoResultadosDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'estado_resultados'
 
@@ -353,7 +339,7 @@ class BalanceComprobacionDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'balance_comprobacion'
 
@@ -364,10 +350,139 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'estado_capital'
-	
+
+def get_movimientos(request, id_transaccion):
+	context = {}
+	context['transaccion'] = Transaccion.objects.get(id_transaccion=id_transaccion)
+	if context['transaccion']:
+		context['movimientos'] = Movimiento.objects.filter(id_transaccion=context['transaccion'])
+		return render(request, template_name='contabilidad/viewTransaccion.html', context=context)
+	else:
+		return render(request, template_name='404.html')
+
+def registrar_transaccion(data):
+	periodos = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[:1]
+	periodo_instance = None
+	for periodo in periodos:
+		periodo_instance = periodo
+	ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo_instance).count()
+	tipo = None
+	transaccion = Transaccion.objects.create(
+		id_periodo_contable=periodo_instance,
+		id_tipo=tipo,
+		numero_transaccion=ultima_transaccion,
+		fecha_transaccion=datetime.datetime.now(),
+		descripcion_transaccion='Compra de materia prima',
+		monto_transaccion=data['total']
+	)
+	cuentas = {}
+	if data['tipo'] == 'COMPRA':
+		cuentas['inv_mp'] = Cuenta.objects.get(codigo_cuenta=111101)
+		cuentas['iva'] = Cuenta.objects.get(codigo_cuenta=2110)
+		if data['compra'] == 'CREDITO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CREDITO')
+			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
+			movimiento_abono = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cp'],
+				monto_cargo=None,
+				monto_abono=data['total']
+			)
+		elif data['compra'] == 'CONTADO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CONTADO')
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
+			movimiento_abono = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=None,
+				monto_abono=data['total']
+			)
+		elif data['compra'] == 'PROPORCION':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA PARCIALMENTE AL CREDITO')
+			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
+			movimiento_abono1 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=None,
+				monto_abono=data['total']*(1-data['proporcion'])
+			)
+			movimiento_abono2 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cp'],
+				monto_cargo=None,
+				monto_abono=data['total']*data['proporcion']
+			)
+		transaccion.id_tipo = tipo
+		transaccion.save()
+		inventario_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['inv_mp'],
+			monto_cargo=data['sub_total'],
+			monto_abono=None
+		)
+		iva_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['iva'],
+			monto_cargo=data['iva'],
+			monto_abono=None
+		)
+	elif data['tipo'] == 'VENTA':
+		cuentas['inv_pt'] = Cuenta.objects.get(codigo_cuenta=111104)
+		cuentas['iva'] = Cuenta.objects.get(codigo_cuenta=2111)
+		if data['venta'] == 'CREDITO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA AL CREDITO')
+			cuentas['cc'] = Cuenta.objects.get(codigo_cuenta=1104)
+			movimiento_cargo = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cc'],
+				monto_cargo=data['total'],
+				monto_abono=None
+			)
+		elif data['venta'] == 'CONTADO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA AL CONTADO')
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
+			movimiento_cargo = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=data['total'],
+				monto_abono=None
+			)
+		elif data['venta'] == 'PROPORCION':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA PARCIALMENTE AL CREDITO')
+			cuentas['cc'] = Cuenta.objects.get(codigo_cuenta=1104)
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
+			movimiento_cargo1 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=data['total']*(1-data['proporcion']),
+				monto_abono=None
+			)
+			movimiento_cargo2 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				id_cuenta=cuentas['cc'],
+				monto_cargo=data['total']*data['proporcion'],
+				monto_abono=None
+			)
+		transaccion.id_tipo = tipo
+		transaccion.save()
+		inventario_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['inv_pt'],
+			monto_cargo=None,
+			monto_abono=data['sub_total']
+		)
+		iva_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['iva'],
+			monto_cargo=None,
+			monto_abono=data['iva']
+		)
+	return transaccion
+			
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
     if request.method == 'DELETE':
@@ -459,5 +574,20 @@ def import_data_cuenta(request):
 					is_alta=is_alta,
 					id_rubro=id_rubro,
 					codigo_cuenta_padre=codigo_cuenta_padre
+				)
+	return HttpResponse('Hecho')
+
+def import_data_transaccion(self):
+	f = 'C:\\tipo_transaccion.csv'
+	with open(f) as file:
+		reader = csv.reader(file)
+		for new in reader:
+			row=new[0].split(";")
+			if row[0] != "id_tipo":
+				nombre_tipo = new[1]
+				descripcion_tipo = new[2]
+				objecto, created = TipoTransaccion.objects.update_or_create(
+					nombre_tipo=nombre_tipo,
+					descripcion_tipo=descripcion_tipo
 				)
 	return HttpResponse('Hecho')

@@ -38,6 +38,7 @@
                     <br>
                     <div  class="col-lg-6 col-xs-12">
                       <h4 class="mb-3 text-center header_id">PRODUCTO</h4>
+                      {{ producto_form|bootstrap_inline }}
                       {{ detalle_venta_form|bootstrap_inline }}
                       {{ movimiento_form|bootstrap_inline }}
                     </div>
@@ -58,11 +59,12 @@
               </div>
               <div class="card-body">
                 <div class="table-responsive">
-                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <table class="table table-bordered" width="100%" cellspacing="0">
                     <thead>
                       <tr>
                         <th class="text-center">#</th>
-                        <th>Cliente</th>               
+                        <th>Cliente</th>  
+                        <th>Producto</th>             
                         <th>Cantidad</th>
                         <th>Precio Unitario</th>
                         <th>SubTotal</th>
@@ -73,23 +75,23 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th colspan="4" class="text-right">Sub Total</th>
+                        <th colspan="5" class="text-right">Sub Total</th>
                         <th class="text-center" id="subTotal">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Total IVA</th>
+                        <th colspan="5" class="text-right">Total IVA</th>
                         <th class="text-center" id="iva">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Contado</th>
+                        <th colspan="5" class="text-right">Contado</th>
                         <th class="text-center" id="contado">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Crédito</th>
+                        <th colspan="5" class="text-right">Crédito</th>
                         <th class="text-center" id="credito">$ 0.00</th>
                       </tr>
                       <tr>
-                        <th colspan="4" class="text-right">Total</th>
+                        <th colspan="5" class="text-right">Total</th>
                         <th class="text-center" id="total">$ 0.00</th>
                       </tr>
                     </tfoot>
@@ -111,8 +113,9 @@
               var totales = "";
               var clientes = "";
               var cantidades = "";
+              var productos = "";
               var proporcion =  0;
-              var codigocliente = null;
+              var codigoCliente = null;
               var contado = 0;
               var credito = 0;
               var isContado = true;
@@ -137,25 +140,26 @@
               function getData(){
                 console.log("ADDROWS")
                 count = count + 1;
-                codigocliente = $("#id_nombre_cliente").val();
+                codigoCliente = $("#id_nombre_cliente").val();
 
-                var cbcliente = document.getElementById("id_nombre_cliente");
+                var cbCliente = document.getElementById("id_nombre_cliente");
                     
-                var cliente = cbcliente.options[cbcliente.selectedIndex].text;
-                    
+                var cliente = cbCliente.options[cbCliente.selectedIndex].text;
+                
+                var producto = $('#id_nombre_recurso').val();
                 var cantidad = parseInt($("#id_cantidad_detalle").val());
-                var precio = parseFloat($("#id_costo_unitario_movimiento").val();
+                var precio = parseFloat($("#id_costo_unitario_movimiento").val());
 
                 if(getCheckbox()){
                   proporcion =  parseFloat($("#id_proporcion").val());
                 }
 
-                if(cliente!='' && cliente!='---------' && !isNaN(cantidad) && !isNaN(precio)){
-                    addRows(cliente, cantidad, precio);
+                if(cliente!='' && cliente!='---------' && producto!='' && !isNaN(cantidad) && !isNaN(precio)){
+                    addRows(cliente, producto, cantidad, precio);
                 }
               };
 
-              function addRows(cliente, cantidad, precio){
+              function addRows(cliente, producto, cantidad, precio){
                 console.log("registro")
                 var totalFila=round(cantidad*precio);
                 totales+=totalFila+",";
@@ -170,16 +174,18 @@
                   if(isCredito){
                     credito = totalVenta;
                   }else{
-                    contado = totalVe1nta;
+                    contado = totalVenta;
                   }
                 }
-                clientes+=codigocliente+",";
+                clientes+=codigoCliente+",";
                 cantidades+=cantidad+",";
+                productos+=producto+",";
 
                 console.log("CANTIDAD");
                 $("#tbBody").append(
                   "<tr><td class='text-center'>"+count+"</td>"+
                   "<td>"+cliente+"</td>"+
+                  "<td>"+producto+"</td>"+
                   "<td class='text-center'>"+cantidad+"</td>"+
                   "<td class='text-center'>$ "+precio+"</td>"+
                   "<td class='text-center'>$ "+totalFila+"</td></tr>"
@@ -202,11 +208,12 @@
               };
 
               function sendData(){
-                if(cliente!='' && cliente!='---------' && cantidades!='' && clientes!='' && totales!=''){
+                if(cliente!='' && cliente!='---------' && productos!='' && cantidades!='' && clientes!='' && totales!=''){
                   data = {}
                   if(getData){
                     data = {
                     'clientes': clientes,
+                    'productos': productos,
                     'totales': totales,
                     'cantidades': cantidades,
                     'proporcion': proporcion
@@ -214,6 +221,7 @@
                 }else{
                   data = {
                     'clientes': clientes,
+                    'productos': productos,
                     'totales': totales,
                     'cantidades': cantidades,
                   }
@@ -246,6 +254,7 @@
                     'totalVenta': subTotalVenta,
                     'totales': totales,
                     'clientes': clientes,
+                    'productos': productos,
                     'cantidades': cantidades,
                     'proporcion': proporcion
                   }
@@ -254,6 +263,7 @@
                     'totalVenta': subTotalVenta,
                     'totales': totales,
                     'clientes': clientes,
+                    'productos': productos,
                     'cantidades': cantidades,
                     'isCredito': isCredito
                   }
