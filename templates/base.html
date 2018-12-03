@@ -109,6 +109,9 @@
                     case 'MATERIAPRIMA':
                         location.href = '/detalle/material/'+id;
                         break;
+                    case 'VENTA':
+                        location.href = '/detalle/venta/'+id;
+                        break;
                     case 'DEPARTAMENTO':
                         location.href = '/detalle/departamento/'+id;
                         break;
@@ -156,6 +159,9 @@
                         break;
                     case 'MATERIAPRIMA':
                         url = '/ajax/materiaprima/'+id;
+                        break;
+                    case 'VENTA':
+                        url = '/ajax/venta/'+id+'/';
                         break;
                     case 'DEPARTAMENTO':
                         url = '/ajax/departamento/'+id;

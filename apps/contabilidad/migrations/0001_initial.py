@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Estado Financiero',
                 'verbose_name_plural': 'Estados Financieros',
-                'ordering': ['id_perido_contable', 'nombre_estado_financiero'],
+                'ordering': ['id_periodo_contable', 'nombre_estado_financiero'],
             },
         ),
         migrations.CreateModel(
@@ -166,7 +166,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='estadofinanciero',
-            name='id_perido_contable',
+            name='id_periodo_contable',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='contabilidad.PeriodoContable', verbose_name='Período Contable'),
         ),
         migrations.AddField(

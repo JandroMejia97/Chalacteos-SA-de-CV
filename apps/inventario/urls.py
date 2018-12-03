@@ -164,4 +164,9 @@ urlpatterns = [
 		views.load_materia,
 		name='ajax-materia'
 	),
+	path(
+		'ajax/venta/',
+		views.VentaCreateView.as_view(),
+		name='ajax-venta'
+	),
 ]
