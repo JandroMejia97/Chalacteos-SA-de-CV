@@ -8,15 +8,10 @@ class EmpleadoForm(forms.ModelForm):
     class Meta:
         model = Empleado
         fields = [
-            'id_puesto',
+            'puesto',
             'dui',
-            'primer_nombre',
-            'segundo_nombre',
-            'primer_apellido',
-            'segundo_apellido',
-            'fecha_nacimiento'
-            'codigo',
+            'fecha_nacimiento',
             'telefono',
             'direccion',
-            'activo',
+            'is_active',
         ]

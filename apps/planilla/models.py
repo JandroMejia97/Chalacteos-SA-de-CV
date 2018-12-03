@@ -79,7 +79,7 @@ class Puesto(models.Model):
     departamento = models.ForeignKey(
         Departamento,
         verbose_name='Departamento',
-        on_delete=models.DO_NOTHINGADE,
+        on_delete=models.DO_NOTHING,
         blank=False,
         default=0,
         null=False,
@@ -122,7 +122,7 @@ class Puesto(models.Model):
     class Meta:
         verbose_name = 'Puesto'
         verbose_name_plural = 'Puestos'
-        unique_together = ("codigo", "nombre_funcional")
+        unique_together = ("codigo_puesto", "nombre_funcional")
         ordering= ["id_puesto"]
  
 
@@ -140,31 +140,32 @@ class Empleado(models.Model):
         verbose_name='Puesto',
         on_delete=models.DO_NOTHING,
         blank=False,
-        null=False
+        null=True
     )
     dui = models.CharField(
         verbose_name='DUI',
         max_length=10, 
-        null=False, 
+        null=True, 
         blank=False,
         help_text='Ingrese el Documento Único de Identidad del empleado' 
     )
     fecha_nacimiento = models.DateField(
         verbose_name='Fecha de nacimiento',
-        null=False, 
+        null=True, 
         blank=False,
         help_text='Ingrese el segundo apellido de la persona' 
     )
     telefono = models.IntegerField(
         verbose_name='Numero de telefono',
-        null=False, 
+        null=True, 
         blank=False,
         help_text='Ingrese el telefono'
     )
     direccion = models.CharField(
         verbose_name='Direccion',
         max_length=50,
-        help_text='Ingrese la direccion'
+        help_text='Ingrese la direccion',
+        null=True
     )
     is_active = models.BooleanField(
         verbose_name='¿El empleado está de alta?',
@@ -175,17 +176,16 @@ class Empleado(models.Model):
     class Meta:
         verbose_name = 'Empleado'
         verbose_name_plural = 'Empleados'
-        unique_together = ("dui")
         ordering= ["puesto", 'dui']
 
     def __str__(self):
         return '%s %s' % (self.empleado.first_name, self.empleado.last_name)
 
-    @receiver(post_save, sender=User)
-    def create_user_profile(self, sender, instance, created, **kwargs):
+    """@receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
         if created:
             Empleado.objects.create(empleado=instance)
 
     @receiver(post_save, sender=User)
-    def save_user_profile(self, sender, instance, **kwargs):
-        instance.Empleado.save()
+    def save_user_profile(sender, instance, **kwargs):
+        instance.empleado.save()"""
