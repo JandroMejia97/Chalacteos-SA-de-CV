@@ -1,7 +1,5 @@
-from django.conf.urls import include
-from django.urls import reverse_lazy, path, re_path
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import views as auth_views
+from django.urls import path, re_path
+
 from . import views
 
 app_name = 'inventario'

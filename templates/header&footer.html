@@ -5,11 +5,11 @@
 {% block header %}
   <header>
     <nav class="navbar navbar-expand static-top bg-dark">
-    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-      <a href="{% url 'contabilidad:index' %}">
+    <a href="{% url 'contabilidad:index' %}">
         {% load staticfiles %}
-        <img class="image-circle" style="max-width:120px; margin-top: -7px;" src="{% static 'media/images/logo.png' %}">
-      </a>
+      <img class="image-circle" style="max-width:120px; margin-top: -7px;" src="{% static 'media/images/logo.png' %}">
+    </a>
+    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       {% if user.is_authenticated %}
         <i class="fas fa-bars" style="margin-left: 10%;"></i>
       {% endif %}

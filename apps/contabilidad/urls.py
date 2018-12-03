@@ -102,9 +102,9 @@ urlpatterns = [
 		views.TransaccionUpdateView.as_view(),
 		name='transaccion-edicion'
 	),
-	path(
-		'detalle/transaccion/<slug:pk>/',
-		views.CuentaDetailView.as_view(),
+	re_path(
+		r'detalle/transaccion/(?P<id_transaccion>[0-9]+)/',
+		views.get_movimientos,
 		name='transaccion-detalle'
 	),
 	re_path(

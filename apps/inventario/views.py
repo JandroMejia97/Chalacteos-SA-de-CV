@@ -28,34 +28,12 @@ class ProveedoresListView(LoginRequiredMixin, ListView):
 	template_name = 'inventario/gestionarProveedores.html'
 	context_object_name = 'proveedores'
 
-	def get_queryset(self):
-		user = self.request.user
-		context = Proveedor.objects.all()
-		if context:
-			return context
-		else:
-			return render(self.request, template_name='404.html')
-
-	def get_context_data(self, **kwargs):
-		context = super(ProveedoresListView, self).get_context_data(**kwargs)
-		return context
 
 class ClientesListView(LoginRequiredMixin, ListView):
 	model = Cliente
 	template_name = 'inventario/gestionarClientes.html'
 	context_object_name = 'clientes'
 
-	def get_queryset(self):
-		user = self.request.user
-		context = Cliente.objects.all()
-		if context:
-			return context
-		else:
-			return render(self.request, template_name='404.html')
-
-	def get_context_data(self, **kwargs):
-		context = super(ClientesListView, self).get_context_data(**kwargs)
-		return context
 
 class VentasListView(LoginRequiredMixin, ListView):
 	model = Venta
@@ -63,7 +41,7 @@ class VentasListView(LoginRequiredMixin, ListView):
 	context_object_name = 'ventas'
 
 	def get_queryset(self):
-		user = self.request.user
+		
 		context = Venta.objects.all()
 		if context:
 			return context
@@ -162,10 +140,6 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		context['detalle_compra_form'] = DetalleCompraForm()
 		context['impuesto'] = Impuesto.objects.get(nombre_impuesto='IVA')
 		return self.render_to_response(context)
-	
-	def post(self, request, *args, **kwargs):
-		
-		return redirect(self.success_url)
 
 	def post(self, request, *args, **kwargs):
 		sub_total_compra = float(request.POST['totalCompra'])
@@ -180,6 +154,8 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 
 		data = {}
 		data['tipo'] = 'COMPRA'
+		data['sub_total'] = sub_total_compra
+		data['iva'] = iva
 		data['total'] = total
 		
 		if(request.POST.get('isCredito')):
@@ -207,8 +183,9 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 					transaccion=transaccion
 				)
 		else:
-			data['proporcion'] = float(request.POST['proporcion'])
+			data['proporcion'] = float(request.POST['proporcion'])/100
 			data['compra'] = 'PROPORCION'
+			
 			transaccion = conta.registrar_transaccion(data)
 
 			factura = Factura.objects.create(
@@ -217,7 +194,7 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 				monto_aplicacion=iva,
 				is_credito=True,
 				is_contado=True,
-				proporcion=data['proporicion'],
+				proporcion=data['proporcion'],
 				transaccion=transaccion
 			)
 
@@ -428,7 +405,7 @@ def impuestos(request, id_impuesto):
     if request.method == 'DELETE':
         parametro = Impuesto.objects.get(id_impuesto=id_impuesto)
         parametro.delete()
-        message = "El proveedor fue borrado exitosamente"
+        message = "El impuesto fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')
@@ -529,6 +506,9 @@ def import_data_recursos(request):
 					nombre_recurso=nombre_recurso,
 					descripcion_recurso=descripcion_recurso,
 					unidad_medida=unidad_medida
+				)
+				created = Kardex.objects.update_or_create(
+					id_recurso=objecto
 				)
 	return HttpResponse('Hecho')
 

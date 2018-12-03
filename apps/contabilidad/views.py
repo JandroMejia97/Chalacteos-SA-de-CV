@@ -19,7 +19,6 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
-import datetime
 import csv
 import json
 
@@ -133,7 +132,7 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 
 	def post(self, request, *args, **kwargs):
 		periodo = PeriodoContable.objects.all().last()
-		ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
+		ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo).count()
 
 		abonos_str = request.POST['abonos']
 		cargos_str = request.POST['cargos']
@@ -166,7 +165,7 @@ class TransaccionCreateView(LoginRequiredMixin, TemplateView):
 			if total_abonos == monto_transaccion:
 
 				transaccion = Transaccion.objects.create(
-					id_perido_contable=periodo,
+					id_periodo_contable=periodo,
 					id_tipo=tipo,
 					numero_transaccion=ultima_transaccion+1,
 					descripcion_transaccion=request.POST['descripcion'],
@@ -317,7 +316,7 @@ class BalanceGeneralDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'balance_general'
 
@@ -328,7 +327,7 @@ class EstadoResultadosDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'estado_resultados'
 
@@ -339,7 +338,7 @@ class BalanceComprobacionDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'balance_comprobacion'
 
@@ -350,80 +349,91 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 	fields = [
 		'id_empresa',
 		'nombre_estado_financiero'
-		'id_perido_contable',
+		'id_periodo_contable',
 	]
 	context_object_name = 'estado_capital'
 
-def registrar_transaccion(self, data):
-	ultima_transaccion = Transaccion.objects.filter(id_perido_contable=periodo).count()
-	periodo = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[1]
+def get_movimientos(request, id_transaccion):
+	context = {}
+	context['transaccion'] = Transaccion.objects.get(id_transaccion=id_transaccion)
+	if context['transaccion']:
+		context['movimientos'] = Movimiento.objects.filter(id_transaccion=context['transaccion'])
+		return render(request, template_name='contabilidad/viewTransaccion.html', context=context)
+	else:
+		return render(request, template_name='404.html')
+
+def registrar_transaccion(data):
+	periodo_instance = PeriodoContable.objects.all().last()
+	ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo_instance).count()
 	tipo = None
 	transaccion = Transaccion.objects.create(
-		id_periodo_contable=periodo,
+		id_periodo_contable=periodo_instance,
 		id_tipo=tipo,
 		numero_transaccion=ultima_transaccion,
-		fecha_transaccion=datetime.datetime.now(),
+		fecha_transaccion=timezone.now(),
 		descripcion_transaccion='Compra de materia prima',
 		monto_transaccion=data['total']
 	)
-
+	cuentas = {}
 	if data['tipo'] == 'COMPRA':
+		cuentas['inv_mp'] = Cuenta.objects.get(codigo_cuenta=111101)
+		cuentas['iva'] = Cuenta.objects.get(codigo_cuenta=2110)
 		if data['compra'] == 'CREDITO':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CREDITO')
-			cuentas = {
-				'cp': Cuenta.objects.get(codigo_cuenta=2102),
-				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
-			}
+			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cp'],
 				monto_cargo=None,
 				monto_abono=data['total']
 			)
 		elif data['compra'] == 'CONTADO':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA AL CONTADO')
-			cuentas = {
-				'cg': Cuenta.objects.get(codigo_cuenta=110101),
-				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
-			}
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=None,
 				monto_abono=data['total']
 			)
 		elif data['compra'] == 'PROPORCION':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='COMPRA PARCIALMENTE AL CREDITO')
-			cuentas = {
-				'cp': Cuenta.objects.get(codigo_cuenta=2102),
-				'cg': Cuenta.objects.get(codigo_cuenta=110101),
-				'inv_mp': Cuenta.objects.get(codigo_cuenta=111101)
-			}
+			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono1 = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=None,
 				monto_abono=data['total']*(1-data['proporcion'])
 			)
 			movimiento_abono2 = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cp'],
 				monto_cargo=None,
 				monto_abono=data['total']*data['proporcion']
 			)
 		transaccion.id_tipo = tipo
 		transaccion.save()
-		movimiento_cargo = Movimiento.objects.create(
+		inventario_cargo = Movimiento.objects.create(
 			id_transaccion=transaccion,
+			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['inv_mp'],
-			monto_cargo=None,
-			monto_abono=data['total']
+			monto_cargo=data['sub_total'],
+			monto_abono=None
+		)
+		iva_cargo = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			periodo_contable=periodo_instance,
+			id_cuenta=cuentas['iva'],
+			monto_cargo=data['iva'],
+			monto_abono=None
 		)
 	return transaccion
 			
-	
-
-
 @login_required(login_url='/sign-in/')
 def cuentas(request, id_cuenta):   
     if request.method == 'DELETE':
@@ -440,6 +450,22 @@ def estados_financieros(request, id_estado_financiero):
         parametro.delete()
         message = "El estado financiero fue borrado exitosamente"
         return JsonResponse(data={'message': message})
+
+def mayorizar(request):
+	if request.method == 'GET':
+		periodo = PeriodoContable.objects.all().last()
+		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
+		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=None)
+
+def mayor(cuenta, periodo):
+	cuentas = Cuenta.object.filter(codigo_cuenta_padre=cuenta)
+	if cuentas:
+		for cuenta in cuentas:
+			mayor(cuenta)
+	else:
+		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
+		
+		
 
 @login_required(login_url='/sign-in/')
 def load_sub_cuenta(request):

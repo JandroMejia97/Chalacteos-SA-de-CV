@@ -69,6 +69,15 @@
                     case 'MATERIAPRIMA':
                         location.href = '/edicion/material/'+id;
                         break;
+                    case 'DEPARTAMENTO':
+                        location.href = '/edicion/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        location.href = '/edicion/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        location.href = '/edicion/empleado/';
+                        break;
                 }
             };
             function redirectView(caso, id){
@@ -99,6 +108,15 @@
                         break;
                     case 'MATERIAPRIMA':
                         location.href = '/detalle/material/'+id;
+                        break;
+                    case 'DEPARTAMENTO':
+                        location.href = '/detalle/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        location.href = '/detalle/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        location.href = '/detalle/empleado/';
                         break;
                 }
             };
@@ -138,6 +156,15 @@
                         break;
                     case 'MATERIAPRIMA':
                         url = '/ajax/materiaprima/'+id;
+                        break;
+                    case 'DEPARTAMENTO':
+                        url = '/ajax/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        url = '/ajax/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        url = '/ajax/empleado/'+id;
                         break;
                 }
                 $('#confirmacion').attr('onclick', 'ejecutarAJAX('+id+',\''+url+'\')');
@@ -197,16 +224,12 @@
         <!-- Core plugin JavaScript-->
         <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
 
-        <!-- Angular -->
-        <script src="{% static 'js/angular.js' %}"></script>
-
         <!-- Page level plugin JavaScript-->
         <script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
         <script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
 
         <!-- Custom scripts for all pages-->
         <script src="{% static 'js/sb-admin.min.js' %}"></script>
-        <script src="{% static 'js/invernaderos.js' %}"></script>
         <script src="{% static 'js/csrf.js' %}"></script>
 
         <!-- Demo scripts for this page-->

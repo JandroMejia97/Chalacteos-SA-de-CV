@@ -4,7 +4,7 @@
 {% block content %}
   
   {% block sidebar %}
-
+    {% include 'sidebarPlanilla.html' %}
   {% endblock sidebar %}
   {% block tables %}
   {% load bootstrap %}
@@ -27,7 +27,8 @@
           <div class="card-body">
             <form action="" method="POST" disabled id="detalleForm">
                 {% csrf_token %}
-                {{ form|bootstrap_inline }}
+                {{ user_form|bootstrap_inline }}
+                {{ empleado_form|bootstrap_inline }}
                 <div class="form-group text-center">
                     <button id='aprobar' type="submit" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
                     <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    

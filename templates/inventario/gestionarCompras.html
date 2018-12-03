@@ -33,17 +33,25 @@
                 <thead>
                   <tr>
                       <th>Compra N°</th>
-                      <th>Proveedor</th>
-                      <th>Factura N°</th>
+                      <th>Fecha</th>
+                      <th>Total</th>
+                      <th>Tipo</th>
                       <th>Operaciones</th>
                   </tr>
                 </thead>
                 <tbody>
                     {% for compra in compras %}
-                        <tr id="{{ compra.id_compra }}">
+                        <tr id="{{ compra.id_compra }}" class="text-center">
                             <td class="text-center">{{ compra.id_compra }}</td>
-                            <td>{{ compra.id_factura.fecha }}</td>
-                            <td>{{ compra.id_factura }}</td>
+                            <td>{{ compra.id_factura.transaccion.fecha_transaccion|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>$ {{ compra.id_factura.total_factura }}</td>
+                            {% if compra.id_factura.is_credito and compra.id_factura.is_contado %}
+                              <td>Parcialmente al Credito</td>
+                            {% elif compra.id_factura.is_credito %}
+                              <td>Al Crédito</td>
+                            {% elif compra.id_factura.is_contado %}
+                              <td>Al Contado</td>
+                            {% endif %}
                             <td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
                                 <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('COMPRA', {{ compra.id_compra }})" style="color:gray !important"></a>
