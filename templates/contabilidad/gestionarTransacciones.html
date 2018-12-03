@@ -49,8 +49,8 @@
                             <td>{{ transaccion.monto_transaccion }}</td>
                             <td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ transaccion.id_transaccion }}, '{{transaccion.nombre_transaccion}}', 'TRANSACCION');" style="color:gray !important"></a>
+                                <!--<a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ transaccion.id_transaccion }}, '{{transaccion.nombre_transaccion}}', 'TRANSACCION');" style="color:gray !important"></a>-->
                             </td>                          
                         </tr>
                     {% empty %}
