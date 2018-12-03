@@ -86,6 +86,10 @@
           </div>
         </div>        
         <script>
+            window.onload=function(){
+                $("#id_fecha_transaccion").attr('type','datetime-local')
+                //$("#id_fecha_transaccion").val(moment().format())
+            }
             function getCuenta(id, id_sub){
                 console.log("GETCUENTA");
                 var cuenta = $("#"+id).val();
@@ -144,7 +148,8 @@
             var codigoTipo = null;
             var monto = null;
             var descripcion = null
-                
+            var periodo = '{{fecha.fecha_inicio_periodo|date:"d/m/Y h:i"}}'
+            console.log(periodo)
             function getData(){
                 console.log("ADDROWS")
                 count = count + 1;
@@ -264,6 +269,9 @@
                 tipo = cbTipo.options[cbTipo.selectedIndex].text;
                 monto = parseFloat($("#id_monto_transaccion").val());
                 descripcion = $("#id_descripcion_transaccion").val();
+                fecha = $("#id_fecha_transaccion").val();
+                console.log(fecha)
+
                 if(tipo!='' && tipo!='---------' && !isNaN(monto) && descripcion!=''){
                     if(totalAbonos==totalCargos){
                         if(totalAbonos==monto){
@@ -277,7 +285,8 @@
                                     'abonos': abonos,
                                     'codigoTipo': codigoTipo,
                                     'monto': monto,
-                                    'descripcion': descripcion
+                                    'descripcion': descripcion,
+                                    'fecha': fecha
                                 },
                                 success: function(data){
                                     console.log(data);
@@ -362,6 +371,5 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{% static 'js/sb-admin.min.js' %}"></script>
-    <script src="{% static 'js/invernaderos.js' %}"></script>
     <script src="{% static 'js/csrf.js' %}"></script>
 {% endblock js %}

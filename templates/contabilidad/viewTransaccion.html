@@ -1,0 +1,127 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Detalle{% endblock title %}
+
+{% block content %}
+    
+  {% block sidebar %}
+    {% include 'sidebarContabilidad.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+      <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Visualización</a>
+          </li>
+          <li class="breadcrumb-item active">Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa fa-eye"></i>
+            <strong><i> Detalles de la Transaccion: {{ transaccion }}</i></strong>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <tbody id="bodyTable">
+                    <tr class="row">
+                        <td class="text-right col">
+                          Periodo Contable
+                        </td>
+                        <td class="text-left col">{{transaccion.id_periodo_contable}}</td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Transaccion Número
+                      </td>
+                      <td class="text-left col">{{transaccion.numero_transaccion}}</td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Tipo de Transaccion
+                      </td>
+                      <td class="text-left col">{{ transaccion.id_tipo }}</a></td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Fecha de la Transaccion
+                      </td>
+                      <td class="text-left col">
+                          {{transaccion.fecha_transaccion|date:"SHORT_DATE_FORMAT"}}
+                      </td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Hora en que fue realizada
+                      </td>
+                      <td class="text-left col">
+                          {{transaccion.fecha_transaccion|date:"h:i:s A"}}
+                      </td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Descripcion
+                      </td>
+                      <td class="text-left col">{{transaccion.descripcion_transaccion}}</td>
+                    </tr>
+                    <tr class="row">
+                      <td class="text-right col">
+                        Monto de la Transaccion
+                      </td>
+                      <td class="text-left col">
+                          $ {{transaccion.monto_transaccion}}
+                      </td>
+                    </tr>
+                </tbody>
+              </table>
+              <div class="card mb-3">
+              <div class="card-header">
+                <i class="fas fa-table"></i>
+                  Movimientos
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th class="text-center">#</th>
+                        <th>Cuenta</th>
+                        <th>Cargo</th>                
+                        <th>Abono</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbBody">
+                        {% for movimiento in movimientos %}    
+                            <tr>
+                                <td>{{movimiento.id_movimiento}}</td>
+                                <td>{{movimiento.id_cuenta}}</td>
+                                {% if movimiento.monto_cargo %}
+                                    <td>{{movimiento.monto_cargo}}</td>
+                                    <td></td>
+                                {% elif movimiento.monto_abono %}
+                                    <td></td>
+                                    <td>{{movimiento.monto_abono}}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+              <div class="row">
+                <div class="col-12 form-group text-center">
+                  <br>
+                  <button class='btn btn-primary' onclick="javascript:history.back()" style="width: 50%;" type='button'>Salir</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock tables %}
+{% endblock content %}

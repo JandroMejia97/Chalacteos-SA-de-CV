@@ -364,17 +364,14 @@ def get_movimientos(request, id_transaccion):
 		return render(request, template_name='404.html')
 
 def registrar_transaccion(data):
-	periodos = PeriodoContable.objects.all().order_by('fecha_inicio_periodo')[:1]
-	periodo_instance = None
-	for periodo in periodos:
-		periodo_instance = periodo
+	periodo_instance = PeriodoContable.objects.all().last()
 	ultima_transaccion = Transaccion.objects.filter(id_periodo_contable=periodo_instance).count()
 	tipo = None
 	transaccion = Transaccion.objects.create(
 		id_periodo_contable=periodo_instance,
 		id_tipo=tipo,
 		numero_transaccion=ultima_transaccion,
-		fecha_transaccion=datetime.datetime.now(),
+		fecha_transaccion=timezone.now(),
 		descripcion_transaccion='Compra de materia prima',
 		monto_transaccion=data['total']
 	)
@@ -387,6 +384,7 @@ def registrar_transaccion(data):
 			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cp'],
 				monto_cargo=None,
 				monto_abono=data['total']
@@ -396,6 +394,7 @@ def registrar_transaccion(data):
 			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=None,
 				monto_abono=data['total']
@@ -406,12 +405,14 @@ def registrar_transaccion(data):
 			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono1 = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=None,
 				monto_abono=data['total']*(1-data['proporcion'])
 			)
 			movimiento_abono2 = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cp'],
 				monto_cargo=None,
 				monto_abono=data['total']*data['proporcion']
@@ -420,12 +421,14 @@ def registrar_transaccion(data):
 		transaccion.save()
 		inventario_cargo = Movimiento.objects.create(
 			id_transaccion=transaccion,
+			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['inv_mp'],
 			monto_cargo=data['sub_total'],
 			monto_abono=None
 		)
 		iva_cargo = Movimiento.objects.create(
 			id_transaccion=transaccion,
+			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['iva'],
 			monto_cargo=data['iva'],
 			monto_abono=None
@@ -438,6 +441,7 @@ def registrar_transaccion(data):
 			cuentas['cc'] = Cuenta.objects.get(codigo_cuenta=1104)
 			movimiento_cargo = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cc'],
 				monto_cargo=data['total'],
 				monto_abono=None
@@ -447,6 +451,7 @@ def registrar_transaccion(data):
 			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_cargo = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=data['total'],
 				monto_abono=None
@@ -457,12 +462,14 @@ def registrar_transaccion(data):
 			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_cargo1 = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=data['total']*(1-data['proporcion']),
 				monto_abono=None
 			)
 			movimiento_cargo2 = Movimiento.objects.create(
 				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cc'],
 				monto_cargo=data['total']*data['proporcion'],
 				monto_abono=None
@@ -471,6 +478,7 @@ def registrar_transaccion(data):
 		transaccion.save()
 		inventario_abono = Movimiento.objects.create(
 			id_transaccion=transaccion,
+			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['inv_pt'],
 			monto_cargo=None,
 			monto_abono=data['total']
@@ -478,6 +486,7 @@ def registrar_transaccion(data):
 		iva_abono = Movimiento.objects.create(
 			id_transaccion=transaccion,
 			id_cuenta=cuentas['iva_v'],
+			periodo_contable=periodo_instance,
 			monto_cargo=None,
 			monto_abono=None
 		)
@@ -499,6 +508,22 @@ def estados_financieros(request, id_estado_financiero):
         parametro.delete()
         message = "El estado financiero fue borrado exitosamente"
         return JsonResponse(data={'message': message})
+
+def mayorizar(request):
+	if request.method == 'GET':
+		periodo = PeriodoContable.objects.all().last()
+		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
+		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=None)
+
+def mayor(cuenta, periodo):
+	cuentas = Cuenta.object.filter(codigo_cuenta_padre=cuenta)
+	if cuentas:
+		for cuenta in cuentas:
+			mayor(cuenta)
+	else:
+		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
+		
+		
 
 @login_required(login_url='/sign-in/')
 def load_sub_cuenta(request):

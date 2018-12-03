@@ -44,13 +44,13 @@
                         <tr id="{{transaccion.id_transaccion}}">
                             <td class="text-center">{{transaccion.numero_transaccion}}</td>
                             <td>{{ transaccion.fecha_transaccion | date:"SHORT_DATE_FORMAT" }}</td>
-                            <td>{{ transaccion.fecha_transaccion | time:"h i s A" }}</td>
+                            <td>{{ transaccion.fecha_transaccion | time:"h:i:s A" }}</td>
                             <td>{{ transaccion.id_tipo }}</td>
                             <td>{{ transaccion.monto_transaccion }}</td>
                             <td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ transaccion.id_transaccion }}, '{{transaccion.nombre_transaccion}}', 'TRANSACCION');" style="color:gray !important"></a>
+                                <!--<a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('TRANSACCION', {{ transaccion.id_transaccion }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ transaccion.id_transaccion }}, '{{transaccion.nombre_transaccion}}', 'TRANSACCION');" style="color:gray !important"></a>-->
                             </td>                          
                         </tr>
                     {% empty %}
@@ -66,6 +66,7 @@
                     {% endfor %}
                 </tbody>
               </table>
+              
             </div>
           </div>
         </div>

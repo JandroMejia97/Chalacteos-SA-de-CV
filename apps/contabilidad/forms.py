@@ -1,5 +1,5 @@
 from django import forms
-
+import datetime
 from .models import *
 
 class TransaccionForm(forms.ModelForm):
@@ -18,8 +18,18 @@ class TransaccionForm(forms.ModelForm):
         model = Transaccion
         fields = [
             'id_tipo',
+            'fecha_transaccion',
             'monto_transaccion',
         ]
+    
+    def __init__(self, *args, **kwargs):
+        super(TransaccionForm, self).__init__(*args, **kwargs)
+        self.fields['fecha_transaccion'].format = [
+            '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+            '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+            '%m/%d/%Y',              # '10/25/2006'
+        ]
+        #self.fields['fecha_transaccion'].initial = datetime.datetime.now()
 
 class MovimientoForm(forms.ModelForm):
     scope_prefix = 'movimiento_data'

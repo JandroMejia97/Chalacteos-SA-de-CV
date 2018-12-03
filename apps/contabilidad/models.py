@@ -136,10 +136,10 @@ class PeriodoContable(models.Model):
 	)
 
 	def __str__(self):
-		return str(self.fecha_inicio_periodo)+" - "+str(self.fecha_final_periodo)
+		return str(self.fecha_inicio_periodo.strftime('%d/%m/%y %H:%M:%S'))+" - "+str(self.fecha_final_periodo.strftime('%d/%m/%y %H:%M:%S'))
 
 	class Meta:
-		ordering = ["id_periodo_contable"]
+		ordering = ["fecha_inicio_periodo"]
 		verbose_name = "Período Contable"
 		verbose_name_plural = "Períodos Contables"
 
@@ -374,7 +374,6 @@ class Transaccion(models.Model):
 	)
 	fecha_transaccion = models.DateTimeField(
 		verbose_name='Fecha de transacción',
-        auto_now=True,
         help_text='Fecha en que se realiza la transacción',
         error_messages={
             'empty': 'Este campo no debe quedar vacío'
@@ -425,6 +424,13 @@ class Movimiento(models.Model):
         on_delete=models.SET_NULL,
         blank=False,
         null=True
+	)
+	periodo_contable = models.ForeignKey(
+		PeriodoContable,
+		verbose_name='Período Contable',
+        on_delete=models.SET_NULL,
+        blank=False,
+        null = True
 	)
 	id_cuenta = models.ForeignKey(
 		Cuenta,
@@ -479,7 +485,7 @@ class Movimiento(models.Model):
 			return 'Transaccion: '+str(self.id_transaccion.numero_transaccion)+' Movimiento: '+str(self.id_movimiento)+'\tCargoo: '+str(self.monto_cargo)
 
 	class Meta:
-		ordering = ["id_transaccion", "id_movimiento"]
+		ordering = ["periodo_contable", "id_transaccion", "id_movimiento"]
 		verbose_name = "Movimiento"
 		verbose_name_plural = "Movimientos"
 												
