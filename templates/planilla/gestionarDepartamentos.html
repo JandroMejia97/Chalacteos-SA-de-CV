@@ -35,6 +35,7 @@
                       <th>#</th>
                       <th>Nombre</th>
                       <th>Descripcion</th>
+                      <th>Operaciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -42,7 +43,7 @@
                         <tr id="{{departamento.id_departamento}}">
                             <td class="text-center">{{departamento.id_departamento}}</td>
                             <td>{{ departamento.nombre }}</td>
-                            <td>{{ puesto.descripcion }}</td>
+                            <td>{{ departamento.descripcion }}</td>
                             <td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('DEPARTAMENTO', {{ departamento.id_departamento }})" style="color:gray !important"></a>
                                 <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('DEPARTAMENTO', {{ departamento.id_departamento }})" style="color:gray !important"></a>

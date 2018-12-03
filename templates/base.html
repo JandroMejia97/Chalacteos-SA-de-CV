@@ -69,6 +69,15 @@
                     case 'MATERIAPRIMA':
                         location.href = '/edicion/material/'+id;
                         break;
+                    case 'DEPARTAMENTO':
+                        location.href = '/edicion/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        location.href = '/edicion/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        location.href = '/edicion/empleado/'+id;
+                        break;
                 }
             };
             function redirectView(caso, id){
@@ -147,6 +156,15 @@
                         break;
                     case 'MATERIAPRIMA':
                         url = '/ajax/materiaprima/'+id;
+                        break;
+                    case 'DEPARTAMENTO':
+                        url = '/ajax/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        url = '/ajax/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        url = '/ajax/empleado/'+id;
                         break;
                 }
                 $('#confirmacion').attr('onclick', 'ejecutarAJAX('+id+',\''+url+'\')');

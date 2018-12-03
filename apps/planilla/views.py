@@ -165,3 +165,27 @@ class EmpleadoDetailView(DetailView):
         'is_active',
     ]
     context_object_name = 'empleado'
+
+@login_required(login_url='/sign-in/')
+def departamentos(request, id_departamento):   
+    if request.method == 'DELETE':
+        parametro = Departamento.objects.get(id_departamento=id_departamento)
+        parametro.delete()
+        message = "El departamento fue borrado exitosamente"
+        return JsonResponse(data={'message': message})
+
+@login_required(login_url='/sign-in/')
+def puestos(request, id_puesto):   
+    if request.method == 'DELETE':
+        parametro = Puesto.objects.get(id_puesto=id_puesto)
+        parametro.delete()
+        message = "El puesto fue borrado exitosamente"
+        return JsonResponse(data={'message': message})
+
+@login_required(login_url='/sign-in/')
+def empleados(request, id):   
+    if request.method == 'DELETE':
+        parametro = Empleado.objects.get(id=id)
+        parametro.delete()
+        message = "El empleado fue borrado exitosamente"
+        return JsonResponse(data={'message': message})
