@@ -231,9 +231,6 @@
             }
 
             function addRows(codigoSubCuenta, cuenta, cargo, abono){
-                fecha = new Date($("#id_fecha_transaccion").val());
-                fecha = fecha.getDay()+'/'+fecha.getMonth()+1+'/'+fecha.getFullYear()+1+' '+fecha.getHours()+':'+fecha.getMinutes();
-                console.log(fecha)
                 if(isNaN(abono) && !(isNaN(cargo))){
                     codigo_cuentas+=codigoSubCuenta+",";
                     cargos+=cargo+",";
@@ -273,7 +270,6 @@
                 monto = parseFloat($("#id_monto_transaccion").val());
                 descripcion = $("#id_descripcion_transaccion").val();
                 fecha = $("#id_fecha_transaccion").val();
-                fecha = fecha.getDay()+'/'+fecha.getMonth()+1+'/'+getFullYear()+1+' '+getHours()+':'+getMinutes();
                 console.log(fecha)
 
                 if(tipo!='' && tipo!='---------' && !isNaN(monto) && descripcion!=''){
@@ -375,6 +371,5 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{% static 'js/sb-admin.min.js' %}"></script>
-    <script src="{% static 'js/moment.js' %}"></script>
     <script src="{% static 'js/csrf.js' %}"></script>
 {% endblock js %}
