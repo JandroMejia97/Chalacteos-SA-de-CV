@@ -19,7 +19,6 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
-import datetime
 import csv
 import json
 
@@ -371,7 +370,7 @@ def registrar_transaccion(data):
 		id_periodo_contable=periodo_instance,
 		id_tipo=tipo,
 		numero_transaccion=ultima_transaccion,
-		fecha_transaccion=datetime.datetime.now(),
+		fecha_transaccion=timezone.now(),
 		descripcion_transaccion='Compra de materia prima',
 		monto_transaccion=data['total']
 	)
@@ -384,7 +383,7 @@ def registrar_transaccion(data):
 			cuentas['cp'] = Cuenta.objects.get(codigo_cuenta=2102)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
-				periodo=periodo_instance,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cp'],
 				monto_cargo=None,
 				monto_abono=data['total']
@@ -394,7 +393,7 @@ def registrar_transaccion(data):
 			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono = Movimiento.objects.create(
 				id_transaccion=transaccion,
-				periodo=periodo_instance,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=None,
 				monto_abono=data['total']
@@ -405,14 +404,14 @@ def registrar_transaccion(data):
 			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
 			movimiento_abono1 = Movimiento.objects.create(
 				id_transaccion=transaccion,
-				periodo=periodo_instance,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cg'],
 				monto_cargo=None,
 				monto_abono=data['total']*(1-data['proporcion'])
 			)
 			movimiento_abono2 = Movimiento.objects.create(
 				id_transaccion=transaccion,
-				periodo=periodo_instance,
+				periodo_contable=periodo_instance,
 				id_cuenta=cuentas['cp'],
 				monto_cargo=None,
 				monto_abono=data['total']*data['proporcion']
@@ -421,14 +420,14 @@ def registrar_transaccion(data):
 		transaccion.save()
 		inventario_cargo = Movimiento.objects.create(
 			id_transaccion=transaccion,
-			periodo=periodo_instance,
+			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['inv_mp'],
 			monto_cargo=data['sub_total'],
 			monto_abono=None
 		)
 		iva_cargo = Movimiento.objects.create(
 			id_transaccion=transaccion,
-			periodo=periodo_instance,
+			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['iva'],
 			monto_cargo=data['iva'],
 			monto_abono=None
@@ -458,8 +457,13 @@ def mayorizar(request):
 		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
 		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=None)
 
-def mayor(cuenta):
+def mayor(cuenta, periodo):
 	cuentas = Cuenta.object.filter(codigo_cuenta_padre=cuenta)
+	if cuentas:
+		for cuenta in cuentas:
+			mayor(cuenta)
+	else:
+		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
 		
 		
 
