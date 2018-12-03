@@ -1,0 +1,102 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión de Cuentas{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarPlanilla.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Planilla</a>
+          </li>
+          <li class="breadcrumb-item active">Empleados</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="alert bold alert-info">
+          <i class="fas fw fa-plus-circle"></i>
+          <a href="{% url 'planilla:empleado-crear' %}">
+            <strong>¡Click Aquí para agregar un nuevo empleado!</strong>
+          </a>
+        </div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Lista de Empleados
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>Codigo</th>
+                      <th>Puesto</th>
+                      <th>Dui</th>
+                      <th>Primer Nombre</th>
+                      <th>Segundo Nombre</th>
+                      <th>Primer Apellido</th>
+                      <th>Segundo Apellido</th>
+                      <th>Fecha Nacimiento</th>
+                      <th>Telefono</th>
+                      <th>Direccion</th>
+                      <th>Estado</th>
+                      <th>Operaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for empleado in empleados %}
+                        <tr id="{{empleado.id}}">
+                            <td class="text-center">{{empleado.id}}</td>
+                            <td>{{ empleado.codigo }}</td>
+                            <td>
+                              {% ifnotequal empleado.id None %}
+                                {{ empleado.id_puesto }}
+                              {% endifnotequal %}
+                            </td>
+                            <td>{{ empleado.dui }}</td>
+                            <td>{{ empleado.primer_nombre }}</td>
+                            <td>{{ empleado.segundo_nombre }}</td>
+                            <td>{{ empleado.primer_apellido }}</td>
+                            <td>{{ empleado.segundo_apellido }}</td>
+                            <td>{{ empleado.fecha_nacimiento }}</td>
+                            <td>{{ empleado.telefono }}</td>
+                            <td>{{ empleado.direccion }}</td>
+                            <td>{{ empleado.activo }}</td>
+                            <td class="text-center">
+                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('EMPLEADO', {{ empleado.id }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('EMPLEADO', 
+                                {{ empleado.id }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ empleado.id }}, '{{empleado.nombre}}', 'EMPLEADO');" style="color:gray !important"></a>
+                            </td>                          
+                        </tr>
+                    {% empty %}
+                      <div class="alert bold alert-danger text-center">
+                        <i class="fas fw fa-question-circle">
+                          <strong>¡Opps! Parece que no tienes ningun empleado registrado.</strong>
+                        </i><br><hr>
+                        <i class="fas fw fa-plus-circle"></i>
+                        <a href="{% url 'planilla:empleado-crear' %}">
+                          <strong>¡Click Aquí para agregar un nuevo empleado!</strong>
+                        </a>
+                      </div>
+                    {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}

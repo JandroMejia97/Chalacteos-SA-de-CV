@@ -43,20 +43,22 @@
                 </thead>
                 <tbody>
                     {% for puesto in puestos %}
-                        <tr id="{{puesto.id_puesto}}">
-                            <td class="text-center">{{puesto.id_puesto}}</td>
+                        <tr id="{{puesto.id}}">
+                            <td class="text-center">{{puesto.id}}</td>
                             <td>{{ puesto.codigo }}</td>
                             <td>
-                              {% ifnotequal puesto.id_departamento None %}
+                              {% ifnotequal puesto.id None %}
                                 {{ puesto.id_departamento }}
                               {% endifnotequal %}
                             </td>
+                            <td>{{ puesto.nombre_funcional }}</td>
                             <td>{{ puesto.descripcion }}</td>
                             <td>{{ puesto.salario_base }}</td>
                             <td class="text-center">
-                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('PUESTO', {{ puesto.id_puesto }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('PUESTO', {{ puesto.id_puesto }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ puesto.id_puesto }}, '{{puesto.nombre}}', 'PUESTO');" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('PUESTO', {{ puesto.id }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('PUESTO', 
+                                {{ puesto.id }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ puesto.id }}, '{{puesto.nombre}}', 'PUESTO');" style="color:gray !important"></a>
                             </td>                          
                         </tr>
                     {% empty %}

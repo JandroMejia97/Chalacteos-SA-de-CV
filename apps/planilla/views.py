@@ -1,6 +1,6 @@
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from .models import *
-from django.http import HttpResponse 
+from django.http.response import HttpResponse, JsonResponse
 import csv
 
 from django.views.generic.list import ListView
@@ -15,12 +15,7 @@ from .forms import *
 
 from django.template import  RequestContext
 
-from django.views.generic.edit import (
-    CreateView,
-    UpdateView,
-    DeleteView
-
-)
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 
 def index(request):
@@ -97,7 +92,8 @@ class PuestoCreateView(CreateView):
     success_url = reverse_lazy('planilla:puestos')
     fields = [
         'codigo',
-        'id_puesto',
+        'id',
+        'id_departamento',
         'nombre_funcional',
         'descripcion',
         'salario_base'
@@ -109,7 +105,8 @@ class PuestoUpdateView(UpdateView):
     success_url = reverse_lazy('planilla:puestos')
     fields = [
         'codigo',
-        'id_puesto',
+        'id',
+        'id_departamento',
         'nombre_funcional',
         'descripcion',
         'salario_base'
@@ -121,7 +118,8 @@ class PuestoDetailView(DetailView):
     success_url = reverse_lazy('planilla:puestos')
     fields = [
         'codigo',
-        'id_puesto',
+        'id',
+        'id_departamento',
         'nombre_funcional',
         'descripcion',
         'salario_base'
@@ -153,6 +151,7 @@ class EmpleadoCreateView(CreateView):
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:empleados')
     fields = [
+        'id',
         'id_puesto',
         'dui',
         'primer_nombre',
@@ -163,7 +162,7 @@ class EmpleadoCreateView(CreateView):
         'codigo',
         'telefono',
         'direccion',
-        'activo',
+        'activo'
     ]
  
 class EmpleadoUpdateView(UpdateView):
@@ -171,17 +170,18 @@ class EmpleadoUpdateView(UpdateView):
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:empleados')
     fields = [
+        'id',
         'id_puesto',
         'dui',
         'primer_nombre',
         'segundo_nombre',
         'primer_apellido',
         'segundo_apellido',
-        'fecha_nacimiento'
+        'fecha_nacimiento',
         'codigo',
         'telefono',
         'direccion',
-        'activo',
+        'activo'
     ]
 
 class EmpleadoDetailView(DetailView):
@@ -189,16 +189,39 @@ class EmpleadoDetailView(DetailView):
     template_name = 'planilla/viewEmpleado.html'
     success_url = reverse_lazy('planilla:empleados')
     fields = [
+        'id',
         'id_puesto',
         'dui',
         'primer_nombre',
         'segundo_nombre',
         'primer_apellido',
         'segundo_apellido',
-        'fecha_nacimiento'
+        'fecha_nacimiento',
         'codigo',
         'telefono',
         'direccion',
-        'activo',
+        'activo'
     ]
     context_object_name = 'empleado'
+
+def departamentos(request, id):
+    if request.method == 'DELETE':
+        departamento = Departamento.objects.get(id=id)
+        departamento.delete()
+        message = 'El departamento fue borrado exitosamente'
+        return JsonResponse(data={'message': message})
+
+def puestos(request, id):
+    if request.method == 'DELETE':
+        puesto = Puesto.objects.get(id=id)
+        puesto.delete()
+        message = 'El puesto fue borrado exitosamente'
+        return JsonResponse(data={'message': message})
+
+def empleados(request, id):
+    if request.method == 'DELETE':
+        empleado = Empleado.objects.get(id=id)
+        empleado.delete()
+        message = 'El empleado fue borrado exitosamente'
+        return JsonResponse(data={'message': message})
+

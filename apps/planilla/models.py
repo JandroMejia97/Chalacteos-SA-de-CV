@@ -118,7 +118,8 @@ class Empleado(models.Model):
         on_delete=models.CASCADE,
         blank=False,
         default=0,
-        null=False
+        null=False,
+        help_text='Seleccione el puesto de la persona' 
     )
     dui = models.CharField(
         verbose_name='Dui de la persona',
@@ -159,13 +160,14 @@ class Empleado(models.Model):
         verbose_name='Fecha de nacimiento',
         null=False, 
         blank=False,
-        help_text='Ingrese el segundo apellido de la persona' 
+        help_text='Ingrese su fecha de nacimiento' 
     )
     codigo = models.CharField(
         verbose_name='Codigo del empleado',
         null=False, 
         blank=False,
-        max_length=10
+        max_length=10,
+        help_text='Ingrese su codigo' 
     )
     telefono = models.IntegerField(
         verbose_name='Numero de telefono',

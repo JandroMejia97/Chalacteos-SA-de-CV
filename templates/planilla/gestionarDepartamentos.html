@@ -35,19 +35,20 @@
                       <th>#</th>
                       <th>Nombre</th>
                       <th>Descripcion</th>
+                      <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                     {% for departamento in departamentos %}
-                        <tr id="{{puesto.id_puesto}}">
-                            <td class="text-center">{{puesto.id_puesto}}</td>
+                        <tr id="{{departamento.id}}">
+                            <td class="text-center">{{departamento.id}}</td>
                             <td>{{ departamento.nombre }}</td>
-                            <td>{{ puesto.descripcion }}</td>
+                            <td>{{ departamento.descripcion }}</td>
 
                             <td class="text-center">
-                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('DEPARTAMENTO', {{ departamento.id_departamento }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('DEPARTAMENTO', {{ departamento.id_departamento }})" style="color:gray !important"></a>
-                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ departamento.id_departamento }}, '{{departamento.nombre_departamento}}', 'DEPARTAMENTO');" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('DEPARTAMENTO', {{ departamento.id }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('DEPARTAMENTO', {{ departamento.id }})" style="color:gray !important"></a>
+                                <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ departamento.id }}, '{{departamento.nombre_departamento}}', 'DEPARTAMENTO');" style="color:gray !important"></a>
                             </td>                          
                         </tr>
                     {% empty %}

@@ -66,8 +66,14 @@
                     case 'IMPUESTO':
                         location.href = '/edicion/impuesto/'+id;
                         break;
-                    case 'FACTURAIMPUESTO':
-                        location.href = '/edicion/materia_prima/'+id;
+                    case 'DEPARTAMENTO':
+                        location.href = '/edicion/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        location.href = '/edicion/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        location.href = '/edicion/empleado/'+id;
                         break;
                 }
             };
@@ -99,6 +105,15 @@
                         break;
                     case 'MATERIAPRIMA':
                         location.href = '/detalle/materia_prima/'+id;
+                        break;
+                    case 'DEPARTAMENTO':
+                        location.href = '/detalle/departamento/'+id;
+                        break;
+                    case 'PUESTO':
+                        location.href = '/detalle/puesto/'+id;
+                        break;
+                    case 'EMPLEADO':
+                        location.href = '/detalle/empleado/'+id;
                         break;
                 }
             };
@@ -135,6 +150,15 @@
                         break;
                     case 'IMPUESTO':
                         url = '/ajax/impuesto/'+id+'/';
+                        break;
+                    case 'DEPARTAMENTO':
+                        url = '/ajax/departamento/'+id+'/';
+                        break;
+                    case 'PUESTO':
+                        url = '/ajax/puesto/'+id+'/';
+                        break;
+                    case 'EMPLEADO':
+                        url = '/ajax/empleado/'+id+'/';
                         break;
                     case 'MATERIAPRIMA':
                         url = '/ajax/materia_prima/'+id;
