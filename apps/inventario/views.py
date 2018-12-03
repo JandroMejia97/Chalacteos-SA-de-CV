@@ -172,8 +172,8 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 		cantidad_data = request.POST['cantidad']
 
 		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
-		iva = sub_total_venta*float(impuesto.tasa_impuesto)
-		total = iva + sub_total_venta
+		iva_v = sub_total_venta*float(impuesto.tasa_impuesto)
+		total = iva_v + sub_total_venta
 
 		data = {}
 		data['tipo'] = 'VENTA'
@@ -183,32 +183,32 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 			is_credito = request.POST['isCredito']
 			if is_credito:
 				data['venta'] = 'CREDITO'
-				#transaccion = conta.registrar_transaccion(data)
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_venta,
 					total_factura=total,
-					monto_aplicacion=iva,
+					monto_aplicacion=iva_v,
 					is_credito=True,
 					is_contado=False
 				)
 			else:
 				data['venta'] = 'CONTADO'
-				#transaccion = conta.registrar_transaccion(data)
+				transaccion = conta.registrar_transaccion(data)
 				factura = Factura.objects.create(
 					sub_total_factura=sub_total_venta,
 					total_factura=total,
-					monto_aplicacion=iva,
+					monto_aplicacion=iva_v,
 					is_credito=False,
 					is_contado=True
 				)
 		else:
 			data['proporcion'] = float(request.POST['proporcion'])
 			data['venta'] = 'PROPORCION'
-			#transaccion = conta.registrar_transaccion(data)
+			transaccion = conta.registrar_transaccion(data)
 			factura = Factura.objects.create(
 				sub_total_factura=sub_total_venta,
 				total_factura=total,
-				monto_aplicacion=iva,
+				monto_aplicacion=iva_v,
 				is_credito=True,
 				is_contado=True,
 				proporcion=data['proporcion'],

@@ -432,7 +432,7 @@ def registrar_transaccion(data):
 		)
 	elif data['tipo'] == 'VENTA':
 		cuentas['inv_pt'] = Cuenta.objects.get(codigo_cuenta=111104)
-		cuentas['iva'] = Cuenta.objects.get(codigo_cuenta=2111)
+		cuentas['iva_v'] = Cuenta.objects.get(codigo_cuenta=2111)
 		if data['venta'] == 'CREDITO':
 			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA AL CREDITO')
 			cuentas['cc'] = Cuenta.objects.get(codigo_cuenta=1104)
@@ -473,13 +473,13 @@ def registrar_transaccion(data):
 			id_transaccion=transaccion,
 			id_cuenta=cuentas['inv_pt'],
 			monto_cargo=None,
-			monto_abono=data['sub_tota']
+			monto_abono=data['total']
 		)
 		iva_abono = Movimiento.objects.create(
 			id_transaccion=transaccion,
-			id_cuenta=cuentas['iva'],
+			id_cuenta=cuentas['iva_v'],
 			monto_cargo=None,
-			monto_abono=data['iva']
+			monto_abono=None
 		)
 	return transaccion
 			
