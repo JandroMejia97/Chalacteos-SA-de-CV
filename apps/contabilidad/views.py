@@ -469,13 +469,13 @@ def registrar_transaccion(data):
 			)
 		transaccion.id_tipo = tipo
 		transaccion.save()
-		inventario_cargo = Movimiento.objects.create(
+		inventario_abono = Movimiento.objects.create(
 			id_transaccion=transaccion,
 			id_cuenta=cuentas['inv_pt'],
 			monto_cargo=None,
-			monto_abono=data['sub_total']
+			monto_abono=data['sub_tota']
 		)
-		iva_cargo = Movimiento.objects.create(
+		iva_abono = Movimiento.objects.create(
 			id_transaccion=transaccion,
 			id_cuenta=cuentas['iva'],
 			monto_cargo=None,

@@ -110,10 +110,12 @@
               var count = 0;
               var totalVenta = 0;
               var subTotalVenta = 0;
-              var totales = "";
-              var clientes = "";
-              var cantidades = "";
-              var productos = "";
+              var totalFila = 0;
+              var cliente = "";
+              //var totales = "";
+              //var clientes = "";
+              var cantidad = 0;
+              var producto = "";
               var proporcion =  0;
               var codigoCliente = null;
               var contado = 0;
@@ -144,10 +146,10 @@
 
                 var cbCliente = document.getElementById("id_nombre_cliente");
                     
-                var cliente = cbCliente.options[cbCliente.selectedIndex].text;
+                cliente = cbCliente.options[cbCliente.selectedIndex].text;
                 
-                var producto = $('#id_nombre_recurso').val();
-                var cantidad = parseInt($("#id_cantidad_detalle").val());
+                producto = $('#id_nombre_recurso').val();
+                cantidad = parseInt($("#id_cantidad_detalle").val());
                 var precio = parseFloat($("#id_costo_unitario_movimiento").val());
 
                 if(getCheckbox()){
@@ -161,8 +163,8 @@
 
               function addRows(cliente, producto, cantidad, precio){
                 console.log("registro")
-                var totalFila=round(cantidad*precio);
-                totales+=totalFila+",";
+                totalFila=round(cantidad*precio);
+                //totales+=totalFila+",";
                 subTotalVenta=round((subTotalVenta+totalFila));
                 iva=round(subTotalVenta*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
 
@@ -177,9 +179,9 @@
                     contado = totalVenta;
                   }
                 }
-                clientes+=codigoCliente+",";
-                cantidades+=cantidad+",";
-                productos+=producto+",";
+                //clientes+=codigoCliente+",";
+                //cantidades+=cantidad+",";
+                //productos+=producto+",";
 
                 console.log("CANTIDAD");
                 $("#tbBody").append(
@@ -208,22 +210,22 @@
               };
 
               function sendData(){
-                if(cliente!='' && cliente!='---------' && productos!='' && cantidades!='' && clientes!='' && totales!=''){
+                if(cliente!='' && cliente!='---------' && producto!='' && cantidad!='' && totalFila!=''){
                   data = {}
                   if(getData){
                     data = {
-                    'clientes': clientes,
-                    'productos': productos,
-                    'totales': totales,
-                    'cantidades': cantidades,
+                    'cliente': cliente,
+                    'producto': producto,
+                    'totalFila': totalFila,
+                    'cantidad': cantidad,
                     'proporcion': proporcion
                   }
                 }else{
                   data = {
-                    'clientes': clientes,
-                    'productos': productos,
-                    'totales': totales,
-                    'cantidades': cantidades,
+                    'cliente': cliente,
+                    'producto': producto,
+                    'totalFila': totalFila,
+                    'cantidad': cantidad,
                   }
                 }
                 $.ajax({
@@ -252,19 +254,19 @@
                 if(isCredito && isContado){
                   data = {
                     'totalVenta': subTotalVenta,
-                    'totales': totales,
-                    'clientes': clientes,
-                    'productos': productos,
-                    'cantidades': cantidades,
+                    'totalFila': totalFila,
+                    'cliente': cliente,
+                    'producto': producto,
+                    'cantidad': cantidad,
                     'proporcion': proporcion
                   }
                 }else{
                   data = {
                     'totalVenta': subTotalVenta,
-                    'totales': totales,
-                    'clientes': clientes,
-                    'productos': productos,
-                    'cantidades': cantidades,
+                    'totalFila': totalFila,
+                    'cliente': cliente,
+                    'producto': producto,
+                    'cantidad': cantidad,
                     'isCredito': isCredito
                   }
                 }

@@ -166,10 +166,10 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 
 	def post(self, request, *args, **kwargs):
 		sub_total_venta = float(request.POST['totalVenta'])
-		totales_data =  request.POST['totales'].split(',')
-		clientes_data = request.POST['clientes'].split(',')
-		producto_data = request.POST['productos'].split(',')
-		cantidades_data = request.POST['cantidades'].split(',')
+		total_data =  request.POST['totalFila']
+		cliente_data = request.POST['cliente']
+		producto_data = request.POST['producto']
+		cantidad_data = request.POST['cantidad']
 
 		impuesto = Impuesto.objects.get(nombre_impuesto='IVA')
 		iva = sub_total_venta*float(impuesto.tasa_impuesto)
@@ -214,31 +214,26 @@ class VentaCreateView(LoginRequiredMixin, TemplateView):
 				proporcion=data['proporcion'],
 				transaccion=transaccion
 			)
-
+		cliente = Cliente.objects.get(nombre_cliente=cliente_data)
 		venta = Venta.objects.create(
+			id_cliente=cliente,
 			id_factura=factura
 		)
 
-		for i in range(0, len(clientes_data)-1):
-			producto = Producto.objects.get(id_producto=producto_data[i])
-			recurso = Recurso.objects.get(id_recurso=producto.id_recurso.id_recurso)
-			kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
-			totales_data[i]=float(totales_data[i])
-			cantidades_data[i]=int(cantidades_data[i])
-			movimiento = Movimiento.objects.create(
-				id_kardex=kardex,
-				cantidad_movimiento=cantidades_data[i],
-				costo_unitario_movimiento=get_costo_unitario_venta(producto),
-				monto_movimiento=totales_data[i],
-				is_Input=True,
-			)
-			movimiento.save()
-			movimiento.cantidad_saldo = get_existencias(kardex)
-			movimiento.monto_saldo = get_monto(kardex)
-			movimiento.costo_unitario_saldo = get_costo(kardex)
-			movimiento.save()
-			if not venta.id_cliente.filter(id_cliente=clientes_data[i]):
-				venta.id_cliente.add(clientes_data[i])
+		producto = Producto.objects.get(id_producto=1)
+		recurso = Recurso.objects.get(id_recurso=producto.id_recurso.id_recurso)
+		kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+		total_data=float(total_data)
+		cantidad_data=int(cantidad_data)
+		movimiento = Movimiento.objects.create(
+			id_kardex=kardex,
+			cantidad_movimiento=cantidad_data,
+			costo_unitario_movimiento=total_data/cantidad_data,
+			monto_movimiento=total_data,
+			is_Input=False,
+		)
+		movimiento.save()
+		
 		message = 'La venta ha sido registrada'
 		return JsonResponse(data={'message': message, 'success_url': self.success_url})
 

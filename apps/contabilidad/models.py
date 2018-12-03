@@ -227,7 +227,7 @@ class EstadoFinanciero(models.Model):
         blank=False,
         null=True
 	)
-	id_perido_contable = models.ForeignKey(
+	id_periodo_contable = models.ForeignKey(
         PeriodoContable,
         verbose_name='Período Contable',
         on_delete=models.SET_NULL,
@@ -255,7 +255,7 @@ class EstadoFinanciero(models.Model):
 		return self.nombre_estado_financiero
 	
 	class Meta:
-		ordering = ["id_perido_contable", "nombre_estado_financiero"]
+		ordering = ["id_periodo_contable", "nombre_estado_financiero"]
 		verbose_name = "Estado Financiero"
 		verbose_name_plural = "Estados Financieros"
 
@@ -264,7 +264,7 @@ class Mayorizacion(models.Model):
 	id_mayorizacion = models.AutoField(
 		primary_key = True
 	)
-	id_perido_contable = models.ForeignKey(
+	id_periodo_contable = models.ForeignKey(
 		PeriodoContable,
 		verbose_name='Períodos contables',
         on_delete=models.SET_NULL,
@@ -299,10 +299,10 @@ class Mayorizacion(models.Model):
 	)
 	
 	def __str__(self):
-		return self.id_perido_contable
+		return self.id_periodo_contable
 
 	class Meta:
-		ordering = ["id_mayorizacion","id_perido_contable"]
+		ordering = ["id_mayorizacion","id_periodo_contable"]
 		verbose_name = "Mayorizacion"
 		verbose_name_plural = "Mayorizaciones"
 
@@ -322,7 +322,7 @@ class TipoTransaccion(models.Model):
         }
 	)
 	descripcion_tipo = models.CharField(
-		max_length = 100,
+		max_length = 250,
 		verbose_name='Descripción del tipo transacción',
         blank=False,
         null=True,
@@ -345,7 +345,7 @@ class Transaccion(models.Model):
 	id_transaccion = models.AutoField(
 		primary_key = True
 	)
-	id_perido_contable = models.ForeignKey(
+	id_periodo_contable = models.ForeignKey(
 		PeriodoContable,
 		verbose_name='Período Contable',
         on_delete=models.SET_NULL,
