@@ -45,11 +45,11 @@
                             <td class="text-center">{{ compra.id_compra }}</td>
                             <td>{{ compra.id_factura.transaccion.fecha_transaccion|date:"SHORT_DATE_FORMAT" }}</td>
                             <td>$ {{ compra.id_factura.total_factura }}</td>
-                            {% if compra.is_credito and compra.is_contado %}
+                            {% if compra.id_factura.is_credito and compra.id_factura.is_contado %}
                               <td>Parcialmente al Credito</td>
-                            {% elif compra.is_credito %}
+                            {% elif compra.id_factura.is_credito %}
                               <td>Al Crédito</td>
-                            {% else %}
+                            {% elif compra.id_factura.is_contado %}
                               <td>Al Contado</td>
                             {% endif %}
                             <td class="text-center">

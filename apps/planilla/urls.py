@@ -66,13 +66,13 @@ urlpatterns = [
         name='empleado-crear'
     ),
     path(
-        'edicion/empleado/<slug:pk>',
-        views.EmpleadoUpdateView.as_view(),
+        'edicion/empleado/',
+        views.EmpleadoCreateView.as_view(),
         name='empleado-edicion'
     ),
     path(
-        'detalle/empleado/<slug:pk>',
-        views.EmpleadoDetailView.as_view(),
+        'detalle/empleado/',
+        views.EmpleadoCreateView.as_view(),
         name='empleado-detalle'
     ),
     re_path(

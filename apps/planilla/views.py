@@ -4,7 +4,6 @@ from django.views.generic import CreateView, TemplateView, View
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.forms.models import model_to_dict
 from django.template import loader
@@ -23,25 +22,32 @@ import csv
 import datetime
 
 
-class DepartamentosListView(ListView):
+class DepartamentosListView(ListView, LoginRequiredMixin):
     model = Departamento
     template_name = 'planilla/gestionarDepartamentos.html'
     context_object_name = 'departamentos'
 
 
-class PuestosListView(ListView):
+class PuestosListView(ListView, LoginRequiredMixin):
     model = Puesto
     template_name = 'planilla/gestionarPuestos.html'
     context_object_name = 'puestos'
 
 
-class EmpleadosListView(ListView):
+class EmpleadosListView(ListView, LoginRequiredMixin):
     model = Empleado
     template_name = 'planilla/gestionarEmpleados.html'
     context_object_name = 'empleados'
 
+    def get_queryset(self):
+        context = Empleado.objects.all().filter(is_active=True)
+        if context:
+            return context
+        else:
+            return render(self.request, template_name='404.html')
 
-class DepartamentoCreateView(CreateView):
+
+class DepartamentoCreateView(CreateView, LoginRequiredMixin):
     model = Departamento
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:departamentos')
@@ -51,7 +57,7 @@ class DepartamentoCreateView(CreateView):
     ]
 
 
-class PuestoCreateView(CreateView):
+class PuestoCreateView(CreateView, LoginRequiredMixin):
     model = Puesto
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:puestos')
@@ -64,14 +70,14 @@ class PuestoCreateView(CreateView):
     ]
 
 
-class EmpleadoCreateView(View):
+class EmpleadoCreateView(View, LoginRequiredMixin):
     
     def get(self, request):
-        user_form = UserCreationForm(instance=request.user)
+        user_form = UserForm(instance=request.user)
         empleado_form = EmpleadoForm(instance=request.user.empleado)
         return render(
             request,
-            'editEmpleado.html',
+            'planilla/editEmpleado.html',
             context={
                 'user_form': user_form,
                 'empleado_form': empleado_form
@@ -79,7 +85,7 @@ class EmpleadoCreateView(View):
         )
     
     def post(self, request):
-        user_form = UserCreationForm(request.POST, instance=request.user)
+        user_form = UserForm(request.POST, instance=request.user)
         empleado_form = EmpleadoForm(request.POST, instance=request.user.empleado)
         if user_form.is_valid() and empleado_form.is_valid():
             user_form.save()
@@ -89,7 +95,7 @@ class EmpleadoCreateView(View):
         messages.error(request, 'Por favor corrija los siguientes errores')
 
 
-class DepartamentoUpdateView(UpdateView):
+class DepartamentoUpdateView(UpdateView, LoginRequiredMixin):
     model = Departamento
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:departamentos')
@@ -99,7 +105,7 @@ class DepartamentoUpdateView(UpdateView):
     ]
 
 
-class PuestoUpdateView(UpdateView):
+class PuestoUpdateView(UpdateView, LoginRequiredMixin):
     model = Puesto
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:puestos')
@@ -112,7 +118,7 @@ class PuestoUpdateView(UpdateView):
     ]
 
 
-class EmpleadoUpdateView(UpdateView):
+class EmpleadoUpdateView(UpdateView, LoginRequiredMixin):
     model = Empleado
     template_name = 'editForm.html'
     success_url = reverse_lazy('planilla:empleados')
@@ -126,7 +132,7 @@ class EmpleadoUpdateView(UpdateView):
     ]
 
 
-class DepartamentoDetailView(DetailView):
+class DepartamentoDetailView(DetailView, LoginRequiredMixin):
     model = Departamento
     template_name = 'planilla/viewDepartamento.html'
     success_url = reverse_lazy('planilla:departamentos')
@@ -137,7 +143,7 @@ class DepartamentoDetailView(DetailView):
     context_object_name = 'departamento'
 
 
-class PuestoDetailView(DetailView):
+class PuestoDetailView(DetailView, LoginRequiredMixin):
     model = Puesto
     template_name = 'planilla/viewPuesto.html'
     success_url = reverse_lazy('planilla:puestos')
@@ -151,7 +157,7 @@ class PuestoDetailView(DetailView):
     context_object_name = 'puesto'
 
 
-class EmpleadoDetailView(DetailView):
+class EmpleadoDetailView(DetailView, LoginRequiredMixin):
     model = Empleado
     template_name = 'planilla/viewEmpleado.html'
     success_url = reverse_lazy('planilla:empleados')
@@ -186,6 +192,6 @@ def puestos(request, id_puesto):
 def empleados(request, id):   
     if request.method == 'DELETE':
         parametro = Empleado.objects.get(id=id)
-        parametro.delete()
+        parametro.is_active = False
         message = "El empleado fue borrado exitosamente"
         return JsonResponse(data={'message': message})

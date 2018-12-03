@@ -181,11 +181,11 @@ class Empleado(models.Model):
     def __str__(self):
         return '%s %s' % (self.empleado.first_name, self.empleado.last_name)
 
-    """@receiver(post_save, sender=User)
+    @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
             Empleado.objects.create(empleado=instance)
 
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
-        instance.empleado.save()"""
+        instance.empleado.save()

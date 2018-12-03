@@ -28,34 +28,12 @@ class ProveedoresListView(LoginRequiredMixin, ListView):
 	template_name = 'inventario/gestionarProveedores.html'
 	context_object_name = 'proveedores'
 
-	def get_queryset(self):
-		user = self.request.user
-		context = Proveedor.objects.all()
-		if context:
-			return context
-		else:
-			return render(self.request, template_name='404.html')
-
-	def get_context_data(self, **kwargs):
-		context = super(ProveedoresListView, self).get_context_data(**kwargs)
-		return context
 
 class ClientesListView(LoginRequiredMixin, ListView):
 	model = Cliente
 	template_name = 'inventario/gestionarClientes.html'
 	context_object_name = 'clientes'
 
-	def get_queryset(self):
-		user = self.request.user
-		context = Cliente.objects.all()
-		if context:
-			return context
-		else:
-			return render(self.request, template_name='404.html')
-
-	def get_context_data(self, **kwargs):
-		context = super(ClientesListView, self).get_context_data(**kwargs)
-		return context
 
 class VentasListView(LoginRequiredMixin, ListView):
 	model = Venta
@@ -63,7 +41,7 @@ class VentasListView(LoginRequiredMixin, ListView):
 	context_object_name = 'ventas'
 
 	def get_queryset(self):
-		user = self.request.user
+		
 		context = Venta.objects.all()
 		if context:
 			return context
@@ -427,7 +405,7 @@ def impuestos(request, id_impuesto):
     if request.method == 'DELETE':
         parametro = Impuesto.objects.get(id_impuesto=id_impuesto)
         parametro.delete()
-        message = "El proveedor fue borrado exitosamente"
+        message = "El impuesto fue borrado exitosamente"
         return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')

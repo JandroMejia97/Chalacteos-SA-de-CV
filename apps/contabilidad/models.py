@@ -139,7 +139,7 @@ class PeriodoContable(models.Model):
 		return str(self.fecha_inicio_periodo.strftime('%d/%m/%y %H:%M:%S'))+" - "+str(self.fecha_final_periodo.strftime('%d/%m/%y %H:%M:%S'))
 
 	class Meta:
-		ordering = ["id_periodo_contable"]
+		ordering = ["fecha_inicio_periodo"]
 		verbose_name = "Período Contable"
 		verbose_name_plural = "Períodos Contables"
 
@@ -425,6 +425,13 @@ class Movimiento(models.Model):
         blank=False,
         null=True
 	)
+	periodo_contable = models.ForeignKey(
+		PeriodoContable,
+		verbose_name='Período Contable',
+        on_delete=models.SET_NULL,
+        blank=False,
+        null = True
+	)
 	id_cuenta = models.ForeignKey(
 		Cuenta,
 		verbose_name='Cuenta',
@@ -478,7 +485,7 @@ class Movimiento(models.Model):
 			return 'Transaccion: '+str(self.id_transaccion.numero_transaccion)+' Movimiento: '+str(self.id_movimiento)+'\tCargoo: '+str(self.monto_cargo)
 
 	class Meta:
-		ordering = ["id_transaccion", "id_movimiento"]
+		ordering = ["periodo_contable", "id_transaccion", "id_movimiento"]
 		verbose_name = "Movimiento"
 		verbose_name_plural = "Movimientos"
 												
