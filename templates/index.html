@@ -179,6 +179,64 @@
                 </div>
             </div>
         </div>
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-check-circle"></i>
+                <strong>Recursos Humanos</strong>
+            </div>
+            <div class="card-body">
+                <div class="row bold">
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'planilla:departamentos' %}')">
+                        <div class="card text-white bg-primary o-hidden h-100">
+                            <div class="card-body">
+                                <div class="card-body-icon">
+                                <i class="fas fa-fw fa-address-book"></i>
+                                </div>
+                                <div class="mr-5">Departamentos</div>
+                            </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'planilla:puestos' %}')">
+                        <div class="card text-white bg-warning o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                            <i class="fas fa-fw fa-address-card"></i>
+                            </div>
+                            <div class="mr-5">Puestos</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="#">
+                            <span class="float-left">Ver Detalles</span>
+                            <span class="float-right">
+                            <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-sm-6 mb-4" onclick="redirect('{% url 'planilla:empleados' %}')">
+                        <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-cart-arrow-down"></i>
+                            </div>
+                            <div class="mr-5">Empleados</div>
+                        </div>
+                            <a class="card-footer text-white clearfix small z-1" href="#">
+                                <span class="float-left">Ver Detalles</span>
+                                <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- /.container-fluid -->
         <!-- Sticky Footer -->
       </div>
