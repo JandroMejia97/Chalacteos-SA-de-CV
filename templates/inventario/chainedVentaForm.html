@@ -122,6 +122,7 @@
               var credito = 0;
               var isContado = true;
               var isCredito = false;
+              
               function getCheckbox(){
                 isContado = $("#id_is_contado").prop("checked");
                 isCredito = $("#id_is_credito").prop("checked");
@@ -155,6 +156,7 @@
                     addRows(cliente, producto, cantidad, precio);
                 }
               };
+              
               function addRows(cliente, producto, cantidad, precio){
                 console.log("registro")
                 totalFila=round(cantidad*precio);
@@ -199,44 +201,7 @@
                 number = Math.round(number*100)/100;
                 return number;
               };
-              function sendData(){
-                if(cliente!='' && cliente!='---------' && producto!='' && cantidad!='' && totalFila!=''){
-                  data = {}
-                  if(getData){
-                    data = {
-                    'cliente': cliente,
-                    'producto': producto,
-                    'totalFila': totalFila,
-                    'cantidad': cantidad,
-                    'proporcion': proporcion
-                  }
-                }else{
-                  data = {
-                    'cliente': cliente,
-                    'producto': producto,
-                    'totalFila': totalFila,
-                    'cantidad': cantidad,
-                  }
-                }
-                $.ajax({
-                  url: "{% url 'inventario:ajax-venta' %}",
-                  type: "POST",
-                  data: data,
-                  success: function(data){
-                    console.log(data);
-                    console.log("SUCCES");
-                  },
-                  dataType: "json"
-                }).done(function(data){
-                  location.href = data.success_url;
-                }).fail(function() {
-                  console.log("error");
-                  alert("La transaccion no pudo ser realizada");
-                }).always(function() {
-                  console.log("complete");
-                });
-              }
-            }
+              
             function sendData() {
               var data = {}
               if(totalVenta > 0){

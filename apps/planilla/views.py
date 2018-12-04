@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from django.views.generic import CreateView, TemplateView, View
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
@@ -192,12 +191,11 @@ def puestos(request, id_puesto):
 @login_required(login_url = '/sign-in/')
 def empleados(request, id):   
 	if request.method == 'DELETE':
-		parametro = Empleado.objects.get(id = id)
+		parametro = Empleado.objects.get(id=id)
 		parametro.is_active = False
 		message = "El empleado fue borrado exitosamente"
-		return JsonResponse(data = {'message': message})
+		return JsonResponse(data={'message': message})
 
-@login_required(login_url = '/sign-in/')
 def import_data_departamento(request):
 	f = 'C:\\departamentos.csv'
 	with open(f) as file:

@@ -1,11 +1,14 @@
 {% extends 'header&footer.html' %}
-{% block title %}SAeL - Ver Kardex{% endblock title %}
+{% block title %}SCIeL - Edición / {% endblock title %}
 
-{% block content %}    
+{% block content %}
+  
   {% block sidebar %}
     {% include 'sidebarInventario.html' %}
   {% endblock sidebar %}
   {% block tables %}
+  {% load bootstrap %}
+  {% load l10n %}
     <div id="content-wrapper">
       <div class="container-fluid">
         <!-- Breadcrumbs-->
@@ -24,8 +27,9 @@
             </button>
           </a>
           <a href="{% url 'inventario:venta-crear' %}">
-            <button class="btn btn-primary btn-plus"  type="button">
+            <button class="btn btn-primary btn-plus" type="button" >
               Registrar Venta
+
               <i class="fas fa-plus-circle"></i>
             </button>
           </a>
@@ -100,5 +104,4 @@
       <i class="fas fa-angle-up"></i>
     </a>
   {% endblock tables %}
-    
 {% endblock content %}

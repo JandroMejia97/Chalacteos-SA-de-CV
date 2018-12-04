@@ -71,7 +71,6 @@ class ImpuestosListView(LoginRequiredMixin, ListView):
 	template_name = 'inventario/gestionarImpuestos.html'
 	context_object_name = 'impuestos'
 
-
 class MateriasPrimasListView(LoginRequiredMixin, ListView):
 	model = MateriaPrima
 	template_name = 'inventario/gestionarMateriaPrima.html'
@@ -97,7 +96,6 @@ class ClienteCreateView(LoginRequiredMixin, CreateView):
 		'nombre_cliente',
 		'nombre_titular_cliente'
 	]
-
 
 class DetalleVentaCreateView(LoginRequiredMixin, CreateView):
 	model = Detalle
@@ -276,7 +274,7 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 		else:
 			data['proporcion'] = float(request.POST['proporcion'])/100
 			data['compra'] = 'PROPORCION'
-			
+
 			transaccion = conta.registrar_transaccion(data)
 
 			factura = Factura.objects.create(
@@ -321,8 +319,7 @@ class CompraCreateView(LoginRequiredMixin, TemplateView):
 				compra.id_proveedor.add(proveedores_data[i])
 		message = 'La compra ha sido registrada'
 		return JsonResponse(data={'message': message, 'success_url': self.success_url})
-
-
+		
 class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 	model = Impuesto
 	template_name = 'editForm.html'
@@ -333,7 +330,6 @@ class ImpuestoCreateView(LoginRequiredMixin, CreateView):
 		'descripcion_impuesto',
 		'tasa_impuesto'
 	]
-
 
 class MateriaPrimaCreateView(LoginRequiredMixin, TemplateView):
 	template_name = 'inventario/chainedMateriaPrimaForm.html'
@@ -376,7 +372,6 @@ class ProveedorUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_titular_proveedor'
 	]
 
-
 class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 	model = Cliente
 	template_name = 'editForm.html'
@@ -386,7 +381,6 @@ class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 		'nombre_cliente',
 		'nombre_titular_cliente'
 	]
-
 
 class ImpuestoUpdateView(LoginRequiredMixin, UpdateView):
 	model = Impuesto
@@ -443,7 +437,6 @@ class ProveedorDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'proveedor'
 
-
 class ClienteDetailView(LoginRequiredMixin, DetailView):
 	model = Cliente
 	template_name = 'inventario/viewCliente.html'
@@ -454,7 +447,6 @@ class ClienteDetailView(LoginRequiredMixin, DetailView):
 		'nombre_titular_cliente'
 	]
 	context_object_name = 'cliente'
-
 
 class ImpuestoDetailView(LoginRequiredMixin, DetailView):
 	model = Impuesto
@@ -480,6 +472,17 @@ class MateriaPrimaDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'materia_prima'
 
+class RecursoDetailView(LoginRequiredMixin, DetailView):
+	model = Kardex
+	template_name = 'inventario/viewKardex.html'
+	success_url = reverse_lazy('inventario:kardex')
+	fields = [
+		'nombre_proveedor',
+		'nombre_recurso',
+		'descripcion_recurso',
+		'unidad_medida'
+	]
+
 @login_required(login_url='/sign-in/')
 def get_compra(request, id_compra):
 	context = {}
@@ -492,35 +495,35 @@ def get_compra(request, id_compra):
 
 @login_required(login_url='/sign-in/')
 def proveedores(request, id_proveedor):   
-    if request.method == 'DELETE':
-        parametro = Proveedor.objects.get(id_proveedor=id_proveedor)
-        parametro.delete()
-        message = "El proveedor fue borrado exitosamente"
-        return JsonResponse(data={'message': message})
+	if request.method == 'DELETE':
+		parametro = Proveedor.objects.get(id_proveedor=id_proveedor)
+		parametro.delete()
+		message = "El proveedor fue borrado exitosamente"
+		return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')
 def clientes(request, id_cliente):   
-    if request.method == 'DELETE':
-        parametro = Cliente.objects.get(id_cliente=id_cliente)
-        parametro.delete()
-        message = "El cliente fue borrado exitosamente"
-        return JsonResponse(data={'message': message})
+	if request.method == 'DELETE':
+		parametro = Cliente.objects.get(id_cliente=id_cliente)
+		parametro.delete()
+		message = "El cliente fue borrado exitosamente"
+		return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')
 def impuestos(request, id_impuesto):   
-    if request.method == 'DELETE':
-        parametro = Impuesto.objects.get(id_impuesto=id_impuesto)
-        parametro.delete()
-        message = "El impuesto fue borrado exitosamente"
-        return JsonResponse(data={'message': message})
+	if request.method == 'DELETE':
+		parametro = Impuesto.objects.get(id_impuesto=id_impuesto)
+		parametro.delete()
+		message = "El impuesto fue borrado exitosamente"
+		return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')
 def materiales(request, id_materia_prima):   
-    if request.method == 'DELETE':
-        parametro = MateriaPrima.objects.get(id_materia_prima=id_materia_prima)
-        parametro.delete()
-        message = "La materia prima fue borrada exitosamente"
-        return JsonResponse(data={'message': message})
+	if request.method == 'DELETE':
+		parametro = MateriaPrima.objects.get(id_materia_prima=id_materia_prima)
+		parametro.delete()
+		message = "La materia prima fue borrada exitosamente"
+		return JsonResponse(data={'message': message})
 
 @login_required(login_url='/sign-in/')		
 def load_materia(request):
@@ -558,22 +561,22 @@ def get_movimientos(request, id_kardex):
 		return render(request, template_name='404.html')
 
 def get_existencias(id_kardex):
-    entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_entradas=models.Sum('cantidad_movimiento'))
-    if entradas['total_entradas'] == None:
-        entradas['total_entradas'] = 0
-    salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_salidas=models.Sum('cantidad_movimiento'))
-    if salidas['total_salidas'] == None:
-        salidas['total_salidas'] = 0
-    return float(entradas['total_entradas'])-float(salidas['total_salidas'])
+	entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_entradas=models.Sum('cantidad_movimiento'))
+	if entradas['total_entradas'] == None:
+		entradas['total_entradas'] = 0
+	salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_salidas=models.Sum('cantidad_movimiento'))
+	if salidas['total_salidas'] == None:
+		salidas['total_salidas'] = 0
+	return float(entradas['total_entradas'])-float(salidas['total_salidas'])
 
 def get_monto(id_kardex):
-    monto_entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_monto=models.Sum('monto_movimiento'))
-    if monto_entradas['total_monto'] == None:
-        monto_entradas['total_monto'] = 0
-    monto_salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_monto=models.Sum('monto_movimiento'))
-    if monto_salidas['total_monto'] == None:
-        monto_salidas['total_monto'] = 0
-    return float(monto_entradas['total_monto'])-float(monto_salidas['total_monto'])
+	monto_entradas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=True).aggregate(total_monto=models.Sum('monto_movimiento'))
+	if monto_entradas['total_monto'] == None:
+		monto_entradas['total_monto'] = 0
+	monto_salidas = Movimiento.objects.filter(id_kardex=id_kardex).filter(is_Input=False).aggregate(total_monto=models.Sum('monto_movimiento'))
+	if monto_salidas['total_monto'] == None:
+		monto_salidas['total_monto'] = 0
+	return float(monto_entradas['total_monto'])-float(monto_salidas['total_monto'])
 
 def get_costo(id_kardex):
 	if get_monto(id_kardex) == 0 or get_existencias(id_kardex) == 0:
@@ -582,6 +585,19 @@ def get_costo(id_kardex):
 		costo = get_monto(id_kardex)/get_existencias(id_kardex)
     
 	return float(costo)
+
+def get_costo_unitario_venta(request, id):
+	producto= Producto.objects.get(id_producto=id)
+	recurso = Recurso.objects.get(nombre_recurso=producto.id_recurso)
+	kardex = Kardex.objects.get(id_recurso=recurso.id_recurso)
+	movimiento = Movimiento.objects.get(id_kardex=kardex.id_kardex)
+
+	if 'producto_form' not in context:
+		context['producto_form'] = RecursoProductoForm(instance=recurso)
+	if 'movimiento_form' not in context:
+		context['movimiento_form'] = MovimientoForm(instance=movimiento)
+	context['id_producto'] = producto
+	return context
 
 def import_data_proveedor(request):
 	f = 'C:\\proveedores.csv'

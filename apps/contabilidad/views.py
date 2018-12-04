@@ -19,6 +19,7 @@ from django.utils import timezone
 from .models import *
 from .forms import *
 
+import datetime
 import csv
 import json
 
@@ -431,6 +432,63 @@ def registrar_transaccion(data):
 			periodo_contable=periodo_instance,
 			id_cuenta=cuentas['iva'],
 			monto_cargo=data['iva'],
+			monto_abono=None
+		)
+	elif data['tipo'] == 'VENTA':
+		cuentas['inv_pt'] = Cuenta.objects.get(codigo_cuenta=111104)
+		cuentas['iva_v'] = Cuenta.objects.get(codigo_cuenta=2111)
+		if data['venta'] == 'CREDITO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA AL CREDITO')
+			cuentas['cc'] = Cuenta.objects.get(codigo_cuenta=1104)
+			movimiento_cargo = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
+				id_cuenta=cuentas['cc'],
+				monto_cargo=data['total'],
+				monto_abono=None
+			)
+		elif data['venta'] == 'CONTADO':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA AL CONTADO')
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
+			movimiento_cargo = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=data['total'],
+				monto_abono=None
+			)
+		elif data['venta'] == 'PROPORCION':
+			tipo = TipoTransaccion.objects.get(nombre_tipo='VENTA PARCIALMENTE AL CREDITO')
+			cuentas['cc'] = Cuenta.objects.get(codigo_cuenta=1104)
+			cuentas['cg'] = Cuenta.objects.get(codigo_cuenta=110101)
+			movimiento_cargo1 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
+				id_cuenta=cuentas['cg'],
+				monto_cargo=data['total']*(1-data['proporcion']),
+				monto_abono=None
+			)
+			movimiento_cargo2 = Movimiento.objects.create(
+				id_transaccion=transaccion,
+				periodo_contable=periodo_instance,
+				id_cuenta=cuentas['cc'],
+				monto_cargo=data['total']*data['proporcion'],
+				monto_abono=None
+			)
+		transaccion.id_tipo = tipo
+		transaccion.save()
+		inventario_abono = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			periodo_contable=periodo_instance,
+			id_cuenta=cuentas['inv_pt'],
+			monto_cargo=None,
+			monto_abono=data['total']
+		)
+		iva_abono = Movimiento.objects.create(
+			id_transaccion=transaccion,
+			id_cuenta=cuentas['iva_v'],
+			periodo_contable=periodo_instance,
+			monto_cargo=None,
 			monto_abono=None
 		)
 	return transaccion

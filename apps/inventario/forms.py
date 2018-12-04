@@ -2,6 +2,7 @@ from django import forms
 
 from .models import *
 
+
 class VentaForm(forms.ModelForm):
     scope_prefix = 'venta_data'
     form_name = 'venta_form'
@@ -10,6 +11,7 @@ class VentaForm(forms.ModelForm):
         fields = [
             'id_cliente'
         ]
+
 
 class MovimientoForm(forms.ModelForm):
     scope_prefix = 'movimiento_data'
@@ -20,6 +22,7 @@ class MovimientoForm(forms.ModelForm):
             'costo_unitario_movimiento'
         ]
 
+
 class RecursoProductoForm(forms.ModelForm):
     scope_prefix = 'producto_data'
     form_name = 'producto_form'
@@ -29,6 +32,7 @@ class RecursoProductoForm(forms.ModelForm):
         fields = [
             'nombre_recurso'
         ]
+
 
 class DetalleVentaForm(forms.ModelForm):
     scope_prefix = 'detalle_venta_data'
@@ -43,6 +47,7 @@ class DetalleVentaForm(forms.ModelForm):
         super(DetalleVentaForm, self).__init__(*args,**kwargs)
         self.fields['cantidad_detalle'].widget.attrs.update({'min':'0'})
 
+
 class CompraForm(forms.ModelForm):
     scope_prefix = 'compra_data'
     form_name = 'compra_form'
@@ -52,6 +57,7 @@ class CompraForm(forms.ModelForm):
         fields = [
             'id_proveedor'
         ]
+
 
 class DetalleCompraForm(forms.ModelForm):
     scope_prefix = 'detalle_compra_data'
@@ -75,6 +81,7 @@ class DetalleCompraForm(forms.ModelForm):
         self.fields['precio_unitario'].widget.attrs.update({'min':'0', 'step':0.01})
         self.fields['id_materia_prima'].choices = (('', '---------'),)
         self.fields['id_materia_prima'].widget.attrs.update({'disabled': 'true'})
+
 
 class RecursoForm(forms.ModelForm):
     scope_prefix = 'recurso_data'
@@ -164,6 +171,7 @@ class ProveedorForm(forms.ModelForm):
             help_text='Seleccione el proveedor al que se le comprará la materia prima',
         )
 
+
 class ClienteVentaForm(forms.ModelForm):
     scope_prefix = 'cliente_data'
     form_name = 'cliente_form'
@@ -204,3 +212,4 @@ class ClienteVentaForm(forms.ModelForm):
         })
         self.fields['is_contado'].widget.attrs.update({'onchange':'getCheckbox()', 'checked': 'checked'})
         self.fields['is_credito'].widget.attrs.update({'onchange':'getCheckbox()'})
+ 
