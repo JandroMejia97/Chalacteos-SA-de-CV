@@ -20,25 +20,25 @@ class Catalogo(models.Model):
 
 class Empresa(models.Model):
 	id_empresa = models.AutoField(
-		primary_key = True
+		primary_key=True
 	)
-	id_usuario = models.OneToOneField(
+	propietario = models.OneToOneField(
 		User,
 		verbose_name='Usuario',
-        on_delete=models.CASCADE,
-        blank=False
+		on_delete=models.CASCADE,
+		blank=False
 	)
 	id_catalogo = models.OneToOneField(
 		Catalogo,
 		verbose_name='Catálogo',
-        on_delete=models.CASCADE,
-        blank=False
+		on_delete=models.CASCADE,
+		blank=False
 	)
 	nombre_empresa = models.CharField(
 		max_length = 30,
 		verbose_name='Nombre de la Empresa',
-        blank=False,
-        help_text="Ingrese el nombre de la empresa"
+		blank=False,
+		help_text="Ingrese el nombre de la empresa"
 	)
 
 	def __str__(self):
