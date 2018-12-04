@@ -58,6 +58,10 @@
                                 <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ compra.id_compra }}, '{{ compra.id_cliente }}', 'COMPRA');" style="color:gray !important"></a>
                             </td>                          
                         </tr>
+                    {% empty %}
+                      <tr>
+                        <td>Lo sentimos, no hay compras registradas</td>
+                      </tr>
                     {% endfor %}
                 </tbody>
               </table>

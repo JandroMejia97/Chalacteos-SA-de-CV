@@ -512,9 +512,53 @@ def estados_financieros(request, id_estado_financiero):
 
 def mayorizar(request):
 	if request.method == 'GET':
+		cargos = 0
+		abonos = 0
 		periodo = PeriodoContable.objects.all().last()
 		movimientos = Movimiento.objects.all().filter(periodo_contable=periodo)
-		cuentas = Cuenta.objects.all().filter(codigo_cuenta_padre=None)
+		cuentas_padre = Cuenta.objects.filter(codigo_cuenta_padre=None).order_by('codigo_cuenta', 'codigo_cuenta_padre')
+		for cuenta_padre in cuentas_padre:
+			cuentas_hijas = Cuenta.objects.filter(codigo_cuenta_padre=cuenta_padre).order_by('codigo_cuenta', 'codigo_cuenta_padre')
+			for cuenta_hija in cuentas_hijas:
+				cuentas_menores = Cuenta.objects.filter(codigo_cuenta_padre=cuenta_hija).order_by('codigo_cuenta', 'codigo_cuenta_padre')
+				for cuenta_menor in cuentas_menores:
+					if cuenta_menor:
+						movimientos = Movimiento.objects.filter(periodo_contable=periodo).filter(id_cuenta=cuenta_menor)
+						for movimiento in movimientos:
+							if movimiento.monto_cargo:
+								cargos += movimiento.monto_cargo
+							elif movimiento.monto_abono:
+								abonos += movimiento.monto_abono
+				if cuenta_hija:
+					movimientos = Movimiento.objects.filter(periodo_contable=periodo).filter(id_cuenta=cuenta_hija)
+					for movimiento in movimientos:
+							if movimiento.monto_cargo:
+								cargos += movimiento.monto_cargo
+							elif movimiento.monto_abono:
+								abonos += movimiento.monto_abono
+			if cuenta_padre:
+				movimientos = Movimiento.objects.filter(periodo_contable=periodo).filter(id_cuenta=cuenta_padre)
+				for movimiento in movimientos:
+					if movimiento.monto_cargo:
+						cargos += movimiento.monto_cargo
+					elif movimiento.monto_abono:
+						abonos += movimiento.monto_abono								
+
+			if cargos > abonos:
+				mayorizacion = Mayorizacion.objects.create(
+					id_periodo_contable=periodo,
+					id_cuenta=cuenta_padre,
+					monto_saldo=cargos - abonos,
+					is_saldo_acreedor=False
+				)
+			elif cargos < abonos:
+				mayorizacion = Mayorizacion.objects.create(
+					id_periodo_contable=periodo,
+					id_cuenta=cuenta_padre,
+					monto_saldo=abonos - cargos,
+					is_saldo_acreedor=True
+				)
+				
 
 def mayor(cuenta, periodo):
 	cuentas = Cuenta.object.filter(codigo_cuenta_padre=cuenta)
