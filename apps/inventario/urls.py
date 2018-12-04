@@ -135,6 +135,11 @@ urlpatterns = [
 		name='materia-prima-detalle'
 	),
 	re_path(
+		r'detalle/compra/(?P<id_compra>[0-9]+)/',
+		views.get_compra,
+		name='materia-compra'
+	),
+	re_path(
         r'ajax/proveedor/(?P<id_proveedor>[0-9]+)/',
         views.proveedores,
         name='ajax-proveedor'
@@ -163,5 +168,10 @@ urlpatterns = [
 		'ajax/load/materia/',
 		views.load_materia,
 		name='ajax-materia'
+	),
+	path(
+		'ajax/venta/',
+		views.VentaCreateView.as_view(),
+		name='ajax-venta'
 	),
 ]

@@ -6,6 +6,26 @@ app_name = 'planilla'
 
 urlpatterns = [
     path(
+		'import/puestos/',
+		views.import_data_puesto,
+		name='import-puesto'
+	),
+    path(
+		'import/empleados/',
+		views.import_data_empleado,
+		name='import-empleado'
+	),
+    path(
+		'import/usuarios/',
+		views.import_data_usuario,
+		name='import-usuario'
+	),
+    path(
+		'import/departamentos/',
+		views.import_data_departamento,
+		name='import-departamento'
+	),
+    path(
         'departamentos/',
         views.DepartamentosListView.as_view(),
         name='departamentos'

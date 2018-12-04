@@ -353,6 +353,7 @@ class EstadoCapitalDetailView(LoginRequiredMixin, DetailView):
 	]
 	context_object_name = 'estado_capital'
 
+@login_required(login_url='/sign-in/')
 def get_movimientos(request, id_transaccion):
 	context = {}
 	context['transaccion'] = Transaccion.objects.get(id_transaccion=id_transaccion)

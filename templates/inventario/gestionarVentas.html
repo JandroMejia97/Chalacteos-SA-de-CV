@@ -35,7 +35,10 @@
                       <th>Venta N°</th>
                       <th>Cliente</th>
                       <th>Factura N°</th>
-                      <th>Operaciones</th>
+                      <th>Sub Total</th>
+                      <th>IVA</th>
+                      <th>Total</th>
+                      <!--<th>Operaciones</th>-->
                   </tr>
                 </thead>
                 <tbody>
@@ -44,11 +47,14 @@
                             <td class="text-center">{{ venta.id_venta }}</td>
                             <td>{{ venta.id_cliente }}</td>
                             <td>{{ venta.id_factura }}</td>
-                            <td class="text-center">
+                            <td>{{ venta.id_factura.sub_total_factura }}</td>
+                            <td>{{ venta.id_factura.monto_aplicacion }}</td>
+                            <td>{{ venta.id_factura.total_factura }}</td>
+                            <!--<td class="text-center">
                                 <a class="fas fa-w fa-eye" name="ver" href="#"  data-toggle="modal" onclick="redirectView('VENTA', {{ venta.id_venta }})" style="color:gray !important"></a>
                                 <a class="fas fa-w fa-edit" name="editar" href="#" onclick="redirectEdit('VENTA', {{ venta.id_venta }})" style="color:gray !important"></a>
                                 <a class="fas fa-w fa fa-trash" name="eliminar" href="#" onclick="operacion({{ venta.id_venta }}, '{{ venta.id_cliente }}', 'VENTA');" style="color:gray !important"></a>
-                            </td>                          
+                            </td>-->
                         </tr>
                     {% endfor %}
                 </tbody>
