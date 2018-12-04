@@ -237,17 +237,16 @@ def import_data_puesto(request):
 def import_data_empleado(request):
 	f = 'C:\\empleados.csv'
 	with open(f) as file:
-		count = 3
+		count = 2
 		reader = csv.reader(file)
 		for new in reader:
 			row = new[0].split(";")
 			empleado = User.objects.get(id=count)
-			puesto = Puesto.objetcs.get(id_puesto=new[1])
-			dui = new[2]
-			fecha_nacimiento = new[3]
-			telefono = new[4]
-			direccion = new[5]
-			is_active = new[6]
+			puesto = Puesto.objects.get(id_puesto=new[0])
+			dui = new[1]
+			fecha_nacimiento = datetime.datetime.strptime(new[2], '%d/%m/%Y')
+			telefono = new[3]
+			direccion = new[4]
 			objeto, created = Empleado.objects.update_or_create(
 				empleado=empleado,
 				puesto=puesto,
@@ -255,7 +254,7 @@ def import_data_empleado(request):
 				fecha_nacimiento = fecha_nacimiento,
 				telefono = telefono,
 				direccion = direccion,
-				is_active = is_active,
+				is_active = True,
 			)
 			count+=1
 	return HttpResponse('Hecho') 

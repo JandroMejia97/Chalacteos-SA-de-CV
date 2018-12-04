@@ -22,7 +22,7 @@ import csv
 
 class ProveedoresListView(LoginRequiredMixin, ListView):
 	model = Proveedor
-	template_name = 'inventario/gestionarProveedores.html'
+	template_name = 'costeo/chainedOrdenForm.html'
 	context_object_name = 'proveedores'
 
 

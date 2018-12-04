@@ -4,5 +4,9 @@ from . import views
 
 app_name = 'costeo'
 urlpatterns = [
-    
+    path(
+		'crear/boleta/',
+		views.BoletaCreateView.as_view(),
+		name='boleta-crear'
+	),
 ]

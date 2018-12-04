@@ -1,0 +1,67 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión Requsición material{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarCosteo.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Boleta de trabajo</a>
+          </li>
+          <li class="breadcrumb-item active">Requsición material</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Requsición material
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <td colspan="2">Empresa:</td>
+                  </tr>
+                <tr>
+                    <tr class="text-center">
+                      <td colspan="1">No. de requisicion: </td>
+                      <td colspan="2"></td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="5">Fecha: </td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="5">Departamento: </td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="5">Solicita</td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="1">Cantidad</td>
+                      <td colspan="2">Descripcion</td>
+                      <td colspan="3">No de orden</td>
+                      <td colspan="4">Costo unitario ($)</td>
+                      <td colspan="5">Costo total<
+                    </tr>
+                  </tr>
+                </thead>
+
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}

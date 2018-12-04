@@ -172,6 +172,9 @@
                     case 'EMPLEADO':
                         url = '/ajax/empleado/'+id;
                         break;
+                    case 'BOLETA':
+                        url = '/ajax/boleta/'+id;
+                        break;
                 }
                 $('#confirmacion').attr('onclick', 'ejecutarAJAX('+id+',\''+url+'\')');
             };

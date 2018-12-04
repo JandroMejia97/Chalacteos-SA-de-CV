@@ -1,0 +1,69 @@
+{% extends 'header&footer.html' %}
+{% block title %}SAeL - Gestión de Clientes{% endblock title %}
+
+{% block content %}    
+  {% block sidebar %}
+    {% include 'sidebarCosteo.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Orden de fabricacion</a>
+          </li>
+          <li class="breadcrumb-item active">Orden de fabricacion</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Orden de fabricacion
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <td colspan="10"># orden de fabricacion</td>
+                  </tr>
+                  <tr>
+                    <td colspan="10">Departamento</td>
+                  </tr>
+                  <tr>
+                    <tr class="text-center">
+                      <th rowspan="2" style="vertical-align: middle !important">Fecha</th>
+                      <th colspan="3" style="vertical-align: middle !important">Materiales</th>
+                      <th colspan="3" style="vertical-align: middle !important">Mano de pobra</th>
+                      <th colspan="3" style="vertical-align: middle !important">CIF</th>
+                    </tr>
+                    <tr class="text-center">
+                      <th style="vertical-align: middle !important">Materia</th>
+                      <th style="vertical-align: middle !important">Cantidad</th>
+                      <th style="vertical-align: middle !important">Precio unitario</th>
+                      <th style="vertical-align: middle !important">#Obrero </th>
+                      <th style="vertical-align: middle !important<"Importe"</th>
+                      <th style="vertical-align: middle !important">Cantidad</th>
+                      <th style="vertical-align: middle !important">Costo Unitario</th>
+                      <th style="vertical-align: middle !important">Tasa</th>
+                      <th style="vertical-align: middle !important">Importe</th>
+
+                    </tr>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}

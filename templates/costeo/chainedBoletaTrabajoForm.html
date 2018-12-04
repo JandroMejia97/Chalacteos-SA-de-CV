@@ -1,0 +1,229 @@
+{% extends 'header&footer.html' %}
+{% block title %}SCIeL - Edición / {% endblock title %}
+
+{% block content %}
+  
+  {% block sidebar %}
+    {% include 'sidebarInventario.html' %}
+  {% endblock sidebar %}
+  {% block tables %}
+  {% load bootstrap %}
+  {% load l10n %}
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Edición  | Creación</a>
+          </li>
+          <li class="breadcrumb-item active">Ingreso de Datos</li>
+        </ol>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-edit"></i>
+                Edición | Creación
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="card-body" id="1">
+            <div>
+              <div class="col-lg-12 col-xs-12 border rounded">
+                <form name="compra_form" novalidate>
+                {% csrf_token %}
+                  <div class="row">
+                    <div class="col-lg-6 col-xs-12">
+                      <h4 class="mb-3 text-center header_id">EMPRESA</h4>
+                      {{ empresa_form|bootstrap_inline }}
+                      {{ departamento_form|bootstrap_inline }}
+                    </div>
+                    <br>
+                    <div  class="col-lg-6 col-xs-12">
+                      <h4 class="mb-3 text-center header_id">BOLETA DE TRABAJO</h4>
+                      {{ boleta_form|bootstrap_inline }}
+                    </div>
+                  </div>
+                  <div class="col-12 text-center">    
+                    <button class="btn btn-outline-primary btn-plus" onclick="getData()" type="button">
+                      Registrar requision 
+                      <i class="fas fa-plus-circle"></i>
+                    </button>
+                  </div><br>
+                </form>
+              </div>
+            </div>
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Boleta de trabajo
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <td colspan="2">Empresa:</td>
+                  </tr>
+                  <tr>
+                    <tr class="text-center">
+                      <td colspan="1">No. de orden: </td>
+                      <td colspan="2"></td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="1">Fecha: </td>
+                      <td colspan="2">Departamento: </td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="1">Hora comienzo</td>
+                      <td colspan="2">Nombre empleado: </td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="1">Hora finalización</td>
+                      <td colspan="2">Salario por hora </td>
+                    </tr>
+                    <tr class="text-center">
+                      <td colspan="1">Total de horas</td>
+                      <td colspan="2">Monto total</td>
+                    </tr>
+                  </tr>
+                </thead>
+            </table>
+                </div>
+              </div>
+            </div>
+            <div class="form-group text-center">
+              <br>
+              <button id='aprobar' type="submit" onclick="sendData()" class='btn btn-primary' style="width: 30%" href='#'>Guardar</button>
+              <button class='btn btn-secondary' onclick="javascript:history.back()" style="width: 30%" type='button'>Cancelar</button>                    
+            </div>
+          </div>
+            <script>
+              //Declarando variable globales
+              var count = 0;
+              var totalVenta = 0;
+              var subTotalVenta = 0;
+              var totalFila = 0;
+              var empleado = "";
+              var cantidad = 0;
+              var empresa = "";
+              var codigoEmpleado = null;
+              
+              function getData(){
+                console.log("ADDROWS")
+                count = count + 1;
+                codigoCliente = $("#id_nombre_cliente").val();
+                codigoDepartamento = $("#id_nombre").val();
+                var cbEmpleado = document.getElementById("id_nombre");
+                var cbDepartamento = document.getElementById("id_nombre");
+
+                empleado = cbEmpleado.options[cbEmpleado.selectedIndex].text;
+                departamento = cbDepartamento.options[cbDepartamento.selectedIndex].text;                
+                
+                cantidad = parseInt($("#id_cantidad").val());
+                var precio = parseFloat($("#id_costo_unitario_movimiento").val());
+                if(getCheckbox()){
+                  proporcion =  parseFloat($("#id_proporcion").val());
+                }
+                if(cliente!='' && cliente!='---------' && producto!='' && !isNaN(cantidad) && !isNaN(precio)){
+                    addRows(cliente, producto, cantidad, precio);
+                }
+              };
+              
+              function addRows(cliente, producto, cantidad, precio){
+                console.log("registro")
+                totalFila=round(cantidad*precio);
+                //totales+=totalFila+",";
+                subTotalVenta=round((subTotalVenta+totalFila));
+                iva=round(subTotalVenta*parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}}));
+                totalVenta=round(subTotalVenta*(1+parseFloat({{impuesto.tasa_impuesto|stringformat:'f'}})));
+                if(isCredito && isContado){
+                  credito = round(totalVenta*proporcion/100);
+                  contado = round(totalVenta*(1-proporcion/100));
+                }else{
+                  if(isCredito){
+                    credito = totalVenta;
+                  }else{
+                    contado = totalVenta;
+                  }
+                }
+                console.log("CANTIDAD");
+                $("#tbBody").append(
+                  "<tr><td class='text-center'>"+count+"</td>"+
+                  "<td>"+cliente+"</td>"+
+                  "<td>"+producto+"</td>"+
+                  "<td class='text-center'>"+cantidad+"</td>"+
+                  "<td class='text-center'>$ "+precio+"</td>"+
+                  "<td class='text-center'>$ "+totalFila+"</td></tr>"
+                );
+                $("#subTotal").empty();
+                $("#subTotal").append("$ "+subTotalVenta);
+                $("#iva").empty();
+                $("#iva").append("$ "+iva);
+                $("#contado").empty();
+                $("#contado").append("$ "+contado);
+                $("#credito").empty();
+                $("#credito").append("$ "+credito);
+                $("#total").empty();
+                $("#total").append("$ "+totalVenta);
+              }
+              function round(number){
+                number = Math.round(number*100)/100;
+                return number;
+              };
+              
+            function sendData() {
+              var data = {}
+              if(totalVenta > 0){
+                if(isCredito && isContado){
+                  data = {
+                    'totalVenta': subTotalVenta,
+                    'totalFila': totalFila,
+                    'cliente': cliente,
+                    'producto': producto,
+                    'cantidad': cantidad,
+                    'proporcion': proporcion
+                  }
+                }else{
+                  data = {
+                    'totalVenta': subTotalVenta,
+                    'totalFila': totalFila,
+                    'cliente': cliente,
+                    'producto': producto,
+                    'cantidad': cantidad,
+                    'isCredito': isCredito
+                  }
+                }
+                $.ajax({
+                  url: '{% url 'inventario:venta-crear' %}',
+                  type: 'POST',
+                  data: data,
+                  success: function(data){
+                    console.log(data);
+                    console.log("SUCCESS");
+                  },
+                  dataType: 'json'
+                }).done(function(data){
+                  alert(data.message)
+                  location.href = data.success_url;
+                }).fail(function(data) {
+                  console.log("error");
+                  console.log(data.message);
+                }).always(function() {
+                  console.log("complete");
+                });
+              }
+            }
+          </script>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+  {% endblock tables %}
+    
+{% endblock content %}
